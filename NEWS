@@ -1,0 +1,25 @@
+CHANGES IN VERSION 0.99.2
+-------------------------
+
+NEW FEATURES
+
+    o made aldex.clr into a class
+
+    o allowed input of SummarizedExperiment object instead of a reads data frame
+
+    o prioritized use of the BiocParallel package for multicore processing. If BiocParallel is not installed then the parallel package used, if neither packages are installed, then serial processing is used
+
+
+CHANGES IN VERSION 0.99.1
+-------------------------
+
+NEW FEATURES
+
+    o changed conditional tests for multiprocessor use, defaults to FALSE
+
+CHANGES IN VERSION 0.99.0
+-------------------------
+
+NEW FEATURES
+
+    o first submission to Bioc-devel
