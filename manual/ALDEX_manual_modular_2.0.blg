@@ -1,0 +1,52 @@
+This is BibTeX, Version 0.99d (TeX Live 2013)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: ALDEX_manual_modular_2.0.aux
+The style file: plos2009.bst
+Database file #1: bibdesk_refs.bib
+Warning--entry type for "aitchisonconcise" isn't style-file defined
+--line 599 of file bibdesk_refs.bib
+Warning--entry type for "oliveros:2007" isn't style-file defined
+--line 2495 of file bibdesk_refs.bib
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+You've used 9 entries,
+            2441 wiz_defined-function locations,
+            593 strings with 6435 characters,
+and the built_in function-call counts, 6597 in all, are:
+= -- 577
+> -- 132
+< -- 0
++ -- 66
+- -- 33
+* -- 537
+:= -- 794
+add.period$ -- 20
+call.type$ -- 9
+change.case$ -- 8
+chr.to.int$ -- 0
+cite$ -- 18
+duplicate$ -- 668
+empty$ -- 691
+format.name$ -- 39
+if$ -- 1450
+int.to.chr$ -- 0
+int.to.str$ -- 9
+missing$ -- 90
+newline$ -- 62
+num.names$ -- 9
+pop$ -- 129
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 76
+stack$ -- 0
+substring$ -- 842
+swap$ -- 165
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 51
+width$ -- 10
+write$ -- 111
+(There were 2 warnings)

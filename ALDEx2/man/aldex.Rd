@@ -8,7 +8,8 @@
     Return two sample test values (Welch's t, Wilcoxon) or multi-sample test values (glm or Kruskal Wallace). Returns effect size values by defaulte.
 }
 \usage{
-aldex(reads, conditions, mc.samples=128, test="t", effect=TRUE, include.sample.summary=FALSE, verbose=FALSE)
+aldex(reads, conditions, mc.samples=128, test="t", effect=TRUE,
+    include.sample.summary=FALSE, verbose=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
