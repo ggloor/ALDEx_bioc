@@ -8,8 +8,7 @@
     determines the effect size, which is the median of the ratio of the between group difference and the larger of the variance within groups
 }
 \usage{
-aldex.effect(clr, conditions, verbose = TRUE, include.sample.summary = FALSE, 
-    useMC=FALSE)
+aldex.effect(clr, conditions, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE)
 }
 \arguments{
     \item{clr}{

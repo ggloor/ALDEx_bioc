@@ -10,6 +10,6 @@
 \format{A dataframe of 1600 features and 14 samples. The first 7 samples are non-selected, the last 7 are selected.}
 \source{McMurrough et al (2014) PNAS doi:10.1073/pnas.1322352111}
 \references{
- McMurrough et al (2014) PNAS doi:10.1073/pnas.1322352111
+ McMurrough et al, submitted
 }
 \keyword{datasets}
