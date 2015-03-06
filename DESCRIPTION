@@ -2,14 +2,13 @@ Package: ALDEx2
 Type: Package
 Title: Analysis of differential abundance taking sample variation into
         account
-Version: 1.1.0
+Version: 0.99.3
 Suggests: parallel, BiocParallel
 Date: 2014-06-27
 Author: Greg Gloor, Ruth Grace Wong, Andrew Fernandes, Arianne Albert,
         Matt Links
 Maintainer: Greg Gloor <ggloor@uwo.ca>
-Depends: methods
-Imports: GenomicRanges
+Depends: methods, GenomicRanges
 biocViews: DifferentialExpression, RNASeq, DNASeq, ChIPSeq,
         GeneExpression, Bayesian, Sequencing, Software
 Description: A differential abundance analysis for the comparison of
@@ -25,3 +24,4 @@ Description: A differential abundance analysis for the comparison of
         Reports both P and fdr values calculated by the Benjamini
         Hochberg correction.
 License: file LICENSE
+

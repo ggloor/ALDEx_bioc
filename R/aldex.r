@@ -2,7 +2,7 @@ aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE, incl
     
     # wrapper function for the entire set of 
     print("aldex.clr: generating Monte-Carlo instances and clr values")
-    x <- aldex.clr(reads=reads, mc.samples=mc.samples, verbose=verbose,useMC=TRUE)
+    x <- aldex.clr(reads=reads, mc.samples=mc.samples, verbose=verbose,useMC=FALSE)
     if(test == "t") {
         print("aldex.ttest: doing t-test")
         x.tt <- aldex.ttest(x, conditions, paired.test=FALSE)
