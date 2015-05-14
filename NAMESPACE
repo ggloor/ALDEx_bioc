@@ -1,10 +1,11 @@
 #import( BiocParallel )
 #import( parallel )
 import(methods)
+import(S4Vectors)
+import(IRanges)
+import(GenomicRanges)
+import(SummarizedExperiment)
+
 export( aldex )
 exportPattern( "^aldex[.]*" )
-importClassesFrom(GenomicRanges,SummarizedExperiment)
-importMethodsFrom(GenomicRanges,assays)
-
-
 exportMethods(getMonteCarloInstances,getSampleIDs,getFeatures,numFeatures,numMCInstances,getFeatureNames,getReads,numConditions,getMonteCarloReplicate)

@@ -2,7 +2,7 @@
 \alias{aldex.clr}
 \alias{aldex.clr.function}
 \alias{aldex.clr,data.frame-method}
-\alias{aldex.clr,SummarizedExperiment-method}
+\alias{aldex.clr,RangedSummarizedExperiment-method}
 
 \title{
     Compute an \code{aldex.clr} Object 
@@ -17,7 +17,7 @@ aldex.clr(reads, mc.samples = 128, verbose = FALSE, useMC=FALSE)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{reads}{
-        a non-negative, integer-only containing \code{data.frame} or \code{SummarizedExperiment} that has unique names for all rows and columns, where each row is a different gene and each column represents a sequencing read-count. Rows with 0 reads in each sample are deleted prior to analysis}
+        a \code{data.frame} or \code{RangedSummarizedExperiment} object containing non-negative integers only and with unique names for all rows and columns, where each row is a different gene and each column represents a sequencing read-count. Rows with 0 reads in each sample are deleted prior to analysis}
   \item{mc.samples}{
         the number of Monte Carlo samples to use to estimate the underlying distributions; since we are estimating central tendencies, 128 is usually sufficient
 }
@@ -48,8 +48,8 @@ An explicit description of the input format for the \code{reads} object is shown
 \examples{
 
     # The 'reads' data.frame or
-    # SummarizedExperiment object should have
-    # row and column names that are unique,
+    # RangedSummarizedExperiment object should
+    # have row and column names that are unique,
     # and looks like the following:
     #
     #              T1a T1b  T2  T3  N1  N2  Nx

@@ -75,8 +75,8 @@
 \examples{
 
     # The 'reads' data.frame or
-    # SummarizedExperiment object should have
-    # row and column names that are unique,
+    # RangedSummarizedExperiment object should
+    # have row and column names that are unique,
     # and looks like the following:
     #
     #              T1a T1b  T2  T3  N1  N2  Nx

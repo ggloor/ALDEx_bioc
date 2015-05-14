@@ -28,11 +28,11 @@ aldex.clr.function <- function( reads, mc.samples=128, verbose=FALSE, useMC=FALS
 # number of Monte-Carlo Dirichlet instances: length(x[[1]][1,])
 # feature names: rownames(x[[1]])
 
-# coerce SummarizedExperiment reads into data.frame
+# coerce RangedSummarizedExperiment reads into data.frame
 if (summarizedExperiment) {
     reads <- data.frame(as.list(assays(reads,withDimnames=TRUE)))
     if (verbose) {
-        print("converted SummarizedExperiment read count object into data frame")
+        print("converted RangedSummarizedExperiment read count object into data frame")
     }
 }
 
@@ -189,6 +189,6 @@ setMethod("getMonteCarloReplicate", signature(.object="aldex.clr",i="numeric"), 
 
 setMethod("aldex.clr", signature(reads="data.frame"), function(reads, mc.samples=128, verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, mc.samples, verbose, useMC, summarizedExperiment=FALSE))
 
-setMethod("aldex.clr", signature(reads="SummarizedExperiment"), function(reads, mc.samples=128, verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, mc.samples, verbose, useMC, summarizedExperiment=TRUE))
+setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, mc.samples=128, verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, mc.samples, verbose, useMC, summarizedExperiment=TRUE))
 
 
