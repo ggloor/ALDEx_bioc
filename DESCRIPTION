@@ -2,7 +2,7 @@ Package: ALDEx2
 Type: Package
 Title: Analysis of differential abundance taking sample variation into
         account
-Version: 1.3.0
+Version: 1.4.0
 Suggests: parallel, BiocParallel
 Date: 2014-06-27
 Author: Greg Gloor, Ruth Grace Wong, Andrew Fernandes, Arianne Albert,
