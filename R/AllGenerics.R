@@ -20,4 +20,4 @@ setGeneric("numConditions", function(.object) standardGeneric("numConditions"))
 
 setGeneric("getMonteCarloReplicate", function(.object, i=-1) standardGeneric("getMonteCarloReplicate"))
 
-setGeneric("aldex.clr", function(reads, mc.samples=128, verbose=FALSE, useMC=FALSE) standardGeneric("aldex.clr"), signature=c("reads"))
+setGeneric("aldex.clr", function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) standardGeneric("aldex.clr"), signature=c("reads"))

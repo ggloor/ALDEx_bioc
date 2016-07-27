@@ -8,7 +8,8 @@
     determines the effect size, which is the median of the ratio of the between group difference and the larger of the variance within groups
 }
 \usage{
-aldex.effect(clr, conditions, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE)
+aldex.effect(clr, conditions, verbose = TRUE, include.sample.summary = FALSE,
+    useMC=FALSE)
 }
 \arguments{
     \item{clr}{
@@ -44,7 +45,7 @@ aldex.effect(clr, conditions, verbose = TRUE, include.sample.summary = FALSE, us
     \item{diff.btw}{
         a vector containing the per-feature median difference between condition A and B
     }
-    \item{diff.btw}{
+    \item{diff.win}{
         a vector containing the per-feature maximum median difference between Dirichlet instances within conditions
     }
     \item{effect}{
@@ -71,7 +72,9 @@ aldex.effect(clr, conditions, verbose = TRUE, include.sample.summary = FALSE, us
     # conditions is a description of the data
     # for the selex dataset, conditions <- c(rep("N", 7), rep("S", 7))
     data(selex)
-    x <- aldex.clr(selex, mc.samples=2)
-    conditions <- c(rep("N", 7), rep("S", 7))
-    effect.test <- aldex.effect(x, conditions)
+    #subset for efficiency
+    selex <- selex[1201:1600,]
+    conds <- c(rep("NS", 7), rep("S", 7))
+    x <- aldex.clr(selex, conds, mc.samples=2, denom="all")
+    effect.test <- aldex.effect(x, conds)
 }

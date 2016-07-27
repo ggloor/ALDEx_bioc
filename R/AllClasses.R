@@ -1,5 +1,5 @@
 ### =========================================================================
-### All classes 
+### All classes
 ### =========================================================================
 
 
@@ -8,9 +8,11 @@
 ###
 
 setClass("aldex.clr",
-    slots=c( 
+    slots=c(
         reads="data.frame",
+        conds="data.frame",
         mc.samples="numeric",
+        denom="character",
         verbose="logical",
         useMC="logical",
         analysisData="list"
@@ -22,13 +24,15 @@ validReads <- function(object) {
         TRUE
     }
     else {
-        paste("Unable to create aldex.clr object. Duplicated row names:",rownames(object)[duplicated(row.names(object))])
+        paste("Unable to create aldex.clr object.
+            Duplicated row names:",rownames(object)[duplicated(row.names(object))])
     }
     if (length(duplicated(colnames(object)))==0) {
         TRUE
     }
     else {
-        paste("Unable to create aldex.clr object. Duplicated column names:",colnames(object)[duplicated(row.names(object))])
+        paste("Unable to create aldex.clr object.
+            Duplicated column names:",colnames(object)[duplicated(row.names(object))])
     }
 }
 

@@ -15,3 +15,11 @@ bibentry(
     year    = "2014",
     url     = "*** http://doi:10.1186/2049-2618-2-15"
 )
+bibentry(
+    bibtype = "Article",
+    title   = "*** Displaying Variation in Large Datasets: a Visual Summary of Effect Sizes",
+    author  = as.person("Gregory B. Gloor and Jean M. Macklaim and Andrew D. Fernandes"),
+    journal = "*** Journal of Computational and Graphical Statistics, ",
+    year    = "2016",
+    url     = "*** http://dx.doi.org/10.1080/10618600.2015.1131161"
+)

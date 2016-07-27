@@ -1,11 +1,19 @@
-#import( BiocParallel )
+import( BiocParallel )
 #import( parallel )
 import(methods)
 import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
 import(SummarizedExperiment)
+importFrom("grDevices", "rgb")
+importFrom("graphics", "abline", "hist", "par", "plot", "points")
+importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
+    "p.adjust", "rgamma", "t.test", "wilcox.test")
+importFrom("utils", "installed.packages")
+#importFrom("BiocParallel", "bplapply")
 
 export( aldex )
 exportPattern( "^aldex[.]*" )
-exportMethods(getMonteCarloInstances,getSampleIDs,getFeatures,numFeatures,numMCInstances,getFeatureNames,getReads,numConditions,getMonteCarloReplicate)
+exportMethods(getMonteCarloInstances,getSampleIDs,getFeatures,
+    numFeatures,numMCInstances,getFeatureNames,getReads,numConditions,
+    getMonteCarloReplicate)

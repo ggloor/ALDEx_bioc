@@ -59,8 +59,10 @@ aldex.ttest(clr, conditions, paired.test = FALSE, hist.plot=FALSE)
     # conditions is a description of the data
     # for the selex dataset, conditions <- c(rep("N", 7), rep("S", 7))
     data(selex)
-    x <- aldex.clr(selex, mc.samples=2)
-    conditions <- c(rep("N", 7), rep("S", 7))
-    ttest.test <- aldex.ttest(x, conditions)
+    #subset for efficiency
+    selex <- selex[1201:1600,]
+    conds <- c(rep("NS", 7), rep("S", 7))
+    x <- aldex.clr(selex, conds, mc.samples=2, denom="all")
+    ttest.test <- aldex.ttest(x, conds)
 
 }

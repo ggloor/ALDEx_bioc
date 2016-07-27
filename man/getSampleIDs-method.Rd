@@ -32,6 +32,9 @@ getSampleIDs(.object)
 
 \examples{
 data(selex)
-x <- aldex.clr(selex, mc.samples = 2, verbose = FALSE)
+    #subset for efficiency
+    selex <- selex[1201:1600,]
+conds <- c(rep("NS", 7), rep("S", 7))
+x <- aldex.clr(selex, conds, mc.samples = 2, denom = "all", verbose = FALSE)
 sampleIDs <- getSampleIDs(x)
 }

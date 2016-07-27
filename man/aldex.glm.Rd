@@ -27,13 +27,13 @@ aldex.glm(clr, conditions, useMC=FALSE)
 \value{
     Outputs a dataframe with the following information:
     \item{kw.ep}{
-        a vector containing the expected P value of the Kruskal Wallis test for each feature    
+        a vector containing the expected P value of the Kruskal Wallis test for each feature
     }
     \item{kw.eBH}{
-        a vector containing the expected value of the Benjamini Hochberg corrected P value for each feature    
+        a vector containing the expected value of the Benjamini Hochberg corrected P value for each feature
     }
     \item{glm.ep}{
-        a vector containing the expected P value of the glm test for each feature    
+        a vector containing the expected P value of the glm test for each feature
     }
     \item{glm.eBH}{
         a vector containing the expected value of the Benjamini Hochberg corrected P value for each feature
@@ -58,7 +58,9 @@ aldex.glm(clr, conditions, useMC=FALSE)
     # conditions is a description of the data
     # for the selex dataset, conditions <- c(rep("N", 7), rep("S", 7))
     data(selex)
-    x <- aldex.clr(selex, mc.samples=1)
-    conditions <- c(rep("N", 7), rep("S", 7))
-    glm.test <- aldex.glm(x, conditions)
+    #subset for efficiency
+    selex <- selex[1201:1600,]
+    conds <- c(rep("NS", 7), rep("S", 7))
+    x <- aldex.clr(selex, conds, mc.samples=1, denom="all")
+    glm.test <- aldex.glm(x, conds)
 }

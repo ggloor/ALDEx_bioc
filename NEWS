@@ -1,3 +1,15 @@
+CHANGES IN VERSION 1.5.2
+-------------------------
+    o added ability to choose the basis for the clr: all, iqlr, zero or user-defined.
+    useful when dealing with asymmetric datasets (selex, metagenomics, meta-RNA-seq)
+
+    o updated vignette to show how the basis affects the analysis
+
+    o made BiocParallel the only parallel package for multicore processing
+
+    o made zero-replacement a prior probability rather than a pseudocount
+
+
 CHANGES IN VERSION 0.99.2
 -------------------------
 
@@ -7,7 +19,9 @@ NEW FEATURES
 
     o allowed input of SummarizedExperiment object instead of a reads data frame
 
-    o prioritized use of the BiocParallel package for multicore processing. If BiocParallel is not installed then the parallel package used, if neither packages are installed, then serial processing is used
+    o prioritized use of the BiocParallel package for multicore processing. If
+    BiocParallel is not installed then the parallel package used, if neither
+    packages are installed, then serial processing is used
 
 
 CHANGES IN VERSION 0.99.1

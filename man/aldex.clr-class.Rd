@@ -10,15 +10,17 @@
 }
 
 \section{Methods}{
-  In the code below, \code{x} is an \code{aldex.clr} object, and \code{i} is a numeric whole number.
+  In the code below, \code{x} is an \code{aldex.clr} object, and \code{i}
+  is a numeric whole number.
   \describe{
     \item{}{
       \code{getMonteCarloInstances(x)}:
-      Returns \code{x}'s Monte Carlo Dirochlet instances.
+      Returns \code{x}'s Monte Carlo Dirichlet instances.
     }
     \item{}{
       \code{getSampleIDs(x)}:
-      Returns the names of the samples. These can be used to access the original reads, as in \code{reads\$sampleID} (if the reads are a data frame).
+      Returns the names of the samples. These can be used to access the
+      original reads, as in \code{reads\$sampleID} (if the reads are a data frame).
     }
     \item{}{
       \code{getFeatures(x)}:
@@ -57,7 +59,14 @@
 }
 
 \details{
-  An aldex.clr object contains the Monte Carlo Dirochlet instances derived from estimating the technical variance of the raw read count data. It is created by the \code{aldex.clr.function}, which is invoked by the aldex.clr method. It consists of four attributes: the sample names, the feature names, the conditions vector (assigns each sample to a condition), and the Monte Carlo Dirochlet instances themselves. These can be accessed, along with information about the length of some attributes. A single Monte Carlo instance can also be retrieved.
+  An aldex.clr object contains the Monte Carlo Dirochlet instances derived
+  from estimating the technical variance of the raw read count data. It is
+  created by the \code{aldex.clr.function}, which is invoked by the aldex.clr method.
+  It consists of four attributes: the sample names, the feature names,
+  the conditions vector (assigns each sample to a condition),
+  and the Monte Carlo Dirochlet instances themselves. These can be accessed,
+  along with information about the length of some attributes. A single Monte Carlo
+  instance can also be retrieved.
 }
 \value{
     The aldex.clr object contains the clr transformed values for each Monte-Carlo Dirichlet instance, which can be accessed through \code{getMonteCarloInstances(x)}, where \code{x} is the \code{clr} function output. Each list element is named by the sample ID. \code{getFeatures(x)} returns the features, \code{getSampleIDs(x)} returns sample IDs, and \code{getFeatureNames(x)} returns the feature names.
@@ -66,7 +75,8 @@
 \references{
   Please use the citation given by \code{citation(package="ALDEx")}.}
   \author{
-      Greg Gloor, Ruth Grace Wong, Andrew Fernandes and Matt Links contributed to this code
+      Greg Gloor, Ruth Grace Wong, Andrew Fernandes, Jia Rong Wu and Matt Links
+      contributed to this code
   }
   \seealso{
     \code{\link{aldex.clr.function}}
@@ -75,8 +85,8 @@
 \examples{
 
     # The 'reads' data.frame or
-    # RangedSummarizedExperiment object should
-    # have row and column names that are unique,
+    # SummarizedExperiment object should have
+    # row and column names that are unique,
     # and looks like the following:
     #
     #              T1a T1b  T2  T3  N1  N2  Nx
@@ -87,11 +97,14 @@
     #   Gene_00005  10  16   4   0   4  10  10
     #   Gene_00006 129 126 451 223 243 149 209
     #       ... many more rows ...
-    
+
     data(selex)
+    #subset for efficiency
+    selex <- selex[1201:1600,]
+    conds <- c(rep("NS", 7), rep("S", 7))
 
     # x is an object of type aldex.clr
-    x <- aldex.clr(selex, mc.samples = 2, verbose = FALSE)
+    x <- aldex.clr(selex, conds, mc.samples = 2, denom="all", verbose = FALSE)
 
     # get all of the Monte Carlo Dirochlet instances
     monteCarloInstances <- getMonteCarloInstances(x)
@@ -113,7 +126,7 @@
 
     # get number of conditions
     conditions <- numConditions(x)
-    
+
     # get number of conditions
     reads <- getReads(x)
 
