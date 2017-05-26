@@ -40,13 +40,13 @@ aldex.set.mode <- function(reads, conds, denom="all")
     if (is.character(denom))
     {
         if (denom == "zero") {
-            print("Computing zero removal.")
+            print("computing zero removal")
             features <- zero.features(reads,conds)
         } else if (denom == "iqlr") {
-            print("Computing iqlr centering.")
+            print("computing iqlr centering")
             features <- iqlr.features(reads,conds)
         } else if (denom == "all" | denom == "") {
-            print("Computing center with all features.")
+            print("computing center with all features")
             features <- all.features(reads,conds)
         } else {
             print(paste("denom: '", denom, "' unrecognized. Using all features.", sep=""))

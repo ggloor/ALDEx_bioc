@@ -2,6 +2,7 @@
 \alias{aldex.clr}
 \alias{aldex.clr.function}
 \alias{aldex.clr,data.frame-method}
+\alias{aldex.clr,matrix-method}
 \alias{aldex.clr,RangedSummarizedExperiment-method}
 
 \title{

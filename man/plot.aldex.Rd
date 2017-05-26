@@ -20,7 +20,7 @@
         an object of class \code{aldex} produced by the \code{aldex} function
     }
     \item{...}{
-        optional, unused arguments included for compatibility withe the S3 method signature
+        optional, unused arguments included for compatibility with the S3 method signature
     }
     \item{type}{
         which type of plot is to be produced. MA is a Bland-Altman style plot; MW is a difference between to a variance within plot as described in the paper
