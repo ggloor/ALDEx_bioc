@@ -1,3 +1,14 @@
+CHANGES IN VERSION 1.9.2
+
+NEW FEATURES (JRW, GBG)
+
+    o added ability to auto-choose low variance high relative abundance features as
+    the basis
+    o added new class and generic definitions to get the features used as basis
+    o the getDenom function can be exported
+    o updated documentation for above
+    o version bump
+
 CHANGES IN VERSION 1.8.1
 -------------------------
 

@@ -84,6 +84,7 @@ if (summarizedExperiment) {
     # This extracts the set of features to be used in the geometric mean computation
     feature.subset <- aldex.set.mode(reads, conds, denom)
 
+    if ( length(feature.subset[[1]]) == 0 ) stop("No low variance, high abundance features in common between conditions\nPlease choose another denomiator.")
 
     reads <- reads + prior
 
@@ -146,7 +147,7 @@ if (verbose == TRUE) print("dirichlet samples complete")
             })
         }
     } else {
-        ## IQLR or ZERO
+        ## IQLR, custom, house or ZERO
         feat.result <- vector("list", length(unique(conds))) # Feature Gmeans
         condition.list <- vector("list", length(unique(conds)))    # list to store conditions
 
@@ -175,7 +176,10 @@ if (verbose == TRUE) print("dirichlet samples complete")
     }
 if (verbose == TRUE) print("clr transformation complete")
 
-    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,verbose=verbose,useMC=useMC,analysisData=l2p))
+if ( denom == "lvha" ) denom = feature.subset[[1]]
+
+
+    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=denom,verbose=verbose,useMC=useMC,analysisData=l2p))
 }
 
 
@@ -200,6 +204,8 @@ setMethod("getReads", signature(.object="aldex.clr"), function(.object) .object@
 setMethod("numConditions", signature(.object="aldex.clr"), function(.object) length(names(.object@analysisData)))
 
 setMethod("getMonteCarloReplicate", signature(.object="aldex.clr",i="numeric"), function(.object,i) .object@analysisData[[i]])
+
+setMethod("getDenom", signature(.object="aldex.clr"), function(.object) .object@denom)
 
 setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE))
 

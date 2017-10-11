@@ -33,14 +33,16 @@
         sufficient.
     }
       \item{denom}{
-          A \code{character} variable default "all" indicating which features to
-          use as the denominator for the Geometric Mean calculation. Using "all"
-          uses the geometric mean abundance of all features. Using "iqlr" accounts
-          for data with systematic variation and uses the features that are
-          between the first and third quartile of the variance of the clr values
-          across all sample. Using "zero" uses the non-zero features in each grop
+          A \code{character} variable (all, iqlr, zero, lvha) indicating which
+          features to use as the denominator for the Geometric Mean calculation
+          The default "all" uses the geometric mean abundance of all features.
+          Using "iqlr" uses the features that are between the first and third
+          quartile of the variance of the clr values across all samples.
+          Using "zero" uses the non-zero features in each grop
           as the denominator. This approach is an extreme case where there are
-          many nonzero features in one condition but many zeros in another. It is also
+          many nonzero features in one condition but many zeros in another. Using
+          "lvha" uses features that have low variance (bottom quartile) and high
+          relative abundance (top quartile in every sample). It is also
           possible to supply a vector of row indices to use as the denominator.
           Here, the experimentalist is determining a-priori which rows are thought
           to be invariant. In the case of RNA-seq, this could include ribosomal

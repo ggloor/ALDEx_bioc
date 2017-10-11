@@ -1,5 +1,5 @@
 # iqlr_features.r
-# Author: Jia Rong Wu
+# Author: Jia Rong Wu, Greg Gloor
 #
 # USAGE: source("iqlr_features.R")
 #
@@ -24,7 +24,7 @@
 # i.e.
 # conds <- c(rep("A", 10), rep("B", 10))
 #
-# The 'input' input can be "zero", "iqlr", "all", "" or numeric for advanced
+# The 'input' input can be "zero", "iqlr", "all", "lvha", "" or numeric for advanced
 # users.
 #
 # 'input' defaults to "all" if either no parameters or incorrect parameters
@@ -48,6 +48,9 @@ aldex.set.mode <- function(reads, conds, denom="all")
         } else if (denom == "all" | denom == "") {
             print("computing center with all features")
             features <- all.features(reads,conds)
+        } else if (denom == "lvha" ) {
+            print("computing center with housekeeping features")
+            features <- house.features(reads,conds)
         } else {
             print(paste("denom: '", denom, "' unrecognized. Using all features.", sep=""))
             features <- all.features(reads,conds)
@@ -106,6 +109,57 @@ iqlr.features <- function(reads, conds)
 
     return(neg.indicies)
 }
+
+##### Returns a list of vectors with the low variance, high
+##### abundance features. Indistinguishable from user supplied
+
+house.features <- function(reads, conds)
+{
+  neg.indicies <- vector("list", length(unique(conds)))
+
+  invariant.set.list <- vector("list",
+  length(unique(conds)))
+
+  # clr transform
+  reads.clr <- t(apply(reads + 0.5, 2,
+  function(x){log2(x) - mean(log2(x))}))
+
+  # per-condition offsets found
+  for(i in 1:length(unique(conds))){
+	these.rows <- which(conds ==
+	  unique(conds)[i])
+
+  # find the least variable
+	reads.var <- apply(reads.clr[these.rows,],
+    2, function(x){var(x)})
+	var.set <- which(reads.var
+	  < quantile(unlist(reads.var))[2])
+
+	# find the most relative abundant
+	# top quartile in each sample
+	quantile.sample <- apply(reads.clr, 1, quantile)
+
+	abund.set <- apply(reads.clr, 2, function(x)
+      sum(x > quantile.sample[4,]) == length(quantile.sample[4,]))
+
+	invariant.set.list[[i]] <-
+	  intersect(var.set, which(abund.set == TRUE))
+  }
+
+  # get the intersect of all conditions
+  # successive operations on the list elements
+
+  invariant.set <-
+	Reduce(intersect, invariant.set.list)
+
+    for (i in 1:length(unique(conds)))
+    {
+        neg.indicies[[i]] <- invariant.set
+    }
+  if(!length(neg.indicies[[1]])) stop("No features are low variance and high relative abundance")
+  return(neg.indicies)
+}
+
 
 ##### Returns a list of "n" vectors where n is the number of conditions
 ##### Each vector represents the indicies of NONZERO features for that condition

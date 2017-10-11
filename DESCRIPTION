@@ -1,8 +1,8 @@
 Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
-Version: 1.9.1
-Date: 2017-05-26
+Version: 1.9.2
+Date: 2017-10-11
 Author: Greg Gloor, Ruth Grace Wong, Andrew Fernandes, Arianne Albert, Matt Links,
     Thomas Quinn, Jia Rong Wu
 Maintainer: Greg Gloor <ggloor@uwo.ca>

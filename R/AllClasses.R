@@ -10,9 +10,9 @@
 setClass("aldex.clr",
     slots=c(
         reads="data.frame",
-        conds="data.frame",
+        conds="character",
         mc.samples="numeric",
-        denom="character",
+        denom="vector",
         verbose="logical",
         useMC="logical",
         analysisData="list"
