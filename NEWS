@@ -9,6 +9,11 @@ NEW FEATURES (JRW, GBG)
     o updated documentation for above
     o version bump
 
+CHANGES IN VERSION 1.10.1
+-------------------------
+    o fixed a bug whereby the order of samples affected the centring of the data
+
+
 CHANGES IN VERSION 1.8.1
 -------------------------
 

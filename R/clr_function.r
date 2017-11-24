@@ -28,15 +28,25 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 # number of Monte-Carlo Dirichlet instances: length(x[[1]][1,])
 # feature names: rownames(x[[1]])
 
-# coerce SummarizedExperiment reads into data.frame
-if (summarizedExperiment) {
-    reads <- data.frame(as.list(assays(reads,withDimnames=TRUE)))
-    if (verbose) {
-        print("converted SummarizedExperiment read count object into data frame")
-    }
-}
-
     # Fully validate and coerce the data into required formats
+	# coerce SummarizedExperiment reads into data.frame
+	if (summarizedExperiment) {
+		reads <- data.frame(as.list(assays(reads,withDimnames=TRUE)))
+		if (verbose) {
+			print("converted SummarizedExperiment read count object into data frame")
+		}
+	}
+
+    # coerce matrices into data frames
+    # check to ensure there are the same number of samples as in the conditions vector
+    # reorder the samples and conditions by level
+    # function inside rdirichelt.r
+
+    coerced.data <- coerce.data(reads, conds)
+
+    conds <- coerced.data[[1]]
+    reads <- coerced.data[[2]]
+
     # make sure that the multicore package is in scope and return if available
     has.BiocParallel <- FALSE
     if ("BiocParallel" %in% rownames(installed.packages()) & useMC){
@@ -82,6 +92,7 @@ if (summarizedExperiment) {
     prior <- 0.5
 
     # This extracts the set of features to be used in the geometric mean computation
+    # returns a list of features
     feature.subset <- aldex.set.mode(reads, conds, denom)
 
     if ( length(feature.subset[[1]]) == 0 ) stop("No low variance, high abundance features in common between conditions\nPlease choose another denomiator.")
@@ -132,22 +143,8 @@ if (verbose == TRUE) print("dirichlet samples complete")
     # apply the function over elements in a list, that contains an array
 
     # DEFAULT
-    if(length(feature.subset) == nr)
-    {
-        # Default ALDEx2
-        if (has.BiocParallel){
-            l2p <- bplapply( p, function(m) {
-                apply( log2(m), 2, function(col) { col - mean(col) } )
-            })
-            names(l2p) <- names(p)
-        }
-        else{
-            l2p <- lapply( p, function(m) {
-                apply( log2(m), 2, function(col) { col - mean(col) } )
-            })
-        }
-    } else {
-        ## IQLR, custom, house or ZERO
+    if (is.list(feature.subset)) {
+        # ZERO only
         feat.result <- vector("list", length(unique(conds))) # Feature Gmeans
         condition.list <- vector("list", length(unique(conds)))    # list to store conditions
 
@@ -167,8 +164,22 @@ if (verbose == TRUE) print("dirichlet samples complete")
             p[[i]] <- t(p[[i]])
         }
         l2p <- p    # Save the set in order to generate the aldex.clr variable
+    } else if (is.vector(feature.subset)){
+        # Default ALDEx2, iqlr, user defined, lvha
+        if (has.BiocParallel){
+            l2p <- bplapply( p, function(m) {
+                apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
+            })
+            names(l2p) <- names(p)
+        }
+        else{
+            l2p <- lapply( p, function(m) {
+                apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
+            })
+        }
+    }  else {
+        print("the denominator is not recognized, use a different denominator")
     }
-
 
     # sanity check on data
     for ( i in 1:length(l2p) ) {
@@ -176,10 +187,7 @@ if (verbose == TRUE) print("dirichlet samples complete")
     }
 if (verbose == TRUE) print("clr transformation complete")
 
-if ( denom == "lvha" ) denom = feature.subset[[1]]
-
-
-    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=denom,verbose=verbose,useMC=useMC,analysisData=l2p))
+    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,analysisData=l2p))
 }
 
 

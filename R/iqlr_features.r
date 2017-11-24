@@ -66,7 +66,7 @@ aldex.set.mode <- function(reads, conds, denom="all")
         else
         {
             # Return user specified indicies for centering
-            features <- custom.features(denom, conds)
+            features <- denom
             return(features)
         }
     }
@@ -79,13 +79,6 @@ iqlr.features <- function(reads, conds)
 {
     neg.indicies <- vector("list", length(unique(conds)))
 
-    #####  remove all rows with reads less than the minimum set by minsum
-    minsum <- 0
-
-    ##### remove any row in which the sum of the row is 0
-    z <- as.numeric(apply(reads, 1, sum))
-    reads <- as.data.frame( reads[(which(z > minsum)),]  )
-
     ##### Adjust all reads with prior of 0.5
     reads <- reads + 0.5
 
@@ -94,20 +87,33 @@ iqlr.features <- function(reads, conds)
 
     ##### Generate the CLR of the DATA and get variance of the CLR
     reads.clr <- t(apply(reads, 2, function(x){log2(x) - mean(log2(x))}))
-    reads.var <- apply(reads.clr, 2, function(x){var(x)})
-    reads.qtl <- quantile(unlist(reads.var))
+ # per condition typical variance
+	for(i in 1:length(unique(conds))){
+	  these.rows <- which(conds == unique(conds)[i])
 
-    ##### Get the indicies of the "invariant set" features
-    invariant.set <- which(
-        (reads.var < (reads.qtl[4])) & (reads.var > (reads.qtl[2]))
-    )
+	  reads.var <- apply(reads.clr[these.rows,], 2, function(x){var(x)})
+	  reads.qtl <- quantile(unlist(reads.var))
 
-    for (i in 1:length(unique(conds)))
-    {
-        neg.indicies[[i]] <- invariant.set
+	  ##### Get the indicies of the "invariant set" features
+	  this.set <- which(
+		  (reads.var < (reads.qtl[4])) & (reads.var > (reads.qtl[2]))
+	  )
+	  neg.indicies[[i]] <- this.set
+
     }
+ # total dataset typical variance
+    reads.var <- apply(reads.clr, 2, function(x){var(x)})
+	reads.qtl <- quantile(unlist(reads.var))
+	  this.set <- which(
+		  (reads.var < (reads.qtl[4])) & (reads.var > (reads.qtl[2]))
+	  )
+	neg.indicies[[length(unique(conds)) + 1]] <- this.set
 
-    return(neg.indicies)
+
+    invariant.set <- Reduce(intersect, neg.indicies)
+
+    if(!length(invariant.set)) stop("No intersecting features have typical variance")
+    return(as.vector(invariant.set))
 }
 
 ##### Returns a list of vectors with the low variance, high
@@ -130,8 +136,7 @@ house.features <- function(reads, conds)
 	  unique(conds)[i])
 
   # find the least variable
-	reads.var <- apply(reads.clr[these.rows,],
-    2, function(x){var(x)})
+	reads.var <- apply(reads.clr[these.rows,],2, function(x){var(x)})
 	var.set <- which(reads.var
 	  < quantile(unlist(reads.var))[2])
 
@@ -152,12 +157,8 @@ house.features <- function(reads, conds)
   invariant.set <-
 	Reduce(intersect, invariant.set.list)
 
-    for (i in 1:length(unique(conds)))
-    {
-        neg.indicies[[i]] <- invariant.set
-    }
-  if(!length(neg.indicies[[1]])) stop("No features are low variance and high relative abundance")
-  return(neg.indicies)
+  if(!length(invariant.set)) stop("No intersecting features are low variance and high relative abundance")
+  return(invariant.set)
 }
 
 
@@ -193,22 +194,6 @@ zero.features <- function(reads, conds)
     }
 
     return(neg.indicies)
-}
-
-##### Allows the user to submit a custom set of indicies for centering
-##### Returns a list of "n" vectors where "n" is the number of conditions
-custom.features <- function(denom, conds)
-{
-
-    custom.indicies <- vector("list", length(unique(conds)))
-
-    # Set up the format that downstream clr_function.r is expecting
-    for (i in 1: length(unique(conds)))
-    {
-        custom.indicies[[i]] <- denom
-    }
-
-    return(custom.indicies)
 }
 
 

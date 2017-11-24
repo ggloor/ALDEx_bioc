@@ -6,6 +6,9 @@
 
 aldex.effect <- function(clr, conditions, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE){
 
+    # reorder conditions
+    conditions <- clr@conds
+
     is.multicore = FALSE
 
     if ("BiocParallel" %in% rownames(installed.packages()) & useMC){

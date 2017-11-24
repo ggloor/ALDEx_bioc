@@ -33,10 +33,20 @@ rdirichlet <- function (n, alpha)
   if(length(n) == 0 || as.integer(n) == 0) return(numeric(0))
   n <- as.integer(n)
   if(n < 0) stop("integer(n) can not be negative in rtriang")
-  
+
   if(is.vector(alpha)) alpha <- t(alpha)
   l <- dim(alpha)[2]
   x <- matrix(rgamma(l * n, t(alpha)), ncol = l, byrow=TRUE)  # Gere le recycling
   return(x / rowSums(x))
 }
 
+# coerce data into dataframe
+# reorder samples by condition
+
+coerce.data <- function(reads, conds){
+  # ncol df and length(c) must be equal
+  if(ncol(reads) != length(conds)) stop("mismatch between number of samples and condition vector")
+
+  # make an output list
+  return( list(c.out <- conds[order(conds)], df.out <- data.frame(reads[,order(conds)])) )
+}
