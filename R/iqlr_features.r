@@ -150,7 +150,20 @@ house.features <- function(reads, conds)
 	invariant.set.list[[i]] <-
 	  intersect(var.set, which(abund.set == TRUE))
   }
+  # find the least variable
+	reads.var <- apply(reads.clr[],2, function(x){var(x)})
+	var.set <- which(reads.var
+	  < quantile(unlist(reads.var))[2])
 
+	# find the most relative abundant
+	# top quartile in each sample
+	quantile.sample <- apply(reads.clr, 1, quantile)
+
+	abund.set <- apply(reads.clr, 2, function(x)
+      sum(x > quantile.sample[4,]) == length(quantile.sample[4,]))
+
+	invariant.set.list[[length(unique(conds))+1]] <-
+	  intersect(var.set, which(abund.set == TRUE))
   # get the intersect of all conditions
   # successive operations on the list elements
 

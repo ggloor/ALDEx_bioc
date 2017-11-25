@@ -211,64 +211,79 @@ ALDEx2 now incorporates four approaches to deal with asymmetric datasets:
 
 \begin{enumerate}
 \item{\emph{all}: The default  is to calculate the geometric mean of all features. This is the approach used in previous versions of ALDEx2, and is the usual method for the compositional data analysis approach.}
-\item{\emph{iqlr}: The first new approach is to identify those features that exhibit reproducible variance in the entire dataset. This is called the inter-quartile log-ratio or \emph{iqlr} approach. For this, a uniform prior of 0.5 is applied to the dataset, the clr transformation is applied, and the variance of each feature is calculated. Those features that have variance values that fall between the first and third quartiles of variance for all features are retained. When aldex.clr is called, the geometric mean abundance of only the retained features is calculated and used as  the denominator for log-ratio calculations. Modelling shows that this approach is effective in dealing with datasets with minor amounts of asymmetry, and begins to fail when more than 25\% of the features are asymmetric. The approach has the advantage it has little or no effect on symmetric datasets and so is a safe approach if the user is unsure if the data is mildly asymmetric.  }
+\item{\emph{iqlr}: The `iqlr` method identifies those features that exhibit reproducible variance in the entire dataset. This is called the inter-quartile log-ratio or \emph{iqlr} approach. For this, a uniform prior of 0.5 is applied to the dataset, the clr transformation is applied, and the variance of each feature is calculated. Those features that have variance values that fall between the first and third quartiles of variance for all features in all groups and in the entire dataset are retained. When aldex.clr is called, the geometric mean abundance of only the retained features is calculated and used as  the denominator for log-ratio calculations. Modelling shows that this approach is effective in dealing with datasets with minor amounts of asymmetry. The approach has the advantage it has little or no effect on symmetric datasets and so is a safe approach if the user is unsure if the data is mildly asymmetric.  }
 \item{\emph{zero}: This approach identifies those features that are non-zero in each group. In this approach the per-group non-zero features are used aldex.clr calculates the geometric mean in the clr transformation. This method is appropriate when the groups are very asymmetric, but the experimentalist must ask whether the comparison is valid in these extreme cases.}
-\item{\emph{lvha}: This method identifies those features that in the bottom quartile for variance in each group and the top quartile for relative abundance for each sample. This method is appropriate when the groups are very asymmetric, but there are some features that are expected to be relatively constant. Experience suggests that meta-genomic and meta-transcriptomic datasets benefit from this method of choosing the denominator. This method does not work with the selex dataset, since no features fit the criteria.}
+\item{\emph{lvha}: This method identifies those features that in the bottom quartile for variance in each group and the top quartile for relative abundance for each sample and across the entire dataset. This method is appropriate when the groups are very asymmetric, but there are some features that are expected to be relatively constant. The basic idea here is to identify those features that are relatively constant across all samples, similar to the features that would be chosen as internal standards in qPCR. Experience suggests that meta-genomic and meta-transcriptomic datasets benefit from this method of choosing the denominator. This method does not work with the selex dataset, since no features fit the criteria.}
 \item{\emph{user}: The last new approach is to let the user define the set of `invariant' features. In the case of meta-rna-seq, it could be argued that the levels of housekeeping genes should be standard for all samples. In this case the user could define the row indices that correspond to the particular set of housekeeping genes to use as the standard. \emph{It is important that no row contain all 0 values for any feature when this method is used.} }
 \end{enumerate}
 
-Figure \ref{selex4} shows the effect of the iqlr correction on the example dataset. When the denominator is all, we see that the bulk of the points fall above the midpoint (dotted line), but that the bulk of the points are centered around 0 for the iqlr dataset. The mean difference between groups when the denominator is all is 0.6, and 0.05 when the denominator is iqlr; thus, we have a demonstrably better centring of the data in the latter.  Practically speaking, we alter the p values and effect sizes of features near the margin of significance following iqlr transformation. The effect is largest for those features that are close to the bulk datapoints.. 
+Figure \ref{selex4} shows the effect of the iqlr correction on the example dataset. When the denominator is all, we see that the bulk of the points fall off the midpoint (dotted line), but that the bulk of the points are centered around 0 for the iqlr and lvha analysis. Thus, we have a demonstrably better centring of the data in the latter two methods.  Practically speaking, we alter the p values and effect sizes of features near the margin of significance following iqlr or lvha transformation. The effect is largest for those features that are close to the bulk datapoints.
  %%%
  
  First the code:
  
-<<echo=TRUE, eval=TRUE, results=hide>>=
-# this is the function to retrieve the denominator
-# running it as illustration only
-iqlr <- aldex.set.mode(selex, conds, denom="iqlr")
-# show the first 5 rows that will be used for the clr denominator
-iqlr[[1]][1:5]
+<<echo=TRUE, eval=FALSE, results=hide>>=
+# small synthetic dataset for illustration
+# denominator features in x@denominator
 
-# use the iqlr features for the analysis
-y <- aldex.clr(selex, conds, denom="iqlr")
-y.e <- aldex.effect(y, conds)
-y.t <- aldex.ttest(y, conds)
-y.all <- data.frame(y.e, y.t)
-
-# find significant features in each
-sig.x <- x.all$wi.eBH < 0.05
-sig.y <- y.all$wi.eBH < 0.05
+data(synth2)
+blocks <- c(rep("N", 10),rep("S", 10))
+x <- aldex.clr(synth2, blocks, denom="all")
+x.e <- aldex.effect(x, blocks)
+plot(x.e$diff.win, x.e$diff.btw, pch=19, col=rgb(0,0,0,0.1), cex=0.5, xlab="dispersion", ylab="difference", main="all")
+points(x.e$diff.win[x@denom], x.e$diff.btw[x@denom], pch=19, col=rgb(0.8,0.5,0,0.7), cex=0.5)
+points(x.e$diff.win[47:86], x.e$diff.btw[47:86], col=rgb(0.8,0,0,0.7), cex=0.5)
+points(x.e$diff.win[980:1000], x.e$diff.btw[980:1000], col=rgb(0.8,0,0,0.7), cex=0.5)
+abline(0,1)
+abline(0,-1)
+abline(h=0, col="gray", lty=2)
 
 @
 
 \begin{figure}[!h]\label{selex4}
 \begin{center}
 
-<<fig=TRUE,echo=TRUE,width=7,height=4>>=
+<<fig=TRUE,echo=FALSE,results=hide,width=8,height=3>>=
 
 # plot it
-par(mfrow=c(1,2))
-plot(x.all$diff.win,x.all$diff.btw, pch=19, col=rgb(0,0,0,.3), cex=0.3, main="denom=all") 
-points(x.all$diff.win[sig.x],x.all$diff.btw[sig.x], pch=19, col="red", cex=0.4) 
-points(x.all$diff.win[iqlr[[1]]],x.all$diff.btw[iqlr[[1]]], col=rgb(0,0,1,.7), cex=0.5) 
-abline(0,0,lty=3, col="grey")
-abline(0,1,lty=2, col="grey")
-abline(0,-1,lty=2, col="grey")
-abline(0,2,lty=2)
-abline(0,-2,lty=2)
+par(mfrow=c(1,3))
+data(synth2)
+blocks <- c(rep("N", 10),rep("S", 10))
+x <- aldex.clr(synth2, blocks, denom="all")
+x.e <- aldex.effect(x, blocks)
 
-plot(y.all$diff.win,y.all$diff.btw, pch=19, col=rgb(0,0,0,.3), cex=0.3, main="denom=iqlr") 
-points(y.all$diff.win[sig.y],y.all$diff.btw[sig.y], pch=19, col="red", cex=0.4) 
-points(y.all$diff.win[iqlr[[1]]],y.all$diff.btw[iqlr[[1]]], col=rgb(0,0,1,.7), cex=0.5) 
-abline(0,0,lty=3, col="grey")
-abline(0,1,lty=2, col="grey")
-abline(0,-1,lty=2, col="grey")
-abline(0,2,lty=2)
-abline(0,-2,lty=2)
+plot(x.e$diff.win, x.e$diff.btw, pch=19, col=rgb(0,0,0,0.1), cex=0.5, xlab="dispersion", ylab="difference", main="all")
+points(x.e$diff.win[x@denom], x.e$diff.btw[x@denom], pch=19, col=rgb(0.8,0.5,0,0.7), cex=0.5)
+points(x.e$diff.win[47:86], x.e$diff.btw[47:86], col=rgb(0.8,0,0,0.7), cex=0.5)
+points(x.e$diff.win[980:1000], x.e$diff.btw[980:1000], col=rgb(0.8,0,0,0.7), cex=0.5)
+abline(0,1)
+abline(0,-1)
+abline(h=0, col="gray", lty=2)
+
+x <- aldex.clr(synth2, blocks, denom="iqlr")
+x.e <- aldex.effect(x, blocks)
+plot(x.e$diff.win, x.e$diff.btw, pch=19, col=rgb(0,0,0,0.1), cex=0.5, xlab="dispersion", ylab="difference", main="iqlr")
+points(x.e$diff.win[x@denom], x.e$diff.btw[x@denom], pch=19, col=rgb(0.8,0.5,0,0.7), cex=0.5)
+points(x.e$diff.win[47:86], x.e$diff.btw[47:86], col=rgb(0.8,0,0,0.7), cex=0.5)
+points(x.e$diff.win[980:1000], x.e$diff.btw[980:1000], col=rgb(0.8,0,0,0.7), cex=0.5)
+abline(0,1)
+abline(0,-1)
+abline(h=0, col="gray", lty=2)
+
+x <- aldex.clr(synth2, blocks, denom="lvha")
+x.e <- aldex.effect(x, blocks)
+plot(x.e$diff.win, x.e$diff.btw, pch=19, col=rgb(0,0,0,0.1), cex=0.5, xlab="dispersion", ylab="difference", main="lvha")
+points(x.e$diff.win[x@denom], x.e$diff.btw[x@denom], pch=19, col=rgb(0.8,0.5,0,0.7), cex=0.5)
+points(x.e$diff.win[47:86], x.e$diff.btw[47:86], col=rgb(0.8,0,0,0.7), cex=0.5)
+points(x.e$diff.win[980:1000], x.e$diff.btw[980:1000], col=rgb(0.8,0,0,0.7), cex=0.5)
+abline(0,1)
+abline(0,-1)
+abline(h=0, col="gray", lty=2)
+
 
 @
 
-\caption{Differential abundance in the selex dataset using different denominators for the clr calculation. Features with a corrected p value less than 0.05 are shown in red. Features that are non-significant are in grey. Features that have variance between the first and third quartiles are outlined in blue. The geometric mean of these features is used as the denominator when calculating the clr transformation. Lines of constant effect are drawn at 0, and  $\pm$ 1 and 2.}
+\caption{Differential abundance in a synthetic dataset using different denominators for the clr calculation. In this data 2\% of the features are modelled to be sparse in one group but not the other. Features modelled to be different between two groups are shown in red. Features that are non-significant are in grey (or brown). Features used in the denominator shown in brown: the geometric mean of these features is used as the denominator when calculating the clr transformation. Lines of constant effect are drawn at 0, and  $\pm$ 1. Note that the iqlr and lvha denominators place the middle of the non-asymmetric features at a between group difference of 0.}
 \label{selex}\vspace{-0.8cm}
 \end{center}
 \end{figure}
