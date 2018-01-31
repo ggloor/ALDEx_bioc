@@ -37,15 +37,25 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 		}
 	}
 
+    
+  
+  if(missing(conds)){
+    
+    print("no conditions provided: forcing denom = 'all'")
+    print("no conditions provided: forcing conds = 'NA'")
+    denom <- "all"
+    conds <- rep("NA", ncol(reads))
+    
+  }else{
+    
     # coerce matrices into data frames
     # check to ensure there are the same number of samples as in the conditions vector
     # reorder the samples and conditions by level
     # function inside rdirichelt.r
-
     coerced.data <- coerce.data(reads, conds)
-
     conds <- coerced.data[[1]]
     reads <- coerced.data[[2]]
+  }
 
     # make sure that the multicore package is in scope and return if available
     has.BiocParallel <- FALSE
@@ -185,7 +195,7 @@ if (verbose == TRUE) print("dirichlet samples complete")
     for ( i in 1:length(l2p) ) {
         if ( any( ! is.finite( l2p[[i]] ) ) ) stop("non-finite log-frequencies were unexpectedly computed")
     }
-if (verbose == TRUE) print("clr transformation complete")
+if (verbose == TRUE) print("transformation complete")
 
     return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,analysisData=l2p))
 }
