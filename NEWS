@@ -1,4 +1,20 @@
+CHANGES IN VERSION 1.10.2
+-------------------------
+
+NEW FEATURES (TPQ)
+
+    o add README for the GitHub repository
+    o let aldex.clr work even when 'conds' is missing
+
+CHANGES IN VERSION 1.10.1
+-------------------------
+
+BUG FIXES
+
+    o fixed a bug whereby the order of samples affected the centring of the data
+
 CHANGES IN VERSION 1.9.2
+-------------------------
 
 NEW FEATURES (JRW, GBG)
 
@@ -8,11 +24,6 @@ NEW FEATURES (JRW, GBG)
     o the getDenom function can be exported
     o updated documentation for above
     o version bump
-
-CHANGES IN VERSION 1.10.1
--------------------------
-    o fixed a bug whereby the order of samples affected the centring of the data
-
 
 CHANGES IN VERSION 1.8.1
 -------------------------

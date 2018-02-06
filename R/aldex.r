@@ -76,6 +76,8 @@
 aldex <- function(reads, conditions, mc.samples=128, test="t",
                   effect=TRUE, include.sample.summary=FALSE, verbose=FALSE, denom="all"){
   
+  if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
+  
   # wrapper function for the entire set of
   print("aldex.clr: generating Monte-Carlo instances and clr values")
   x <- aldex.clr(reads=reads, conds=conditions, mc.samples=mc.samples,
