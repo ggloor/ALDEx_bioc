@@ -69,7 +69,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     }
 
     # make sure that mc.samples is an integer, despite it being a numeric type value
-    as.numeric(as.integer(mc.samples))
+    mc.samples <- as.numeric(as.integer(mc.samples))
 
     #  remove all rows with reads less than the minimum set by minsum
     minsum <- 0
