@@ -36,8 +36,6 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 			print("converted SummarizedExperiment read count object into data frame")
 		}
 	}
-
-    
   
   if(missing(conds)){
     
@@ -48,13 +46,20 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     
   }else{
     
-    # coerce matrices into data frames
-    # check to ensure there are the same number of samples as in the conditions vector
+    # add special handling for model.matrix input
+    if(class(conds) == "matrix"){
+      print("conditions provided as matrix: selecting first column for aldex.clr")
+      conds <- conds[,1]
+    }
+    
+    # ncol df and length(c) must be equal
+    if(ncol(reads) != length(conds)){
+      stop("mismatch between number of samples and condition vector")
+    }
+    
     # reorder the samples and conditions by level
-    # function inside rdirichelt.r
-    coerced.data <- coerce.data(reads, conds)
-    conds <- coerced.data[[1]]
-    reads <- coerced.data[[2]]
+    conds <- conds[order(conds)]
+    reads <- data.frame(reads[,order(conds)])
   }
 
     # make sure that the multicore package is in scope and return if available
@@ -69,7 +74,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     }
 
     # make sure that mc.samples is an integer, despite it being a numeric type value
-    as.numeric(as.integer(mc.samples))
+    mc.samples <- as.numeric(as.integer(mc.samples))
 
     #  remove all rows with reads less than the minimum set by minsum
     minsum <- 0
