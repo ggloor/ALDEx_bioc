@@ -8,7 +8,7 @@ import(SummarizedExperiment)
 importFrom("grDevices", "rgb")
 importFrom("graphics", "abline", "hist", "par", "plot", "points")
 importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
-    "p.adjust", "rgamma", "t.test", "wilcox.test",
+    "p.adjust", "rgamma", "t.test", "wilcox.test", "coef",
     "pnorm", "psignrank", "pt", "pwilcox")
 importFrom("utils", "installed.packages")
 #importFrom("BiocParallel", "bplapply")

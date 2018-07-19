@@ -1,3 +1,30 @@
+CHANGES IN VERSION 1.10.3
+-------------------------
+
+NEW FEATURES (TPQ)
+
+    o New aldex.glm function uses model matrix
+    
+        o aldex.r: test = "kw" calls old aldex.glm, test = "glm" calls new aldex.glm
+        
+        o AllClasses.R: change "conds" slot to accept "ANY" to expect model matrix
+        
+        o clr_function.r: tweak coerce.data to expect model matrix
+        
+            o Note: coerce.data function replaced with fewer lines of code
+            
+        o clr_ttest.r: Roxygenize documentation
+        
+        o clr_glm.r: old aldex.glm function renamed as aldex.kw + Roxygenize documentation
+        
+        o clr_glm-tpq.R: new aldex.glm uses model matrix + Roxygenize documentation
+        
+        o plot.aldex.r: no changes -- not compatible with new aldex.glm
+        
+        o test-aldex.kw.R: update test to reflect changes
+        
+        o ALDEx2_vignette.Rnw: use aldex.kw in vignette
+
 CHANGES IN VERSION 1.10.2
 -------------------------
 
@@ -11,7 +38,7 @@ CHANGES IN VERSION 1.10.1
 
 BUG FIXES
 
-    o fixed a bug whereby the order of samples affected the centring of the data
+    o fixed a bug whereby the order of samples affected the centering of the data
 
 CHANGES IN VERSION 1.9.2
 -------------------------

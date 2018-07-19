@@ -39,14 +39,3 @@ rdirichlet <- function (n, alpha)
   x <- matrix(rgamma(l * n, t(alpha)), ncol = l, byrow=TRUE)  # Gere le recycling
   return(x / rowSums(x))
 }
-
-# coerce data into dataframe
-# reorder samples by condition
-
-coerce.data <- function(reads, conds){
-  # ncol df and length(c) must be equal
-  if(ncol(reads) != length(conds)) stop("mismatch between number of samples and condition vector")
-
-  # make an output list
-  return( list(c.out <- conds[order(conds)], df.out <- data.frame(reads[,order(conds)])) )
-}
