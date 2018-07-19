@@ -60,7 +60,7 @@ Then we set the comparison groups. This must be a vector of conditions in the sa
 conds <- c(rep("NS", 7), rep("S", 7))
 @
 
-ALDEx2 is now modular, offering the user the ability to build a data analysis pipeline for their experimental design. However, for two sample tests and one-way ANOVA design, the user can run the aldex wrapper. This wrapper will link the modular elements together to emulate ALDEx2 prior to the modular approach. Note that if the test is `glm', then effect should be FALSE. If the test is `t', then effect should be set to TRUE. The `t' option evaluates the data as a two-factor experiment using both the Welch's t and the Wilcoxon rank tests. The `glm' option evaluates the data as a one-way ANOVA using the glm and Kruskal-Wallace test. All tests include a Benjamini-Hochberg correction of the raw P values. The data can be plotted onto MA or effect (MW) plots\footnote[7]{Gloor et al (2016) J. Comp. Graph. Stat. DOI:10.1080/10618600.2015.1131161} for for two-way tests using the `aldex.plot' function. See the end of the modular section for  examples of the plots.
+ALDEx2 is now modular, offering the user the ability to build a data analysis pipeline for their experimental design. However, for two sample tests and one-way ANOVA design, the user can run the aldex wrapper. This wrapper will link the modular elements together to emulate ALDEx2 prior to the modular approach. Note that if the test is `kw', then effect should be FALSE. If the test is `t', then effect should be set to TRUE. The `t' option evaluates the data as a two-factor experiment using both the Welch's t and the Wilcoxon rank tests. The `kw' option evaluates the data as a one-way ANOVA using the glm and Kruskal-Wallace test. All tests include a Benjamini-Hochberg correction of the raw P values. The data can be plotted onto MA or effect (MW) plots\footnote[7]{Gloor et al (2016) J. Comp. Graph. Stat. DOI:10.1080/10618600.2015.1131161} for for two-way tests using the `aldex.plot' function. See the end of the modular section for  examples of the plots.
 
 <<echo=TRUE, eval=TRUE, results=hide, fig=FALSE>>=
 x <- aldex(selex, conds, mc.samples=16, test="t", effect=TRUE,
@@ -90,7 +90,7 @@ x.tt <- aldex.ttest(x, conds, paired.test=TRUE)
 
 Alternatively, the user can perform the glm and Kruskal Wallace tests for one-way ANOVA of two or more conditions. Here there are only two inputs: the aldex object from aldex.clr, and the vector of conditions. Note that this is slow! and is not evaluated for the documentation
 <<echo=TRUE, eval=FALSE, results=hide>>=
-x.glm <- aldex.glm(x, conds)
+x.kw <- aldex.kw(x, conds)
 @
 
 Finally, we estimate effect size and the within and between condition values in the case of two conditions. This step is required for plotting. There are four inputs: the aldex object from aldex.clr, the vector of conditions,  and a flag as to whether to include values for all samples or not are used as the denominator, and the level of verbosity.
@@ -149,7 +149,7 @@ A:E:A:D 9.642872 2.850081 3.4290684 0.0001566327
 
 ALDEx2 returns expected values for summary statistics. It is important to note that ALDEx uses Bayesian sampling from a Dirichlet distribution to estimate  the underlying technical variation. This is controlled by the number of \texttt{mc.samples}, in practice we find that setting this to 16 or 128 is sufficient for most cases as ALDEx2 is estimating the expected value of the distributions\footnote[3]{Fernandes et al (2014) Microbiome doi:10.1186/2049-2618-2-15}. The user is cautioned that the number of features called as differential will vary somewhat between runs because of the sampling procedure. Only features with values close to the chosen significance cutoff will vary between runs.
 
-In the list below, the \texttt{aldex.ttest} function returns the values highlighted with $\ast$, the \texttt{aldex.glm} function returns the values highlighted with $\circ$, and the \texttt{aldex.effect} function returns the values highlighted with $\diamondsuit$.
+In the list below, the \texttt{aldex.ttest} function returns the values highlighted with $\ast$, the \texttt{aldex.kw} function returns the values highlighted with $\circ$, and the \texttt{aldex.effect} function returns the values highlighted with $\diamondsuit$.
 
 \begin{itemize}
   \setlength{\itemsep}{1pt}
