@@ -7,7 +7,7 @@
 #'  and statistical testing in a single line of code. Specifically, this function:
 #'  (a) generates Monte Carlo samples of the Dirichlet distribution for each sample,
 #'  (b) converts each instance using a log-ratio transform, then (c) returns test
-#'  results for two sample (Welch's t, Wilcoxon) or multi-sample (glm, Kruskal Wallace)
+#'  results for two sample (Welch's t, Wilcoxon) or multi-sample (glm, Kruskal-Wallace)
 #'  tests. This function also estimates effect size for two sample analyses.
 #' 
 #' @details
@@ -18,7 +18,8 @@
 #'  columns should contain sequencing read counts (i.e., sample vectors).
 #'  Rows with 0 reads in each sample are deleted prior to analysis.
 #' @param conditions A character vector. A description of the data structure used
-#'  for testing. Typically, a vector of group labels.
+#'  for testing. Typically, a vector of group labels. For \code{aldex.glm}, use
+#'  a \code{model.matrix}.
 #' @param mc.samples An integer. The number of Monte Carlo samples to use when
 #'  estimating the underlying distributions. Since we are estimating central tendencies,
 #'  128 is usually sufficient.
@@ -30,9 +31,10 @@
 #'  many zeros in another. In this case the geometric mean of each group is calculated
 #'  using the set of per-group non-zero features.
 #' @param test A character string. Indicates which tests to perform. "t" calls
-#'  Welch's t and Wilcoxon tests. "glm" calls Kruskal Wallace and glm tests.
+#'  Welch's t and Wilcoxon tests. "kw" calls Kruskal-Wallace and glm tests.
 #'  "iterative" uses the results from an initial "t" routine to seed the denominator
 #'  (i.e., for the Geometric Mean calculation) of a second "t" routine.
+#'  "glm" calls a generalized linear model using a \code{model.matrix}.
 #' @param effect A boolean. Toggles whether to calculate abundances and effect sizes.
 #'  Applies to \code{test = "t"} and \code{test = "iterative"}.
 #' @param include.sample.summary A boolean. Toggles whether to include median clr
@@ -42,17 +44,25 @@
 #'  \code{effect = TRUE}.
 #' 
 #' @return Returns a number of values that depends on the set of options.
-#'  See the return values of aldex.ttest, aldex.glm, and aldex.effect for
-#'  explanations and example.
+#'  See the return values of aldex.ttest, aldex.kw, aldex.glm, and aldex.effect
+#'  for explanations and examples.
 #'  
 #' @author Greg Gloor, Andrew Fernandes, and Matt Links contributed to
-#'  the original package. Thom Quinn added the "iterative" test method.
-#'  
-#' @references Please use the citation given by \code{citation(package="ALDEx")}.
+#'  the original package. Thom Quinn added the "iterative" test method
+#'  and the "glm" test method.
 #' 
-#' @seealso \code{\link{aldex.ttest}}, \code{\link{aldex.glm}},
-#'  \code{\link{aldex.effect}}, \code{\link{aldex.corr}},
+#' @seealso
+#'  \code{\link{aldex}},
+#'  \code{\link{aldex.clr}},
+#'  \code{\link{aldex.ttest}},
+#'  \code{\link{aldex.kw}},
+#'  \code{\link{aldex.glm}},
+#'  \code{\link{aldex.effect}},
+#'  \code{\link{aldex.corr}},
 #'  \code{\link{selex}}
+#'  
+#' @references Please use the citation given by
+#'  \code{citation(package="ALDEx2")}.
 #' 
 #' @examples
 #' # The 'reads' data.frame should have row
@@ -95,8 +105,11 @@ aldex <- function(reads, conditions, mc.samples=128, test="t",
   }else if(test == "t") {
     print("aldex.ttest: doing t-test")
     x.tt <- aldex.ttest(x, conditions, paired.test=FALSE)
+  }else if(test == "kw"){
+    print("aldex.glm: doing Kruskal-Wallace and glm test (ANOVA-like)")
+    x.tt <- aldex.kw(x, conditions)
   }else if(test == "glm"){
-    print("aldex.glm: doing Kruskal Wallace and glm test")
+    print("aldex.glm: doing glm test based on a model matrix")
     x.tt <- aldex.glm(x, conditions)
   }else{
     stop("argument 'test' not recognized")
