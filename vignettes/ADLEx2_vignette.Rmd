@@ -169,7 +169,7 @@ ALDEx2 returns expected values for summary statistics. It is important to note t
 
 
 
-In the list below, the `aldex.ttest`}` function returns the values highlighted with $\ast$, the `aldex.kw` function returns the values highlighted with $\circ$, and the `aldex.effect` function returns the values highlighted with $\diamondsuit$.
+In the list below, the `aldex.ttest` function returns the values highlighted with $\ast$, the `aldex.kw` function returns the values highlighted with $\circ$, and the `aldex.effect` function returns the values highlighted with $\diamondsuit$.
 
 
 1. $\ast$ we.ep - Expected P value of Welch's t test
@@ -183,10 +183,10 @@ In the list below, the `aldex.ttest`}` function returns the values highlighted w
 9. $\diamondsuit$ rab.all - median clr value for all samples in the feature
 10. $\diamondsuit$ rab.win.NS - median clr value for the NS group of samples
 11. $\diamondsuit$ rab.win.S - median clr value for the S group of samples
-12. $\diamondsuit$ rab.X1\_BNS.q50 - median expression value of features in sample X1\_BNS if \texttt[include.item.summary=TRUE]
+12. $\diamondsuit$ rab.X1\_BNS.q50 - median expression value of features in sample X1\_BNS if `include.item.summary=TRUE`
 13. $\diamondsuit$ dif.btw - median difference in clr values between S and NS groups
 14. $\diamondsuit$ dif.win - median of the largest difference in clr values within S and NS groups
-15. $\diamondsuit$ effect - median effect size:  diff.btw / max(dif.win) for all instances
+15. $\diamondsuit$ effect - median effect size:  diff.btw / max(diff.win) for all instances
 16. $\diamondsuit$ overlap - proportion of effect size that overlaps 0 (i.e. no effect)
 
 The built-in aldex.plot function described above will usually be sufficient, but for more user control the example in Figure 4 shows a plot that shows which features are found by the Welchs' or Wilcoxon test individually (blue) or by both (red).
@@ -313,7 +313,7 @@ I am grateful that ALDEx2 has taken on a life of its own.
 
 # Version information
 
-Version 1.04 of ALDEx was the version used for the analysis in \footnote{Macklaim et al (2013) Microbiome doi: 10.1186/2049-2618-1-12},\footnote{Fernandes et al (2013) PLoS ONE http://dx.doi.org/10.1371\%2/journal.pone.0067019)}. This version was suitable only for two-sample two-group comparisons, and provided only effect size estimates of difference between groups. ALDEx v1.0.4 is available at: \begin{verbatim}https://github.com/ggloor/ALDEx2/blob/master/ALDEx_1.0.4.tar.gz\end{verbatim}. No further changes  are expected for that version since it can be replicated completely within ALDEx2 by using only the \texttt{aldex.clr} and \texttt{aldex.effect} commands.
+Version 1.04 of ALDEx was the version used for the analysis in \footnote{Macklaim et al (2013) Microbiome doi: 10.1186/2049-2618-1-12},\footnote{Fernandes et al (2013) PLoS ONE http://dx.doi.org/10.1371\%2/journal.pone.0067019)}. This version was suitable only for two-sample two-group comparisons, and provided only effect size estimates of difference between groups. ALDEx v1.0.4 is available at: \begin{verbatim}https://github.com/ggloor/ALDEx2/blob/master/ALDEx\_1.0.4.tar.gz\end{verbatim}. No further changes  are expected for that version since it can be replicated completely within ALDEx2 by using only the \texttt{aldex.clr} and \texttt{aldex.effect} commands.
 
 
 Versions 2.0 to 2.05 were development versions that enabled P value calculations. Version 2.06 of ALDEx2 was the version used for the analysis in\footnote[3]{Fernandes et al (2014) Microbiome doi:10.1186/2049-2618-2-15}. This version enabled large sample comparisons by calculating effect size from a random sample of the data rather than from an exhaustive comparison.
