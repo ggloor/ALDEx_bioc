@@ -1,18 +1,18 @@
 #' Compute an \code{aldex} Object
-#' 
+#'
 #' @description
 #' Welcome to the \code{ALDEx2} package!
-#' 
+#'
 #' The \code{aldex} function is a wrapper that performs log-ratio transformation
 #'  and statistical testing in a single line of code. Specifically, this function:
 #'  (a) generates Monte Carlo samples of the Dirichlet distribution for each sample,
 #'  (b) converts each instance using a log-ratio transform, then (c) returns test
 #'  results for two sample (Welch's t, Wilcoxon) or multi-sample (glm, Kruskal-Wallace)
 #'  tests. This function also estimates effect size for two sample analyses.
-#' 
+#'
 #' @details
 #' See "Examples" below for a description of the sample input.
-#' 
+#'
 #' @param reads A non-negative, integer-only \code{data.frame} or \code{matrix}
 #'  with unique names for all rows and columns. Rows should contain genes and
 #'  columns should contain sequencing read counts (i.e., sample vectors).
@@ -42,15 +42,15 @@
 #' @param verbose A boolean. Toggles whether to print diagnostic information while
 #'  running. Useful for debugging errors on large datasets. Applies to
 #'  \code{effect = TRUE}.
-#' 
+#'
 #' @return Returns a number of values that depends on the set of options.
 #'  See the return values of aldex.ttest, aldex.kw, aldex.glm, and aldex.effect
 #'  for explanations and examples.
-#'  
+#'
 #' @author Greg Gloor, Andrew Fernandes, and Matt Links contributed to
 #'  the original package. Thom Quinn added the "iterative" test method
 #'  and the "glm" test method.
-#' 
+#'
 #' @seealso
 #'  \code{\link{aldex}},
 #'  \code{\link{aldex.clr}},
@@ -60,10 +60,10 @@
 #'  \code{\link{aldex.effect}},
 #'  \code{\link{aldex.corr}},
 #'  \code{\link{selex}}
-#'  
+#'
 #' @references Please use the citation given by
 #'  \code{citation(package="ALDEx2")}.
-#' 
+#'
 #' @examples
 #' # The 'reads' data.frame should have row
 #' # and column names that are unique, and
@@ -77,7 +77,7 @@
 #' #   Gene_00005  10  16   4   0   4  10  10
 #' #   Gene_00006 129 126 451 223 243 149 209
 #' #       ... many more rows ...
-#' 
+#'
 #' data(selex)
 #' selex <- selex[1201:1600,] # subset for efficiency
 #' conds <- c(rep("NS", 7), rep("S", 7))
@@ -85,44 +85,44 @@
 #'            test="t", effect=FALSE)
 aldex <- function(reads, conditions, mc.samples=128, test="t",
                   effect=TRUE, include.sample.summary=FALSE, verbose=FALSE, denom="all"){
-  
+
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
-  
+
   # wrapper function for the entire set of
-  print("aldex.clr: generating Monte-Carlo instances and clr values")
+  message("aldex.clr: generating Monte-Carlo instances and clr values")
   x <- aldex.clr(reads=reads, conds=conditions, mc.samples=mc.samples,
                  denom=denom, verbose=verbose, useMC=FALSE)
-  
+
   if(test == "iterative"){
-    print("aldex.ttest: doing t-test")
+    message("aldex.ttest: doing t-test")
     x.tt <- aldex.ttest(x, conditions, paired.test=FALSE)
-    print("aldex.ttest: seeding a second t-test")
+    message("aldex.ttest: seeding a second t-test")
     nonDE.i <- which(rownames(reads) %in% rownames(x.tt[x.tt$wi.eBH > .05 | x.tt$we.eBH > .05, ]))
     if(length(nonDE.i) == 0) stop("no non-DE references found")
     x.tt <- aldex(reads, conditions, mc.samples=mc.samples, test="t",
                   effect=effect, include.sample.summary=include.sample.summary,
                   verbose=verbose, denom=nonDE.i)
   }else if(test == "t") {
-    print("aldex.ttest: doing t-test")
-    x.tt <- aldex.ttest(x, conditions, paired.test=FALSE)
+    message("aldex.ttest: doing t-test")
+    x.tt <- aldex.ttest(x, conditions, paired.test=FALSE, verbose=verbose)
   }else if(test == "kw"){
-    print("aldex.glm: doing Kruskal-Wallace and glm test (ANOVA-like)")
-    x.tt <- aldex.kw(x, conditions)
+    message("aldex.glm: doing Kruskal-Wallace and glm test (ANOVA-like)")
+    x.tt <- aldex.kw(x, conditions, verbose=verbose )
   }else if(test == "glm"){
-    print("aldex.glm: doing glm test based on a model matrix")
+    message("aldex.glm: doing glm test based on a model matrix")
     x.tt <- aldex.glm(x, conditions)
   }else{
     stop("argument 'test' not recognized")
   }
-  
+
   if(effect == TRUE && test == "t"){
-    print("aldex.effect: calculating effect sizes")
+    message("aldex.effect: calculating effect sizes")
     x.effect <- aldex.effect(x, conditions,
                              include.sample.summary=include.sample.summary, verbose=verbose)
-    z <- data.frame(x.effect, x.tt)
+    z <- data.frame(x.effect, x.tt, verbose=verbose)
   }else{
     z <- data.frame(x.tt)
   }
-  
+
   return(z)
 }

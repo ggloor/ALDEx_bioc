@@ -4,7 +4,8 @@
 \alias{aldex.ttest}
 \title{Calculate Wilcoxon Rank Sum test and Welch's t-test statistics}
 \usage{
-aldex.ttest(clr, conditions, paired.test = FALSE, hist.plot = FALSE)
+aldex.ttest(clr, conditions, paired.test = FALSE, hist.plot = FALSE,
+  verbose = FALSE)
 }
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}
@@ -17,6 +18,8 @@ a \code{model.matrix}.}
 
 \item{hist.plot}{Toggles whether to plot a histogram of p-values for the
 first Dirichlet Monte Carlo instance.}
+
+\item{verbose}{Boolean controlling diagnostic display.}
 }
 \value{
 Returns a \code{data.frame} with the following information:

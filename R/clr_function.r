@@ -36,27 +36,27 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 			print("converted SummarizedExperiment read count object into data frame")
 		}
 	}
-  
+
   if(missing(conds)){
-    
+
     print("no conditions provided: forcing denom = 'all'")
     print("no conditions provided: forcing conds = 'NA'")
     denom <- "all"
     conds <- rep("NA", ncol(reads))
-    
+
   }else{
-    
+
     # add special handling for model.matrix input
     if(class(conds) == "matrix"){
       print("conditions provided as matrix: selecting first column for aldex.clr")
       conds <- conds[,1]
     }
-    
+
     # ncol df and length(c) must be equal
     if(ncol(reads) != length(conds)){
       stop("mismatch between number of samples and condition vector")
     }
-    
+
     # reorder the samples and conditions by level
     conds <- conds[order(conds)]
     reads <- data.frame(reads[,order(conds)])
@@ -70,7 +70,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
         has.BiocParallel <- TRUE
     }
     else {
-        print("operating in serial mode")
+        message("operating in serial mode")
     }
 
     # make sure that mc.samples is an integer, despite it being a numeric type value

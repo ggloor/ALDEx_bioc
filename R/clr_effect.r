@@ -17,7 +17,7 @@ aldex.effect <- function(clr, conditions, verbose=TRUE, include.sample.summary=F
         is.multicore = TRUE
     }
     else {
-        print("operating in serial mode")
+        message("operating in serial mode")
     }
 
     nr <- numFeatures(clr) # number of features

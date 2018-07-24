@@ -21,6 +21,7 @@ License: file LICENSE
 URL: https://github.com/ggloor/ALDEx2
 BugReports: https://github.com/ggloor/ALDEx2/issues
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr
 Depends:
   methods,
   stats
@@ -32,4 +33,7 @@ Imports:
   SummarizedExperiment,
   multtest
 Suggests:
-  testthat
+  testthat,
+  BiocStyle,
+  knitr,
+  rmarkdown
