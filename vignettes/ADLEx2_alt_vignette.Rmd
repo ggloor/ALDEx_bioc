@@ -36,11 +36,11 @@ There are multiple ways to download and install the most current of ALDEx2. ALDE
 
 # Quick example with `selex' example data and 2 groups:
 
-Case study a growth selection type (SELEX) experiment^[@mcmurrough:2014]. This section contains an analysis of a dataset collected where a single gene  library was made that contained 1600 sequence variants at 4 codons in the sequence. These variants were cloned into an expression vector at equimolar amounts. The wild-type version of the gene conferred resistance to a topoisomerase toxin. Seven independent growths of the gene library were conducted under selective and non-selective conditions and the resulting abundances of each variant was read out by sequencing a pooled, barcoded library on an Illumina MiSeq. The data table is included as selex\_table.txt in the package. In this data table, there are 1600 features and 14 samples. The analysis takes approximately 2 minutes and memory usage tops out at less than 1Gb of RAM on a mobile i7 class processor. For speed concerns we use only the first 400 features. The command used for ALDEx2 is presented below:
+Case study a growth selection type (SELEX) experiment^[@mcmurrough:2014]. This section contains an analysis of a dataset collected where a single gene  library was made that contained 1600 sequence variants at 4 codons in the sequence. These variants were cloned into an expression vector at equimolar amounts. The wild-type version of the gene conferred resistance to a topoisomerase toxin. Seven independent growths of the gene library were conducted under selective and non-selective conditions and the resulting abundances of each variant was read out by sequencing a pooled, barcoded library on an Illumina MiSeq. The data table is included as selex\_table.txt in the package. In this data table, there are 1600 features and 14 samples. The analysis takes approximately 2 minutes and memory usage tops out at less than 1Gb of RAM on a mobile i7 class processor when we use 128 Dirichlet Monte-Carlo Instances (DMC). For speed concerns we use only the first 400 features and perform only 16 DMC. The command used for ALDEx2 is presented below:
 
-First we load the library and the included selex dataset. Then we set the comparison groups. This must be a vector of conditions in the same order as the samples in the input counts table.
+First we load the library and the included selex dataset. Then we set the comparison groups. This must be a vector of conditions in the same order as the samples in the input counts table. The `aldex` command is calling several other functions in the background, and each of them returns diagnostics.
 
-```{r, echo=T, message=F, error=F, warnings=F}
+```{r, echo=T, message=F, error=F, warning=F}
 library(ALDEx2)
 data(selex)
 #subset only the last 400 features for efficiency
