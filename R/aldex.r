@@ -107,7 +107,7 @@ aldex <- function(reads, conditions, mc.samples=128, test="t",
     x.tt <- aldex.ttest(x, conditions, paired.test=FALSE, verbose=verbose)
   }else if(test == "kw"){
     message("aldex.glm: doing Kruskal-Wallace and glm test (ANOVA-like)")
-    x.tt <- aldex.kw(x, conditions, verbose=verbose )
+    x.tt <- aldex.kw(x, conditions )
   }else if(test == "glm"){
     message("aldex.glm: doing glm test based on a model matrix")
     x.tt <- aldex.glm(x, conditions)
