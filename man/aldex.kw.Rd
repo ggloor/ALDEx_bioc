@@ -4,16 +4,16 @@
 \alias{aldex.kw}
 \title{Calculate the Kruskal-Wallis test and glm ANOVA statistics}
 \usage{
-aldex.kw(clr, conditions, useMC = FALSE)
+aldex.kw(clr, useMC = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}
 
-\item{conditions}{A character vector. A description of the data structure used
-for testing. Typically, a vector of group labels. For \code{aldex.glm}, use
-a \code{model.matrix}.}
-
 \item{useMC}{Toggles whether to use multi-core.}
+
+\item{verbose}{A boolean. Toggles whether to print diagnostic information while
+running. Useful for debugging errors on large datasets. Applies to
+\code{effect = TRUE}.}
 }
 \value{
 Returns a \code{data.frame} with the following information:
@@ -36,7 +36,7 @@ data(selex)
 selex <- selex[1201:1600,]
 conds <- c(rep("A", 4), rep("B", 3), rep("C", 7))
 x <- aldex.clr(selex, conds, mc.samples=1, denom="all")
-kw.test <- aldex.kw(x, conds)
+kw.test <- aldex.kw(x)
 }
 \references{
 Please use the citation given by
