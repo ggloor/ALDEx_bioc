@@ -5,7 +5,8 @@
 \title{Compute an \code{aldex} Object}
 \usage{
 aldex(reads, conditions, mc.samples = 128, test = "t", effect = TRUE,
-  include.sample.summary = FALSE, verbose = FALSE, denom = "all")
+  include.sample.summary = FALSE, verbose = FALSE, denom = "all",
+  iterate = FALSE, ...)
 }
 \arguments{
 \item{reads}{A non-negative, integer-only \code{data.frame} or \code{matrix}
@@ -21,11 +22,10 @@ a \code{model.matrix}.}
 estimating the underlying distributions. Since we are estimating central tendencies,
 128 is usually sufficient.}
 
-\item{test}{A character string. Indicates which tests to perform. "t" calls
-Welch's t and Wilcoxon tests. "kw" calls Kruskal-Wallace and glm tests.
-"iterative" uses the results from an initial "t" routine to seed the denominator
-(i.e., for the Geometric Mean calculation) of a second "t" routine.
-"glm" calls a generalized linear model using a \code{model.matrix}.}
+\item{test}{A character string. Indicates which tests to perform. "t" runs
+Welch's t and Wilcoxon tests. "kw" runs Kruskal-Wallace and glm tests.
+"glm" runs a generalized linear model using a \code{model.matrix}.
+"corr" runs a correlation test using \code{cor.test}.}
 
 \item{effect}{A boolean. Toggles whether to calculate abundances and effect sizes.
 Applies to \code{test = "t"} and \code{test = "iterative"}.}
@@ -44,6 +44,12 @@ variance that is between the lower and upper quartile of variance. Using "zero"
 is a more extreme case where there are many non-zero features in one condition but
 many zeros in another. In this case the geometric mean of each group is calculated
 using the set of per-group non-zero features.}
+
+\item{iterate}{A boolean. Toggles whether to iteratively perform a test. For example,
+this will use the results from an initial "t" routine to seed the reference
+(i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
+
+\item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }
 \value{
 Returns a number of values that depends on the set of options.
@@ -99,6 +105,6 @@ Please use the citation given by
 }
 \author{
 Greg Gloor, Andrew Fernandes, and Matt Links contributed to
- the original package. Thom Quinn added the "iterative" test method
- and the "glm" test method.
+ the original package. Thom Quinn added the "glm" test method, the
+ "corr" test method, and the "iterate" procedure.
 }
