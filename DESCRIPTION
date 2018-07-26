@@ -1,7 +1,7 @@
 Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
-Version: 1.10.3
+Version: 1.11.0
 Date: 2018-07-18
 Author: Greg Gloor, Ruth Grace Wong, Andrew Fernandes, Arianne Albert, Matt Links,
     Thomas Quinn, Jia Rong Wu
@@ -15,8 +15,9 @@ Description: A differential abundance analysis for the comparison of two or more
     three or more experimental replicates. The method infers biological and sampling
     variation to calculate the expected false discovery rate, given the variation, based
     on a Wilcoxon Rank Sum test and Welch's t-test (via aldex.ttest), a Kruskal-Wallis test
-    (via aldex.kw), or a generalized linear model (via aldex.glm). All tests
-    report p-values and Benjamini-Hochberg corrected p-values.
+    (via aldex.kw), a generalized linear model (via aldex.glm), or a correlation test
+    (via aldex.corr). All tests report p-values and Benjamini-Hochberg
+    corrected p-values.
 License: file LICENSE
 URL: https://github.com/ggloor/ALDEx2
 BugReports: https://github.com/ggloor/ALDEx2/issues
