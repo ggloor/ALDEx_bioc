@@ -4,14 +4,14 @@
 \alias{aldex.glm}
 \title{Calculate glm test statistics using a \code{model.matrix}}
 \usage{
-aldex.glm(clr, conditions, ...)
+aldex.glm(clr, verbose = FALSE, ...)
 }
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}
 
-\item{conditions}{A character vector. A description of the data structure used
-for testing. Typically, a vector of group labels. For \code{aldex.glm}, use
-a \code{model.matrix}.}
+\item{verbose}{A boolean. Toggles whether to print diagnostic information while
+running. Useful for debugging errors on large datasets. Applies to
+\code{effect = TRUE}.}
 
 \item{...}{Arguments passed to \code{glm}.}
 }
@@ -33,7 +33,7 @@ covariates <- data.frame("A" = sample(0:1, 14, replace = TRUE),
                          "B" = c(rep(0, 7), rep(1, 7)))
 mm <- model.matrix(~ A + B, covariates)
 x <- aldex.clr(selex, mm, mc.samples=1, denom="all")
-glm.test <- aldex.glm(x, mm)
+glm.test <- aldex.glm(x)
 }
 \references{
 Please use the citation given by
@@ -50,5 +50,5 @@ Please use the citation given by
  \code{\link{selex}}
 }
 \author{
-Thomas Quinn
+Thom Quinn
 }

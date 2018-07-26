@@ -12,7 +12,7 @@
 #'  coefficients and their p-values for each feature,
 #'  with FDR appended as a \code{BH} column.
 #' 
-#' @author Thomas Quinn
+#' @author Thom Quinn
 #' 
 #' @seealso
 #'  \code{\link{aldex}},
@@ -35,15 +35,18 @@
 #'                          "B" = c(rep(0, 7), rep(1, 7)))
 #' mm <- model.matrix(~ A + B, covariates)
 #' x <- aldex.clr(selex, mm, mc.samples=1, denom="all")
-#' glm.test <- aldex.glm(x, mm)
-aldex.glm <- function(clr, conditions, ...){
+#' glm.test <- aldex.glm(x)
+aldex.glm <- function(clr, verbose=FALSE, ...){
+  
+  # Use clr conditions slot instead of input
+  conditions <- clr@conds
   
   lr2glm <- function(lr, conditions, ...){
     
     if(class(conditions) != "matrix" &
        !("assign" %in% names(attributes(conditions)))){
       
-      stop("Please use the 'model.matrix' function to prepare 'model.matrix'.")
+      stop("Please define the aldex.clr object for a model.matrix 'conditions'.")
     }
     
     if(nrow(lr) != nrow(conditions)){
@@ -86,12 +89,13 @@ aldex.glm <- function(clr, conditions, ...){
   }
   
   # Keep a running sum of lr2glm instances
+  if(verbose) message("running tests for each MC instance:")
   mc <- ALDEx2::getMonteCarloInstances(clr)
   k <- ALDEx2::numMCInstances(clr)
   r <- 0
   for(i in 1:k){
     
-    numTicks <- progress(i, k, numTicks)
+    if(verbose) numTicks <- progress(i, k, numTicks)
     mci_lr <- t(sapply(mc, function(x) x[, i]))
     r <- r + lr2glm(mci_lr, conditions, ...)
   }
