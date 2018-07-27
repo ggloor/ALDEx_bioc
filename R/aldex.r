@@ -30,11 +30,13 @@
 #'  is a more extreme case where there are many non-zero features in one condition but
 #'  many zeros in another. In this case the geometric mean of each group is calculated
 #'  using the set of per-group non-zero features.
-#' @param test A character string. Indicates which tests to perform. "t" calls
-#'  Welch's t and Wilcoxon tests. "kw" calls Kruskal-Wallace and glm tests.
-#'  "iterative" uses the results from an initial "t" routine to seed the denominator
-#'  (i.e., for the Geometric Mean calculation) of a second "t" routine.
-#'  "glm" calls a generalized linear model using a \code{model.matrix}.
+#' @param test A character string. Indicates which tests to perform. "t" runs
+#'  Welch's t and Wilcoxon tests. "kw" runs Kruskal-Wallace and glm tests.
+#'  "glm" runs a generalized linear model using a \code{model.matrix}.
+#'  "corr" runs a correlation test using \code{cor.test}.
+#' @param iterate A boolean. Toggles whether to iteratively perform a test. For example,
+#'  this will use the results from an initial "t" routine to seed the reference
+#'  (i.e., denominator of Geometric Mean calculation) for a second "t" routine.
 #' @param effect A boolean. Toggles whether to calculate abundances and effect sizes.
 #'  Applies to \code{test = "t"} and \code{test = "iterative"}.
 #' @param include.sample.summary A boolean. Toggles whether to include median clr
@@ -42,14 +44,15 @@
 #' @param verbose A boolean. Toggles whether to print diagnostic information while
 #'  running. Useful for debugging errors on large datasets. Applies to
 #'  \code{effect = TRUE}.
+#' @param ... Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).
 #'
 #' @return Returns a number of values that depends on the set of options.
 #'  See the return values of aldex.ttest, aldex.kw, aldex.glm, and aldex.effect
 #'  for explanations and examples.
 #'
 #' @author Greg Gloor, Andrew Fernandes, and Matt Links contributed to
-#'  the original package. Thom Quinn added the "iterative" test method
-#'  and the "glm" test method.
+#'  the original package. Thom Quinn added the "glm" test method, the
+#'  "corr" test method, and the "iterate" procedure.
 #'
 #' @seealso
 #'  \code{\link{aldex}},
@@ -83,46 +86,63 @@
 #' conds <- c(rep("NS", 7), rep("S", 7))
 #' x <- aldex(selex, conds, mc.samples=2, denom="all",
 #'            test="t", effect=FALSE)
-aldex <- function(reads, conditions, mc.samples=128, test="t",
-                  effect=TRUE, include.sample.summary=FALSE, verbose=FALSE, denom="all"){
-
+aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
+                  include.sample.summary=FALSE, verbose=FALSE,
+                  denom="all", iterate=FALSE, ...){
+  
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
-
+  
   # wrapper function for the entire set of
   message("aldex.clr: generating Monte-Carlo instances and clr values")
   x <- aldex.clr(reads=reads, conds=conditions, mc.samples=mc.samples,
                  denom=denom, verbose=verbose, useMC=FALSE)
-
-  if(test == "iterative"){
+  
+  if(test == "t") {
+    
     message("aldex.ttest: doing t-test")
-    x.tt <- aldex.ttest(x, conditions, paired.test=FALSE)
-    message("aldex.ttest: seeding a second t-test")
-    nonDE.i <- which(rownames(reads) %in% rownames(x.tt[x.tt$wi.eBH > .05 | x.tt$we.eBH > .05, ]))
-    if(length(nonDE.i) == 0) stop("no non-DE references found")
-    x.tt <- aldex(reads, conditions, mc.samples=mc.samples, test="t",
-                  effect=effect, include.sample.summary=include.sample.summary,
-                  verbose=verbose, denom=nonDE.i)
-  }else if(test == "t") {
-    message("aldex.ttest: doing t-test")
-    x.tt <- aldex.ttest(x, conditions, paired.test=FALSE, verbose=verbose)
+    x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose)
+    
   }else if(test == "kw"){
+    
     message("aldex.glm: doing Kruskal-Wallace and glm test (ANOVA-like)")
-    x.tt <- aldex.kw(x, conditions )
+    x.tt <- aldex.kw(x)
+    
   }else if(test == "glm"){
+    
     message("aldex.glm: doing glm test based on a model matrix")
-    x.tt <- aldex.glm(x, conditions)
+    x.tt <- aldex.glm(x, ...)
+    
+  }else if(test == "cor" | test == "corr"){
+    
+    message("aldex.corr: doing correlation with a continuous variable")
+    x.tt <- aldex.corr(x, ...)
+    
   }else{
+    
     stop("argument 'test' not recognized")
   }
-
-  if(effect == TRUE && test == "t"){
+  
+  if(iterate){
+    
+    message("iterate: seeding a second test")
+    x.BHonly <- x.tt[,grepl("BH", colnames(x.tt)), drop = FALSE]
+    nonDE.i <- as.logical(apply(x.BHonly > .05, 1, prod))
+    if(sum(nonDE.i) == 0) stop("no non-DE references found")
+    x.tt <- aldex(reads, conditions, mc.samples=mc.samples, test=test, effect=effect,
+                  include.sample.summary=include.sample.summary, verbose=verbose,
+                  denom=nonDE.i, iterate=FALSE, ...)
+  }
+  
+  if(test == "t" && effect && !iterate){
+    
     message("aldex.effect: calculating effect sizes")
-    x.effect <- aldex.effect(x, conditions,
-                             include.sample.summary=include.sample.summary, verbose=verbose)
+    x.effect <- aldex.effect(x, include.sample.summary=include.sample.summary, verbose=verbose)
     z <- data.frame(x.effect, x.tt, verbose=verbose)
+    
   }else{
+    
     z <- data.frame(x.tt)
   }
-
+  
   return(z)
 }

@@ -72,7 +72,7 @@ test_that("new faster alex.ttest matches old function", {
   
   expect_equal(
     aldex.ttest.old(clr, group),
-    aldex.ttest(clr, group)
+    aldex.ttest(clr)
   )
 })
 
@@ -90,6 +90,6 @@ test_that("new faster alex.ttest matches old function", {
   
   expect_equal(
     aldex.ttest.old(clr, group),
-    aldex.ttest(clr, group)
+    aldex.ttest(clr)
   )
 })

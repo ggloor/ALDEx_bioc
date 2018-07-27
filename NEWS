@@ -1,3 +1,34 @@
+CHANGES IN VERSION 1.11.0
+-------------------------
+
+NEW FEATURES (TPQ)
+
+    o Iterative log-ratio transformation works with all aldex. methods
+    
+        o aldex.r: new "iterate = TRUE" works for any aldex. method
+
+    o New aldex.corr function uses continuous outcome
+    
+        o aldex.corr.r: file with old aldex.corr function was removed
+        
+        o aldex.r: test = "cor" or test = "corr" calls aldex.corr
+        
+        o aldex.r: pass along ... correctly
+        
+    o Add verbose argument to aldex.kw, aldex.glm, aldex.corr
+        
+    o Remove conditions argument
+    
+        o Use clr@conds for aldex.ttest, aldex.kw, aldex.glm, aldex.corr, aldex.effect
+        
+        o aldex.clr: passes along any conditions argument (including matrix)
+        
+        o aldex.r: no longer pass along conditions
+        
+        o new test to verify multi-type clr@conds
+        
+        o old tests updated
+
 CHANGES IN VERSION 1.10.3
 -------------------------
 

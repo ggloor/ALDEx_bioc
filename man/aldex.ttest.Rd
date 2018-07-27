@@ -4,22 +4,19 @@
 \alias{aldex.ttest}
 \title{Calculate Wilcoxon Rank Sum test and Welch's t-test statistics}
 \usage{
-aldex.ttest(clr, conditions, paired.test = FALSE, hist.plot = FALSE,
-  verbose = FALSE)
+aldex.ttest(clr, paired.test = FALSE, hist.plot = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}
-
-\item{conditions}{A character vector. A description of the data structure used
-for testing. Typically, a vector of group labels. For \code{aldex.glm}, use
-a \code{model.matrix}.}
 
 \item{paired.test}{Toggles whether to calculate paired tests.}
 
 \item{hist.plot}{Toggles whether to plot a histogram of p-values for the
 first Dirichlet Monte Carlo instance.}
 
-\item{verbose}{Boolean controlling diagnostic display.}
+\item{verbose}{A boolean. Toggles whether to print diagnostic information while
+running. Useful for debugging errors on large datasets. Applies to
+\code{effect = TRUE}.}
 }
 \value{
 Returns a \code{data.frame} with the following information:
@@ -42,7 +39,7 @@ data(selex)
 selex <- selex[1201:1600,]
 conds <- c(rep("NS", 7), rep("S", 7))
 x <- aldex.clr(selex, conds, mc.samples=2, denom="all")
-ttest.test <- aldex.ttest(x, conds)
+ttest.test <- aldex.ttest(x)
 }
 \references{
 Please use the citation given by

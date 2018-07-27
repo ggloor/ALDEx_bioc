@@ -38,21 +38,22 @@
 #' selex <- selex[1201:1600,]
 #' conds <- c(rep("A", 4), rep("B", 3), rep("C", 7))
 #' x <- aldex.clr(selex, conds, mc.samples=1, denom="all")
-#' kw.test <- aldex.kw(x, conds)
-aldex.kw <- function(clr, conditions, useMC=FALSE){
+#' kw.test <- aldex.kw(x)
+aldex.kw <- function(clr, useMC=FALSE, verbose=FALSE){
   
+  # Use clr conditions slot instead of input
   conditions <- clr@conds
   
   # make sure that the multicore package is in scope and return if available
   is.multicore = FALSE
   
   if ("BiocParallel" %in% rownames(installed.packages()) & useMC){
-    print("multicore environment is OK -- using the BiocParallel package")
+    message("multicore environment is OK -- using the BiocParallel package")
     #require(BiocParallel)
     is.multicore = TRUE
   }
   else {
-    print("operating in serial mode")
+    message("operating in serial mode")
   }
   
   # get dimensions, names, etc from the input data
@@ -80,11 +81,11 @@ aldex.kw <- function(clr, conditions, useMC=FALSE){
   kw.pBH.matrix <- glm.matrix.p # duplicate result container
   
   # mc.i is the i-th Monte-Carlo instance
-  print("running tests for each MC instance:")
+  if(verbose) message("running tests for each MC instance:")
   mc.all <- getMonteCarloInstances(clr)
   for(mc.i in 1:mc.instances){
     
-    numTicks <- progress(mc.i, mc.instances, numTicks)
+    if(verbose) numTicks <- progress(mc.i, mc.instances, numTicks)
     
     # generate a matrix of i-th Monte-Carlo instance, columns are samples, rows are features
     t.input <- sapply(mc.all, function(y){y[, mc.i]})

@@ -4,9 +4,9 @@
 # data is returned in a data frame
 # requires multicore
 
-aldex.effect <- function(clr, conditions, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE){
+aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE){
 
-    # reorder conditions
+  # Use clr conditions slot instead of input
     conditions <- clr@conds
 
     is.multicore = FALSE

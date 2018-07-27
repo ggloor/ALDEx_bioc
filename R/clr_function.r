@@ -44,23 +44,23 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     denom <- "all"
     conds <- rep("NA", ncol(reads))
 
-  }else{
+  }#else{
 
-    # add special handling for model.matrix input
-    if(class(conds) == "matrix"){
-      print("conditions provided as matrix: selecting first column for aldex.clr")
-      conds <- conds[,1]
-    }
-
-    # ncol df and length(c) must be equal
-    if(ncol(reads) != length(conds)){
-      stop("mismatch between number of samples and condition vector")
-    }
-
-    # reorder the samples and conditions by level
-    conds <- conds[order(conds)]
-    reads <- data.frame(reads[,order(conds)])
-  }
+  #   # add special handling for model.matrix input
+  #   if(class(conds) == "matrix"){
+  #     print("conditions provided as matrix: selecting first column for aldex.clr")
+  #     conds <- conds[,1]
+  #   }
+  # 
+  #   # ncol df and length(c) must be equal
+  #   if(ncol(reads) != length(conds)){
+  #     stop("mismatch between number of samples and condition vector")
+  #   }
+  # 
+  #   # reorder the samples and conditions by level
+  #   conds <- conds[order(conds)]
+  #   reads <- data.frame(reads[,order(conds)])
+  # }
 
     # make sure that the multicore package is in scope and return if available
     has.BiocParallel <- FALSE
