@@ -12,12 +12,12 @@ aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=
     is.multicore = FALSE
 
     if ("BiocParallel" %in% rownames(installed.packages()) & useMC){
-        print("multicore environment is OK -- using the BiocParallel package")
+        message("multicore environment is OK -- using the BiocParallel package")
         #require(BiocParallel)
         is.multicore = TRUE
     }
     else {
-        message("operating in serial mode")
+        if (verbose == TRUE) message("operating in serial mode")
     }
 
     nr <- numFeatures(clr) # number of features
@@ -41,7 +41,7 @@ aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=
     }
 
     # end sanity check
-if (verbose == TRUE) print("sanity check complete")
+if (verbose == TRUE) message("sanity check complete")
 
     # Summarize the relative abundance (rab) win and all groups
 
@@ -55,7 +55,7 @@ if (verbose == TRUE) print("sanity check complete")
     rab$all <- t(apply( cl2p, 1, median ))
     rm(cl2p)
     gc()
- if (verbose == TRUE) print("rab.all  complete")
+ if (verbose == TRUE) message("rab.all  complete")
 
     #this is the median value across all monte carlo replicates per level
     for ( level in levels(conditions) ) {
@@ -70,7 +70,7 @@ if (verbose == TRUE) print("sanity check complete")
     if (is.multicore == TRUE)  rab$spl <- bplapply( getMonteCarloInstances(clr), function(m) { t(apply( m, 1, median )) } )
     if (is.multicore == FALSE) rab$spl <- lapply( getMonteCarloInstances(clr), function(m) { t(apply( m, 1, median )) } )
 
-if (verbose == TRUE) print("rab of samples complete")
+if (verbose == TRUE) message("rab of samples complete")
 
     # ---------------------------------------------------------------------
     # Compute diffs btw and win groups
@@ -101,7 +101,7 @@ if (verbose == TRUE) print("rab of samples complete")
         rm(sampl2)
         gc()
     }
-if (verbose == TRUE) print("within sample difference calculated")
+if (verbose == TRUE) message("within sample difference calculated")
     # Handle the case when the groups have different spl sizes
     # get the minimum number of win spl comparisons
     ncol.wanted <- min( sapply( l2d$win, ncol ) )
@@ -130,7 +130,7 @@ if (verbose == TRUE) print("within sample difference calculated")
     rm(smpl1)
     rm(smpl2)
     gc()
-if (verbose == TRUE) print("between group difference calculated")
+if (verbose == TRUE) message("between group difference calculated")
 
     win.max <- matrix( 0 , nrow=nr , ncol=ncol.wanted )
     l2d$effect <- matrix( 0 , nrow=nr , ncol=ncol(l2d$btw) )
@@ -163,11 +163,11 @@ if (verbose == TRUE) print("between group difference calculated")
 
     l2s$btw <- t(apply( l2d$btw, 1, median ))
     l2s$win  <- t(apply( attr(l2d$win,"max"), 1, median ))
-if (verbose == TRUE) print("group summaries calculated")
+if (verbose == TRUE) message("group summaries calculated")
 
     effect  <- t(apply( l2d$effect, 1, median ))
     overlap <- apply( l2d$effect, 1, function(row) { min( aitchison.mean( c( sum( row < 0 ) , sum( row > 0 ) ) + 0.5 ) ) } )
-if (verbose == TRUE) print("effect size calculated")
+if (verbose == TRUE) message("effect size calculated")
 
 # make and fill in the data table
 # i know this is inefficient, but it works and is not a bottleneck
@@ -178,7 +178,7 @@ if (verbose == TRUE) print("effect size calculated")
         overlap = overlap
     )
 
-if (verbose == TRUE) print("summarizing output")
+if (verbose == TRUE) message("summarizing output")
 
    y.rv <- data.frame(t(rv$rab$all))
    colnames(y.rv) <- c("rab.all")

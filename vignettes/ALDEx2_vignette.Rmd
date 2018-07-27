@@ -83,21 +83,21 @@ The next operation performs the Welch's t and Wilcoxon rank test for the instanc
 This operation is reasonably fast.
 
 ```{r,echo=TRUE, eval=TRUE, results="hide"}
-x.tt <- aldex.ttest(x, conds, paired.test=FALSE, verbose=FALSE)
+x.tt <- aldex.ttest(x, paired.test=FALSE, verbose=FALSE)
 ```
 
 ## The `aldex.kw` module
 Alternatively to the t-test, the user can perform the glm and Kruskal Wallace tests for one-way ANOVA of two or more conditions. Here there are only two inputs: the aldex object from aldex.clr, and the vector of conditions. Note that this is slow! and is not evaluated for this documentation.
 
 ```{r,echo=TRUE, eval=FALSE, results="hide"}
-x.kw <- aldex.kw(x, conds)
+x.kw <- aldex.kw(x)
 ```
 
 ## The `aldex.effect` module
 Finally, we estimate effect size and the within and between condition values in the case of two conditions. This step is required for plotting. There are four inputs: the aldex object from aldex.clr, the vector of conditions,  a flag as to whether to include values for all samples or not are used as the denominator, and the level of verbosity.
 
 ```{r,echo=T, eval=TRUE, message=F, error=F, warning=F, results="hide"}
-x.effect <- aldex.effect(x, conds, verbose=FALSE)
+x.effect <- aldex.effect(x, verbose=FALSE)
 ```
 
 ## The `aldex.plot` module
@@ -278,7 +278,7 @@ Figure 5 shows the effect of the iqlr correction on the example dataset. When th
 data(synth2)
 blocks <- c(rep("N", 10),rep("S", 10))
 x <- aldex.clr(synth2, blocks, denom="all")
-x.e <- aldex.effect(x, blocks)
+x.e <- aldex.effect(x)
 plot(x.e$diff.win, x.e$diff.btw, pch=19, col=rgb(0,0,0,0.1), cex=0.5, xlab="dispersion", ylab="difference", main="all")
 points(x.e$diff.win[x@denom], x.e$diff.btw[x@denom], pch=19, col=rgb(0.8,0.5,0,0.7), cex=0.5)
 points(x.e$diff.win[47:86], x.e$diff.btw[47:86], col=rgb(0.8,0,0,0.7), cex=0.5)
@@ -297,7 +297,7 @@ par(mfrow=c(1,3))
 data(synth2)
 blocks <- c(rep("N", 10),rep("S", 10))
 x <- aldex.clr(synth2, blocks, denom="all")
-x.e <- aldex.effect(x, blocks)
+x.e <- aldex.effect(x)
 
 plot(x.e$diff.win, x.e$diff.btw, pch=19, col=rgb(0,0,0,0.1), cex=0.5, xlab="dispersion", ylab="difference", main="all")
 points(x.e$diff.win[x@denom], x.e$diff.btw[x@denom], pch=19, col=rgb(0.8,0.5,0,0.7), cex=0.5)
@@ -308,7 +308,7 @@ abline(0,-1)
 abline(h=0, col="gray", lty=2)
 
 x <- aldex.clr(synth2, blocks, denom="iqlr")
-x.e <- aldex.effect(x, blocks)
+x.e <- aldex.effect(x)
 plot(x.e$diff.win, x.e$diff.btw, pch=19, col=rgb(0,0,0,0.1), cex=0.5, xlab="dispersion", ylab="difference", main="iqlr")
 points(x.e$diff.win[x@denom], x.e$diff.btw[x@denom], pch=19, col=rgb(0.8,0.5,0,0.7), cex=0.5)
 points(x.e$diff.win[47:86], x.e$diff.btw[47:86], col=rgb(0.8,0,0,0.7), cex=0.5)
@@ -318,7 +318,7 @@ abline(0,-1)
 abline(h=0, col="gray", lty=2)
 
 x <- aldex.clr(synth2, blocks, denom="lvha")
-x.e <- aldex.effect(x, blocks)
+x.e <- aldex.effect(x)
 plot(x.e$diff.win, x.e$diff.btw, pch=19, col=rgb(0,0,0,0.1), cex=0.5, xlab="dispersion", ylab="difference", main="lvha")
 points(x.e$diff.win[x@denom], x.e$diff.btw[x@denom], pch=19, col=rgb(0.8,0.5,0,0.7), cex=0.5)
 points(x.e$diff.win[47:86], x.e$diff.btw[47:86], col=rgb(0.8,0,0,0.7), cex=0.5)
