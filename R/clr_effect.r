@@ -4,7 +4,7 @@
 # data is returned in a data frame
 # requires multicore
 
-aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE){
+aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE){
 
   # Use clr conditions slot instead of input
     conditions <- clr@conds
@@ -65,7 +65,7 @@ if (verbose == TRUE) message("sanity check complete")
         rm(cl2p)
         gc()
     }
- if (verbose == TRUE) print("rab.win  complete")
+ if (verbose == TRUE) message("rab.win  complete")
 
     if (is.multicore == TRUE)  rab$spl <- bplapply( getMonteCarloInstances(clr), function(m) { t(apply( m, 1, median )) } )
     if (is.multicore == FALSE) rab$spl <- lapply( getMonteCarloInstances(clr), function(m) { t(apply( m, 1, median )) } )
@@ -165,18 +165,35 @@ if (verbose == TRUE) message("between group difference calculated")
     l2s$win  <- t(apply( attr(l2d$win,"max"), 1, median ))
 if (verbose == TRUE) message("group summaries calculated")
 
-    effect  <- t(apply( l2d$effect, 1, median ))
+    if(CI == FALSE) {
+      effect  <- t(apply( l2d$effect, 1, median ))
+    } else {
+      effectlow <- t(apply( l2d$effect, 1, function(x) quantile(x, probs=0.025, names=FALSE) ))
+      effecthigh <- t(apply( l2d$effect, 1, function(x) quantile(x, probs=0.975, names=FALSE) ))
+      effect  <- t(apply( l2d$effect, 1, median ))
+    }
     overlap <- apply( l2d$effect, 1, function(row) { min( aitchison.mean( c( sum( row < 0 ) , sum( row > 0 ) ) + 0.5 ) ) } )
 if (verbose == TRUE) message("effect size calculated")
 
 # make and fill in the data table
 # i know this is inefficient, but it works and is not a bottleneck
+   if(CI == FALSE) {
     rv <- list(
         rab = rab,
         diff = l2s,
         effect = effect,
         overlap = overlap
     )
+    } else {
+    rv <- list(
+        rab = rab,
+        diff = l2s,
+        effect = effect,
+        effectlow = effectlow,
+        effecthigh = effecthigh,
+        overlap = overlap
+     )
+    }
 
 if (verbose == TRUE) message("summarizing output")
 
@@ -197,9 +214,14 @@ if (verbose == TRUE) message("summarizing output")
        nm <- paste("diff", i, sep=".")
        y.rv[,nm] <- data.frame(t(rv$diff[[i]]))
    }
-   y.rv[,"effect"] <- data.frame(t(rv$effect))
-   y.rv[,"overlap"] <- data.frame(rv$overlap)
-
+   if(CI == FALSE) {
+     y.rv[,"effect"] <- data.frame(t(rv$effect))
+   } else {
+     y.rv[,"effect"] <- data.frame(t(rv$effect))
+     y.rv[,"effect.low"] <- data.frame(t(rv$effectlow))
+     y.rv[,"effect.high"] <- data.frame(t(rv$effecthigh))
+     y.rv[,"overlap"] <- data.frame(rv$overlap)
+   }
     return(y.rv)
 
 }

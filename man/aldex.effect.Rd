@@ -8,7 +8,7 @@
     determines the effect size, which is the median of the ratio of the between group difference and the larger of the variance within groups
 }
 \usage{
-aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE)
+aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE, CI=FALSE)
 }
 \arguments{
     \item{clr}{
@@ -22,6 +22,9 @@ aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE)
     }
       \item{useMC}{
     use multicore by default (FALSE)
+    }
+       \item{CI}{
+    give effect 95% confidence intervals, defaults to FALSE
 }
 }
 \details{
