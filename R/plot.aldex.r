@@ -26,22 +26,28 @@ aldex.plot <- function( x, ..., type=c("MW","MA"),
         called <- x$kw.eBH <= cutoff
     }
     if ( type == "MW" ) {
-        if ( is.null(xlab) ) xlab <- expression( "Median" ~~ Log[2] ~~ "win-Condition diff" )
-        if ( is.null(ylab) ) ylab <- expression( "Median" ~~ Log[2] ~~ "btw-Condition diff" )
+        if ( is.null(xlab) ) xlab <- expression( "Median" ~~ Log[2] ~~ "Dispersion" )
+        if ( is.null(ylab) ) ylab <- expression( "Median" ~~ Log[2] ~~ "Difference" )
 
         plot(x$diff.win, x$diff.btw, xlab=xlab, ylab=ylab, col=all.col, pch=all.pch, cex=all.cex)
         points(x$diff.win[x$rab.all < rare], x$diff.btw[x$rab.all < rare], col=rare.col, pch=rare.pch, cex=rare.cex)
         points(x$diff.win[called], x$diff.btw[called], col=called.col, pch=called.pch, cex=called.cex)
         abline(0,1, col=thres.line.col, lty=2, lwd=thres.lwd)
         abline(0,-1, col=thres.line.col, lty=2, lwd=thres.lwd)
+        cols <- grep("rab.win", colnames(x))
+        mtext(colnames(x)[cols[1]], 2, line=2, at=min(x$diff.btw), col="grey", cex=0.8)
+        mtext(colnames(x)[cols[2]], 2, line=2, at=max(x$diff.btw), col="grey", cex=0.8)
     }
     if ( type == "MA" ) {
+
         if ( is.null(xlab) ) xlab <- expression( "Median" ~~ Log[2] ~~ "relative abundance" )
-        if ( is.null(ylab) ) ylab <- expression( "Median" ~~ Log[2] ~~ "btw-Condition diff" )
+        if ( is.null(ylab) ) ylab <- expression( "Median" ~~ Log[2] ~~ "Difference" )
 
         plot(x$rab.all, x$diff.btw, xlab=xlab, ylab=ylab, col=all.col, pch=all.pch, cex=all.cex)
         points(x$rab.all[x$rab.all < rare], x$diff.btw[x$rab.all < rare], col=rare.col, pch=rare.pch, cex=rare.cex)
         points(x$rab.all[called], x$diff.btw[called],  col=called.col, pch=called.pch, cex=called.cex)
+        cols <- grep("rab.win", colnames(x))
+        mtext(colnames(x)[cols[1]], 2, line=2, at=min(x$diff.btw), col="grey", cex=0.8)
+        mtext(colnames(x)[cols[2]], 2, line=2, at=max(x$diff.btw), col="grey", cex=0.8)
      }
  }
- 

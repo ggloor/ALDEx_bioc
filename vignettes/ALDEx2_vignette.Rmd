@@ -5,7 +5,7 @@ author:
 - name: Greg Gloor
   affiliation: Dep't of Biochemistry, University of Western Ontario
   email: ggloor@uwo.ca
-bibliography: /Users/ggloor/Library/texmf/bibtex/bib/bibdesk_refs.bib
+bibliography: aldex.bib
 output:
   BiocStyle::html_document:
     toc_float: true

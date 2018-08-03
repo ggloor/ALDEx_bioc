@@ -89,41 +89,41 @@
 aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
                   include.sample.summary=FALSE, verbose=FALSE,
                   denom="all", iterate=FALSE, ...){
-  
+
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
-  
+
   # wrapper function for the entire set of
   message("aldex.clr: generating Monte-Carlo instances and clr values")
   x <- aldex.clr(reads=reads, conds=conditions, mc.samples=mc.samples,
                  denom=denom, verbose=verbose, useMC=FALSE)
-  
+
   if(test == "t") {
-    
+
     message("aldex.ttest: doing t-test")
     x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose)
-    
+
   }else if(test == "kw"){
-    
+
     message("aldex.glm: doing Kruskal-Wallace and glm test (ANOVA-like)")
     x.tt <- aldex.kw(x)
-    
+
   }else if(test == "glm"){
-    
+
     message("aldex.glm: doing glm test based on a model matrix")
     x.tt <- aldex.glm(x, ...)
-    
+
   }else if(test == "cor" | test == "corr"){
-    
+
     message("aldex.corr: doing correlation with a continuous variable")
     x.tt <- aldex.corr(x, ...)
-    
+
   }else{
-    
+
     stop("argument 'test' not recognized")
   }
-  
+
   if(iterate){
-    
+
     message("iterate: seeding a second test")
     x.BHonly <- x.tt[,grepl("BH", colnames(x.tt)), drop = FALSE]
     nonDE.i <- as.logical(apply(x.BHonly > .05, 1, prod))
@@ -132,17 +132,17 @@ aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
                   include.sample.summary=include.sample.summary, verbose=verbose,
                   denom=nonDE.i, iterate=FALSE, ...)
   }
-  
+
   if(test == "t" && effect && !iterate){
-    
+
     message("aldex.effect: calculating effect sizes")
     x.effect <- aldex.effect(x, include.sample.summary=include.sample.summary, verbose=verbose)
-    z <- data.frame(x.effect, x.tt, verbose=verbose)
-    
+    z <- data.frame(x.effect, x.tt)
+
   }else{
-    
+
     z <- data.frame(x.tt)
   }
-  
+
   return(z)
 }
