@@ -137,7 +137,7 @@ aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
 
     message("aldex.effect: calculating effect sizes")
     x.effect <- aldex.effect(x, include.sample.summary=include.sample.summary, verbose=verbose)
-    z <- data.frame(x.effect, x.tt)
+    z <- data.frame(x.effect, x.tt, check.names=F)
 
   }else{
 
