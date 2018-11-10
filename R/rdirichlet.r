@@ -20,22 +20,19 @@ aitchison.mean <- function( n, log=FALSE ) {
     return(p)
 }
 
+# From the R-Help mailing list
+# https://stat.ethz.ch/pipermail/r-help/2000-December/009561.html
+# modified to test for rational inputs first by gg Oct 09, 2018
+# this should be clean of any GPL license and we can start again
 
-#<<BEGIN>>
-#copied from mc2d R package
-#licenced GPL>=2
-#should be compatable with AGPL3
-rdirichlet <- function (n, alpha)
-#ISALIAS ddirichlet
-#--------------------------------------------
+rdirichlet<-function(n,a)
+  ## pick n random deviates from the Dirichlet function with shape parameters a
 {
-  if(length(n) > 1) n <- length(n)
-  if(length(n) == 0 || as.integer(n) == 0) return(numeric(0))
-  n <- as.integer(n)
-  if(n < 0) stop("integer(n) can not be negative in rtriang")
-
-  if(is.vector(alpha)) alpha <- t(alpha)
-  l <- dim(alpha)[2]
-  x <- matrix(rgamma(l * n, t(alpha)), ncol = l, byrow=TRUE)  # Gere le recycling
-  return(x / rowSums(x))
+    if(length(n) > 1 || length(n) < 1 || n < 1) stop("n must be a single positive integer value")
+    if(length(a) < 2) stop("a must be a vector of numeric value")
+    n <- floor(n)
+    l<-length(a);
+    x<-matrix(rgamma(l*n,a),ncol=l,byrow=TRUE);
+    # sm<-x%*%rep(1,l);
+    return(x/rowSums(x) );
 }

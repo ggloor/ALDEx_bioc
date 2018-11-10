@@ -2,9 +2,9 @@ Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
 Version: 1.11.0
-Date: 2018-07-18
-Author: Greg Gloor, Ruth Grace Wong, Andrew Fernandes, Arianne Albert, Matt Links,
-    Thomas Quinn, Jia Rong Wu
+Date: 2018-11-09
+Author: Greg Gloor, Andrew Fernandes, Jean Macklaim, Arianne Albert, Matt Links,
+    Thomas Quinn, Jia Rong Wu, Ruth Grace Wong,
 Maintainer: Greg Gloor <ggloor@uwo.ca>
 biocViews: DifferentialExpression, RNASeq, DNASeq, ChIPSeq, GeneExpression, Bayesian,
     Sequencing, Software, Microbiome, Metagenomics

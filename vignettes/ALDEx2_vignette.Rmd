@@ -38,9 +38,9 @@ With this simple realization, a number of groups have realized that HTS datasets
 
 # Installation
 
-There are two ways to download and install the most current of `r Biocpkg("ALDEx2")`. The most recent version of the package will be found at [github.com/ggloor/ALDEx_bioc](https://github.com/ggloor/ALDEx_bioc). The package will run with only the base R packages and a minimal Bioconductor install,  and is capable of running several functions with the `parallel' package if installed. It has been tested with version R version 3, but should run on version 2.12 onward as long as dependencies are met. It is recommended that the package be run on the most up-to-date R and Bioconductor versions. `r Biocpkg("ALDEx2")` will make use of the `BiocParallel` package if possible, otherwise, `r Biocpkg("ALDEx2")` will run in serial mode.
+There are two ways to download and install the most current of `r Biocpkg("ALDEx2")`. The most recent version of the package will be found at [github.com/ggloor/ALDEx_bioc](https://github.com/ggloor/ALDEx_bioc). The package will run with only the base R packages and a minimal Bioconductor install,  and is capable of running several functions with the `parallel' package if installed. It has been tested with version R version 3, but should run on version 2.12 onward as long as dependencies are met. It is recommended that the package be run on the most up-to-date R and Bioconductor versions. `r Biocpkg("ALDEx2")` will make use of the BiocParallel package if possible, otherwise, `r Biocpkg("ALDEx2")` will run in serial mode.
 
-- Install development version:
+- Install development version from github:
 
 ```{r, eval=FALSE}
 install.packages("devtools")
