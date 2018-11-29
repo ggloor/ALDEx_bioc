@@ -1,13 +1,14 @@
 Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
-Version: 1.15.1
-Date: 2018-11-09
+Version: 1.15.2
+Date: 2018-11-29
 Author: Greg Gloor, Andrew Fernandes, Jean Macklaim, Arianne Albert, Matt Links,
     Thomas Quinn, Jia Rong Wu, Ruth Grace Wong,
 Maintainer: Greg Gloor <ggloor@uwo.ca>
-biocViews: DifferentialExpression, RNASeq, DNASeq, ChIPSeq, GeneExpression, Bayesian,
-    Sequencing, Software, Microbiome, Metagenomics
+biocViews: DifferentialExpression, RNASeq, Transcriptomics, GeneExpression, DNASeq,
+    ChIPSeq, Bayesian, Sequencing, Software, Microbiome, Metagenomics,
+    ImmunoOncology
 Description: A differential abundance analysis for the comparison of two or more
     conditions. Useful for analyzing data from standard RNA-seq or meta-RNA-seq assays
     as well as selected and unselected values from in-vitro sequence selections.
