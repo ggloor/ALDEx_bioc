@@ -216,6 +216,7 @@ if (verbose == TRUE) message("summarizing output")
    }
    if(CI == FALSE) {
      y.rv[,"effect"] <- data.frame(t(rv$effect))
+     y.rv[,"overlap"] <- data.frame(rv$overlap)
    } else {
      y.rv[,"effect"] <- data.frame(t(rv$effect))
      y.rv[,"effect.low"] <- data.frame(t(rv$effectlow))
