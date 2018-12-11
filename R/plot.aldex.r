@@ -16,14 +16,15 @@ aldex.plot <- function( x, ..., type=c("MW","MA"),
     }else if (test == "wilcox"){
         if (length(x$wi.eBH) == 0) stop ("Wilcoxon test results not in dataset")
         called <- x$wi.eBH <= cutoff
-    }
-    if (test == "glm"){
+    }else if (test == "glm"){
         if (length(x$glm.eBH) == 0) stop ("glm test results not in dataset")
         called <- x$glm.eBH <= cutoff
-    }
-    if (test == "kruskal"){
+    }else if (test == "kruskal"){
         if (length(x$kw.eBH) == 0) stop ("Kruskall-Wallace test results not in dataset")
         called <- x$kw.eBH <= cutoff
+    }else if (test == "effect"){
+        if (cutoff <= 0.49) stop ("Please set cutoff to at least 0.5")
+        called <- abs(x$effect) >= cutoff
     }
     if ( type == "MW" ) {
         if ( is.null(xlab) ) xlab <- expression( "Median" ~~ Log[2] ~~ "Dispersion" )

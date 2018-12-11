@@ -33,14 +33,14 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 	if (summarizedExperiment) {
 		reads <- data.frame(as.list(assays(reads,withDimnames=TRUE)))
 		if (verbose) {
-			print("converted SummarizedExperiment read count object into data frame")
+			message("converted SummarizedExperiment read count object into data frame")
 		}
 	}
 
   if(missing(conds)){
 
-    print("no conditions provided: forcing denom = 'all'")
-    print("no conditions provided: forcing conds = 'NA'")
+    message("no conditions provided: forcing denom = 'all'")
+    message("no conditions provided: forcing conds = 'NA'")
     denom <- "all"
     conds <- rep("NA", ncol(reads))
 
@@ -48,15 +48,15 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 
   #   # add special handling for model.matrix input
   #   if(class(conds) == "matrix"){
-  #     print("conditions provided as matrix: selecting first column for aldex.clr")
+  #     message("conditions provided as matrix: selecting first column for aldex.clr")
   #     conds <- conds[,1]
   #   }
-  # 
+  #
   #   # ncol df and length(c) must be equal
   #   if(ncol(reads) != length(conds)){
   #     stop("mismatch between number of samples and condition vector")
   #   }
-  # 
+  #
   #   # reorder the samples and conditions by level
   #   conds <- conds[order(conds)]
   #   reads <- data.frame(reads[,order(conds)])
@@ -65,7 +65,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     # make sure that the multicore package is in scope and return if available
     has.BiocParallel <- FALSE
     if ("BiocParallel" %in% rownames(installed.packages()) & useMC){
-        print("multicore environment is is OK -- using the BiocParallel package")
+        message("multicore environment is is OK -- using the BiocParallel package")
         #require(BiocParallel)
         has.BiocParallel <- TRUE
     }
@@ -83,7 +83,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     z <- as.numeric(apply(reads, 1, sum))
     reads <- as.data.frame( reads[(which(z > minsum)),]  )
 
-    if (verbose) print("removed rows with sums equal to zero")
+    if (verbose) message("removed rows with sums equal to zero")
 
 
     #  SANITY CHECKS ON THE DATA INPUT
@@ -114,7 +114,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 
     reads <- reads + prior
 
-if (verbose == TRUE) print("data format is OK")
+if (verbose == TRUE) message("data format is OK")
 
     # ---------------------------------------------------------------------
     # Generate a Monte Carlo instance of the frequencies of each sample via the Dirichlet distribution,
@@ -149,7 +149,7 @@ if (verbose == TRUE) print("data format is OK")
             if ( any( ! is.finite( p[[i]] ) ) ) stop("non-finite frequencies estimated")
     }
 
-if (verbose == TRUE) print("dirichlet samples complete")
+if (verbose == TRUE) message("dirichlet samples complete")
 
     # ---------------------------------------------------------------------
     # Take the log2 of the frequency and subtract the geometric mean log2 frequency per sample
@@ -193,14 +193,14 @@ if (verbose == TRUE) print("dirichlet samples complete")
             })
         }
     }  else {
-        print("the denominator is not recognized, use a different denominator")
+        message("the denominator is not recognized, use a different denominator")
     }
 
     # sanity check on data
     for ( i in 1:length(l2p) ) {
         if ( any( ! is.finite( l2p[[i]] ) ) ) stop("non-finite log-frequencies were unexpectedly computed")
     }
-if (verbose == TRUE) print("transformation complete")
+if (verbose == TRUE) message("transformation complete")
 
     return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,analysisData=l2p))
 }
