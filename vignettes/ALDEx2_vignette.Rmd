@@ -132,7 +132,7 @@ x.all <- data.frame(x.tt,x.effect)
 And the data are plotted. We see that the plotted data in Figure 1 and 2 are essentially the same.
 
 
-```{r,fig=TRUE,echo=TRUE,width=7,height=4, fig.cap="Output from aldex.plot function. The left panel is the MA plot, the right is the MW (effect) plot. In both plots red represents features called as differentially abundant with q $<0.1$; grey are abundant, but not non-differentially abundant; black are rare, but not differentially abundant. This function uses the combined output from the aldex.ttest and aldex.effect functions "}
+```{r,fig=TRUE,echo=TRUE,width=7,height=4, fig.cap="Output from aldex.plot function. The left panel is the MA plot, the right is the MW (effect) plot. In both plots red represents features called as differentially abundant with q $<0.1$; grey are abundant, but not differentially abundant; black are rare, but not differentially abundant. This function uses the combined output from the aldex.ttest and aldex.effect functions "}
 
 par(mfrow=c(1,2))
 aldex.plot(x.all, type="MA", test="welch")
