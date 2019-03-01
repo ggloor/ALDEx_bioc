@@ -4,10 +4,12 @@
 \alias{aldex.corr}
 \title{Calculate correlation with a continuous variable}
 \usage{
-aldex.corr(clr, verbose = FALSE, ...)
+aldex.corr(clr, cont.var, verbose = FALSE, ...)
 }
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}
+
+\item{cont.var}{A continuous numeric vector}
 
 \item{verbose}{A boolean. Toggles whether to print diagnostic information while
 running. Useful for debugging errors on large datasets. Applies to
@@ -23,14 +25,18 @@ Returns a data.frame of the average
 \description{
 \code{aldex.corr} calculates the expected values for the correlation
  between each feature and a continuous variable, using data returned
- returned by \code{aldex.clr}.
+ returned by \code{aldex.clr} and a vector of the continuous variable.
+ By default uses pearson but method="kendall" or "spearman" can be
+ passed to the cor.test function.
 }
 \examples{
 data(selex)
 #subset for efficiency
 selex <- selex[1201:1600,]
-x <- aldex.clr(selex, 1:14)
-corr.test <- aldex.corr(x)
+conds <- c(rep("N", 7), rep("S",7))
+cont.var <-  1:14
+x <- aldex.clr(selex, conds)
+corr.test <- aldex.corr(x, cont.var)
 }
 \references{
 Please use the citation given by
@@ -47,5 +53,5 @@ Please use the citation given by
  \code{\link{selex}}
 }
 \author{
-Thom Quinn
+Thom Quinn, Greg Gloor
 }
