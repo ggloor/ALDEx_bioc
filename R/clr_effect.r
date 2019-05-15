@@ -60,7 +60,7 @@ if (verbose == TRUE) message("sanity check complete")
     #this is the median value across all monte carlo replicates per level
     for ( level in levels(conditions) ) {
         cl2p <- NULL
-        for ( i in levels[[level]] ) cl2p <- cbind( cl2p, getMonteCarloReplicate(clr,i) )
+        for ( i in levels[[level]] ) cl2p <- cbind( cl2p, getMonteCarloInstance(clr,i) )
         rab$win[[level]] <- t(apply( cl2p, 1, median ))
         rm(cl2p)
         gc()
@@ -84,7 +84,7 @@ if (verbose == TRUE) message("rab of samples complete")
     for ( level in levels(conditions) ) {
         concat <- NULL
         for ( l1 in sort( levels[[level]] ) ) {
-            concat <- cbind(  getMonteCarloReplicate(clr,l1),concat )
+            concat <- cbind(  getMonteCarloInstance(clr,l1),concat )
 
         }
 
@@ -113,8 +113,8 @@ if (verbose == TRUE) message("within sample difference calculated")
     #get the btw condition as a random sample rather than exhaustive search
     concatl1 <- NULL
     concatl2 <- NULL
-    for( l1 in levels[[1]] ) concatl1 <- cbind( getMonteCarloReplicate(clr,l1),concatl1 )
-    for( l2 in levels[[2]] ) concatl2 <- cbind( getMonteCarloReplicate(clr,l2),concatl2 )
+    for( l1 in levels[[1]] ) concatl1 <- cbind( getMonteCarloInstance(clr,l1),concatl1 )
+    for( l2 in levels[[2]] ) concatl2 <- cbind( getMonteCarloInstance(clr,l2),concatl2 )
 
     sample.size <- min(ncol(concatl1), ncol(concatl2))
 

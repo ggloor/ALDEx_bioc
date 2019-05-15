@@ -1,17 +1,17 @@
-\name{getMonteCarloReplicate}
+\name{getMonteCarloSample}
 
-\alias{getMonteCarloReplicate}
-\alias{getMonteCarloReplicate,aldex.clr,numeric-method}
+\alias{getMonteCarloSample}
+\alias{getMonteCarloSample,aldex.clr,numeric-method}
 
-\title{getMonteCarloReplicate}
+\title{getMonteCarloSample}
 
 \description{
-  Returns the designated Monte Carlo Dirochlet replicate generated from analysis,
+  Returns a set of Monte Carlo Dirochlet replicates for one sample generated from analysis,
   for an \code{aldex.clr} object.
 }
 
 \usage{
-getMonteCarloReplicate(.object,i)
+getMonteCarloSample(.object,i)
 }
 
 \arguments{
@@ -19,16 +19,16 @@ getMonteCarloReplicate(.object,i)
   instances derived from estimating the technical variance of the raw read count data,
   along with sample and feature information.
   }
-  \item{i}{The numeric index of the desired replicate.
+  \item{i}{The numeric index of the desired sample.
   }
 }
 
 \details{
-  Returns the designated Monte Carlo Dirochlet replicate generated from analysis.
+  Returns the designated Monte Carlo Dirochlet replicates for one sample generated from analysis.
 }
 
 \value{
-  A data frame representing the designated Monte Carlo Dirochlet replicate generated
+  A data frame representing the designated Monte Carlo Dirochlet replicates for one sample generated
   from analysis.
 }
 
@@ -42,5 +42,5 @@ data(selex)
     selex <- selex[1201:1600,]
 conds <- c(rep("NS", 7), rep("S", 7))
 x <- aldex.clr(selex, conds, mc.samples = 2, denom = "all", verbose = FALSE)
-monteCarloInstance <- getMonteCarloReplicate(x,1)
+monteCarloSample <- getMonteCarloSample(x,1)
 }

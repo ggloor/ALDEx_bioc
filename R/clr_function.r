@@ -226,7 +226,9 @@ setMethod("getReads", signature(.object="aldex.clr"), function(.object) .object@
 
 setMethod("numConditions", signature(.object="aldex.clr"), function(.object) length(names(.object@analysisData)))
 
-setMethod("getMonteCarloReplicate", signature(.object="aldex.clr",i="numeric"), function(.object,i) .object@analysisData[[i]])
+setMethod("getMonteCarloSample", signature(.object="aldex.clr",i="numeric"), function(.object,i) .object@analysisData[[i]])
+
+setMethod("getMonteCarloInstance", signature(.object="aldex.clr",i="numeric"), function(.object,i) sapply(.object@analysisData, function(x) {x[,i]}))
 
 setMethod("getDenom", signature(.object="aldex.clr"), function(.object) .object@denom)
 
@@ -235,5 +237,3 @@ setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.
 setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE))
 
 setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE))
-
-
