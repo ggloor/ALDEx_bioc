@@ -182,15 +182,27 @@ if (verbose == TRUE) message("dirichlet samples complete")
     } else if (is.vector(feature.subset)){
         # Default ALDEx2, iqlr, user defined, lvha
         if (has.BiocParallel){
+            if (denom != "median"){
             l2p <- bplapply( p, function(m) {
                 apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
             })
+            } else if (denom == "median"){
+            l2p <- bplapply( p, function(m) {
+                apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
+            })
+            }
             names(l2p) <- names(p)
         }
         else{
+            if (denom != "median"){
             l2p <- lapply( p, function(m) {
                 apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
             })
+            } else if (denom == "median"){
+             l2p <- lapply( p, function(m) {
+                apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
+            })
+            }
         }
     }  else {
         message("the denominator is not recognized, use a different denominator")
