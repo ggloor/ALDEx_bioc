@@ -198,12 +198,13 @@ if (verbose == TRUE) message("dirichlet samples complete")
         l2p <- p    # Save the set in order to generate the aldex.clr variable
     } else if (is.vector(feature.subset)){
         # Default ALDEx2, iqlr, user defined, lvha
+        # denom[1] is put in explicitly for the user-defined denominator case
         if (has.BiocParallel){
-            if (denom != "median"){
+            if (denom[1] != "median"){
             l2p <- bplapply( p, function(m) {
                 apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
             })
-            } else if (denom == "median"){
+            } else if (denom[1] == "median"){
             l2p <- bplapply( p, function(m) {
                 apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
             })
@@ -211,11 +212,11 @@ if (verbose == TRUE) message("dirichlet samples complete")
             names(l2p) <- names(p)
         }
         else{
-            if (denom != "median"){
+            if (denom[1] != "median"){
             l2p <- lapply( p, function(m) {
                 apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
             })
-            } else if (denom == "median"){
+            } else if (denom[1] == "median"){
              l2p <- lapply( p, function(m) {
                 apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
             })
