@@ -38,7 +38,7 @@ aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=
     for ( l in levels( conditions ) ) {
         levels[[l]] <- which( conditions == l )
         if ( length( levels[[l]] ) < 2 ) stop("condition level '",l,"' has less than two replicates")
-
+    }
 
     # end sanity check
 if (verbose == TRUE) message("sanity check complete")
