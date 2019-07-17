@@ -1,5 +1,5 @@
 aldex.expectedDistance <- function(d.clr) {
-    if (class(d.clr) != "aldex.clr") {
+    if (class(d.clr) != "aldex.clr" && class(d.clr) != "list") {
         stop("Please supply a valid aldex.clr object.")
     }
 
@@ -14,7 +14,10 @@ aldex.expectedDistance <- function(d.clr) {
 
     # Apply median() across all distance-value instances for each sample pair
     message("computing median distance across instances...")
-    expectedDist <- apply(distances, c(1, 2), median)
+    expectedDist <- as.matrix(apply(distances, c(1, 2), median))
 
-    return(expectedDist)
+    rownames(expectedDist) <- getSampleIDs(d.clr)
+    colnames(expectedDist) <- getSampleIDs(d.clr)
+    
+    return(as.dist(expectedDist))
 }
