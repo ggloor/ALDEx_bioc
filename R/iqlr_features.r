@@ -45,7 +45,7 @@ aldex.set.mode <- function(reads, conds, denom="all")
         } else if (denom == "iqlr") {
             message("computing iqlr centering")
             features <- iqlr.features(reads,conds)
-        } else if (denom == "all" | denom == "") {
+        } else if (denom == "all" | denom == "" | denom == "median") {
             message("computing center with all features")
             features <- all.features(reads,conds)
         } else if (denom == "lvha" ) {

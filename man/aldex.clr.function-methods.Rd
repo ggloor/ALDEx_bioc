@@ -33,9 +33,10 @@
         sufficient.
     }
       \item{denom}{
-          A \code{character} variable (all, iqlr, zero, lvha) indicating which
+          An \code{any} variable (all, iqlr, zero, lvha, median,user) indicating
           features to use as the denominator for the Geometric Mean calculation
           The default "all" uses the geometric mean abundance of all features.
+          Using "median" returns the median abundance of all features.
           Using "iqlr" uses the features that are between the first and third
           quartile of the variance of the clr values across all samples.
           Using "zero" uses the non-zero features in each grop
@@ -71,7 +72,7 @@
 \references{
     Please use the citation given by \code{citation(package="ALDEx")}.}
 \author{
-    Greg Gloor, Ruth Grace Wong, Andrew Fernandes, Matt Links and Jia Rong Wu contributed to this code.
+    Greg Gloor, Thom Quinn, Ruth Grace Wong, Andrew Fernandes, Matt Links and Jia Rong Wu contributed to this code.
 }
 
 \seealso{

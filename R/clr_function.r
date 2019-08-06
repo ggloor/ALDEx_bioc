@@ -1,6 +1,6 @@
 #  invocation:
 #  use selex dataset from ALDEx2 library
-#  x <- aldex.clr( reads, conditions, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE )
+#  x <- aldex.clr( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE )
 #  this function generates the centre log-ratio transform of Monte-Carlo instances
 #  drawn from the Dirichlet distribution.
 
@@ -36,7 +36,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 			message("converted SummarizedExperiment read count object into data frame")
 		}
 	}
-
+  # make sure the conditions vector or matrix is reasonable
   if(missing(conds)){
 
     message("no conditions provided: forcing denom = 'all'")
@@ -44,23 +44,40 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     denom <- "all"
     conds <- rep("NA", ncol(reads))
 
-  }#else{
+  }
 
-  #   # add special handling for model.matrix input
-  #   if(class(conds) == "matrix"){
-  #     message("conditions provided as matrix: selecting first column for aldex.clr")
-  #     conds <- conds[,1]
-  #   }
-  #
-  #   # ncol df and length(c) must be equal
-  #   if(ncol(reads) != length(conds)){
-  #     stop("mismatch between number of samples and condition vector")
-  #   }
-  #
-  #   # reorder the samples and conditions by level
-  #   conds <- conds[order(conds)]
-  #   reads <- data.frame(reads[,order(conds)])
-  # }
+# if a model matrix is supplied, then aldex.effect is not valid
+# force the use of either all for the denominator
+# or
+# the use of a user-supplied denominator
+  if(class(conds) == "matrix"){
+    message("checking for condition length disabled!")
+    if(is.vector(denom, mode="integer")){
+      message("user-defined denominator used")
+    } else if (denom == "all"){
+      message("using all features for denominator")
+    } else {
+      stop("please supply a vector of indices for the denominator")
+    }
+#     if(conds.col == 0){
+#       message("conditions provided as matrix: selecting first column for aldex.clr")
+#       conds <- as.character(conds[,1])
+#     }else{
+#       message("conditions provided as matrix: user selected column for aldex.clr")
+#       if(is.numeric(conds.col)){
+#         print(conds[,conds.col])
+#         conds <- as.vector(conds[,conds.col])
+#         prints(conds)
+#         print(length(conds))
+#       }
+#     }
+  }
+
+  if(ncol(reads) != length(conds) & class(conds) != "matrix"){
+    print(length(conds))
+    print(ncol(reads))
+    stop("mismatch between number of samples and condition vector")
+  }
 
     # make sure that the multicore package is in scope and return if available
     has.BiocParallel <- FALSE
@@ -181,16 +198,29 @@ if (verbose == TRUE) message("dirichlet samples complete")
         l2p <- p    # Save the set in order to generate the aldex.clr variable
     } else if (is.vector(feature.subset)){
         # Default ALDEx2, iqlr, user defined, lvha
+        # denom[1] is put in explicitly for the user-defined denominator case
         if (has.BiocParallel){
+            if (denom[1] != "median"){
             l2p <- bplapply( p, function(m) {
                 apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
             })
+            } else if (denom[1] == "median"){
+            l2p <- bplapply( p, function(m) {
+                apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
+            })
+            }
             names(l2p) <- names(p)
         }
         else{
+            if (denom[1] != "median"){
             l2p <- lapply( p, function(m) {
                 apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
             })
+            } else if (denom[1] == "median"){
+             l2p <- lapply( p, function(m) {
+                apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
+            })
+            }
         }
     }  else {
         message("the denominator is not recognized, use a different denominator")
