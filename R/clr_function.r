@@ -226,7 +226,7 @@ setMethod("getReads", signature(.object="aldex.clr"), function(.object) .object@
 
 setMethod("numConditions", signature(.object="aldex.clr"), function(.object) length(names(.object@analysisData)))
 
-setMethod("getMonteCarloSample", signature(.object="aldex.clr",i="numeric"), function(.object,i) .object@analysisData[[i]])
+setMethod("getMonteCarloReplicate", signature(.object="aldex.clr",i="numeric"), function(.object,i) .object@analysisData[[i]])
 
 setMethod("getMonteCarloInstance", signature(.object="aldex.clr",i="numeric"), function(.object,i) sapply(.object@analysisData, function(x) {x[,i]}))
 

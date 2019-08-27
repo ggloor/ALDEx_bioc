@@ -1,9 +1,9 @@
-\name{getMonteCarloSample}
+\name{getMonteCarloInstance}
 
-\alias{getMonteCarloSample}
-\alias{getMonteCarloSample,aldex.clr,numeric-method}
+\alias{getMonteCarloInstance}
+\alias{getMonteCarloInstance,aldex.clr,numeric-method}
 
-\title{getMonteCarloSample}
+\title{getMonteCarloInstance}
 
 \description{
   Returns a single Monte Carlo Dirochlet replicate (instance) generated from analysis,
@@ -11,7 +11,7 @@
 }
 
 \usage{
-getMonteCarloSample(.object,i)
+getMonteCarloInstance(.object,i)
 }
 
 \arguments{
