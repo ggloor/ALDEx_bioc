@@ -91,7 +91,6 @@ aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
                   denom="all", iterate=FALSE, ...){
 
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
-  if(nrow(reads) < 5 & denom=="iqlr") stop("too few features for iqlr")
 
   # wrapper function for the entire set of
   message("aldex.clr: generating Monte-Carlo instances and clr values")

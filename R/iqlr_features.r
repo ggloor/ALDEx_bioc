@@ -113,6 +113,8 @@ iqlr.features <- function(reads, conds)
     invariant.set <- Reduce(intersect, neg.indicies)
 
     if(!length(invariant.set)) stop("No intersecting features have typical variance")
+    if(length(invariant.set) <= 5) stop("Five or less members in intersecting feature set")
+    
     return(as.vector(invariant.set))
 }
 
@@ -171,6 +173,8 @@ house.features <- function(reads, conds)
 	Reduce(intersect, invariant.set.list)
 
   if(!length(invariant.set)) stop("No intersecting features are low variance and high relative abundance")
+  if(length(invariant.set) <= 5) stop("Five or less members in intersecting feature set")
+  
   return(invariant.set)
 }
 
