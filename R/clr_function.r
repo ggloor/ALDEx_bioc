@@ -228,7 +228,7 @@ setMethod("numConditions", signature(.object="aldex.clr"), function(.object) len
 
 setMethod("getMonteCarloReplicate", signature(.object="aldex.clr",i="numeric"), function(.object,i) .object@analysisData[[i]])
 
-setMethod("getMonteCarloInstance", signature(.object="aldex.clr",i="numeric"), function(.object,i) sapply(.object@analysisData, function(x) {x[,i]}))
+setMethod("getMonteCarloSample", signature(.object="aldex.clr",i="numeric"), function(.object,i) sapply(.object@analysisData, function(x) {x[,i]}))
 
 setMethod("getDenom", signature(.object="aldex.clr"), function(.object) .object@denom)
 
