@@ -1,10 +1,10 @@
 Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
-Version: 1.17.1.1
-Date: 2019-6-19
+Version: 1.17.2
+Date: 2019-10-25
 Author: Greg Gloor, Andrew Fernandes, Jean Macklaim, Arianne Albert, Matt Links,
-    Thomas Quinn, Jia Rong Wu, Ruth Grace Wong,
+    Thomas Quinn, Jia Rong Wu, Ruth Grace Wong, Brandon Lieng
 Maintainer: Greg Gloor <ggloor@uwo.ca>
 biocViews: DifferentialExpression, RNASeq, Transcriptomics, GeneExpression, DNASeq,
     ChIPSeq, Bayesian, Sequencing, Software, Microbiome, Metagenomics,
@@ -20,8 +20,8 @@ Description: A differential abundance analysis for the comparison of two or more
     (via aldex.corr). All tests report p-values and Benjamini-Hochberg
     corrected p-values.
 License: file LICENSE
-URL: https://github.com/ggloor/ALDEx2
-BugReports: https://github.com/ggloor/ALDEx2/issues
+URL: https://github.com/ggloor/ALDEx_bioc
+BugReports: https://github.com/ggloor/ALDEx_bioc/issues
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
 Depends:
