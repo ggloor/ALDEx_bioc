@@ -4,9 +4,18 @@
 \alias{aldex}
 \title{Compute an \code{aldex} Object}
 \usage{
-aldex(reads, conditions, mc.samples = 128, test = "t", effect = TRUE,
-  include.sample.summary = FALSE, verbose = FALSE, denom = "all",
-  iterate = FALSE, ...)
+aldex(
+  reads,
+  conditions,
+  mc.samples = 128,
+  test = "t",
+  effect = TRUE,
+  include.sample.summary = FALSE,
+  verbose = FALSE,
+  denom = "all",
+  iterate = FALSE,
+  ...
+)
 }
 \arguments{
 \item{reads}{A non-negative, integer-only \code{data.frame} or \code{matrix}

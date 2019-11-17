@@ -4,8 +4,7 @@
 \alias{aldex.ttest}
 \title{Calculate Wilcoxon Rank Sum test and Welch's t-test statistics}
 \usage{
-aldex.ttest(clr, paired.test = FALSE, hist.plot = FALSE,
-  verbose = FALSE)
+aldex.ttest(clr, paired.test = FALSE, hist.plot = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}

@@ -32,9 +32,9 @@ Returns a data.frame of the average
 \examples{
 data(selex)
 #subset for efficiency
-selex <- selex[1201:1600,]
+selex <- selex[1:400,]
 conds <- c(rep("N", 7), rep("S",7))
-cont.var <-  1:14
+cont.var <-  c(rep(1,7), rep(2,7))
 x <- aldex.clr(selex, conds)
 corr.test <- aldex.corr(x, cont.var)
 }
