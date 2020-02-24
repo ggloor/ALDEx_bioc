@@ -4,10 +4,17 @@
 # data is returned in a data frame
 # requires multicore
 
-aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE){
+aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE, glm.conds=NULL){
 
   # Use clr conditions slot instead of input
-    conditions <- clr@conds
+     if (is.vector(clr@conds)) {
+       conditions <- clr@conds
+     } else if (is.matrix(clr@conds)){
+       if(is.null(glm.conds)) stop("please provide a binary condition vector")
+       conditions <- glm.conds
+     } else {
+       stop("please check that the conditions parameter for aldex.clr is correct.")
+     }
 
     is.multicore = FALSE
 
