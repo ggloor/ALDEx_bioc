@@ -117,7 +117,7 @@ x.kw <- aldex.kw(x)
 ```
 
 ## The `aldex.effect` module
-Finally, we estimate effect size and the within and between condition values in the case of two conditions. This step is required for plotting, in our lab we base our conclusions only on the output of this function^[@macklaim:2013;@mcmurrough:2014;@bian:2017].. There is one input: the aldex object from aldex.clr,  ; and several parameters: a flag as to whether to include values for all samples or not are used as the denominator, and the level of verbosity. It is also possible to include the 95% confidence interval information for the effect size estimate with the flag `CI=TRUE`. This can be helpful when deciding whether to include or exclude specific features from consideration. We find that a large effect but that is an outlier for the extremes of the effect distribution can be false positives.
+Finally, we estimate effect size and the within and between condition values in the case of two conditions. This step is required for plotting, in our lab we base our conclusions primarily on the output of this function^[@macklaim:2013;@mcmurrough:2014;@bian:2017].. There is one input: the aldex object from aldex.clr,  ; and several parameters: a flag as to whether to include values for all samples or not are used as the denominator, and the level of verbosity. It is also possible to include the 95% confidence interval information for the effect size estimate with the flag `CI=TRUE`. This can be helpful when deciding whether to include or exclude specific features from consideration. We find that a large effect but that is an outlier for the extremes of the effect distribution can be false positives.
 
 ```{r,echo=T, eval=TRUE, message=F, error=F, warning=F, results="hide"}
 x.effect <- aldex.effect(x, CI=T, verbose=FALSE)
@@ -164,7 +164,6 @@ abline(0,2, lty=2, col="grey")
 abline(0,-2, lty=2, col="grey")
 ```
 
-
 ## Complex study designs and the aldex.glm module
 
 The aldex.glm module has been included so that the probabilistic compositional approach can be used for complex study designs. This module is substantially slower than the two-comparison tests above, but we think it is worth it if you have complex study designs.
@@ -177,10 +176,13 @@ Note that `aldex.clr` will accept the `denom="all"` or a user-defined vector of 
 
 ```{r,fig=TRUE,echo=TRUE,width=7,height=4, message=F, error=F, warning=F, fig.cap="Comparing the glm and t-test. Plots of the expected P values for variables output from the glm function with model A (random predictors), and model B (actual study design groups) compared to the P values output by the Welch's t-test. This toy model shows how to use a generalized linear model within theALDEx2 framework. All values are the expected value of the test statistic after correction for multiple hypothesis testing."}
  covariates <- data.frame("A" = sample(0:1, 14, replace = TRUE),
-     "B" = c(rep(0, 7), rep(1, 7)))
- mm <- model.matrix(~ A + B, covariates)
+     "B" = c(rep(0, 7), rep(1, 7)),
+     "Z" = sample(c(1,2,3), 14, replace=TRUE))
+ mm <- model.matrix(~ A + Z + B, covariates)
  x <- aldex.clr(selex.sub, mm, mc.samples=4, denom="all", verbose=F)
  glm.test <- aldex.glm(x, mm)
+ glm.effect <- aldex.glm.effect(x)
+
  par(mfrow=c(1,2))
  plot(glm.test[,"model.A Pr(>|t|).BH"], x.all$we.eBH, log="xy",
      xlab="glm model A", ylab="Welch's t-test")
@@ -188,12 +190,23 @@ Note that `aldex.clr` will accept the `denom="all"` or a user-defined vector of 
      xlab="glm model B", ylab="Welch's t-test")
 ```
 
+The `aldex.glm.effect` function will calculate the effect size for all models in the matrix that are binary. The effect size calculations for each binary predictor are output to a named list. These effect sizes, and outputs from `aldex.glm` can be plotted as in the example code block below which plots the BH-corrected glm values for the actual test case vs. the effect size for the binary predictor.
+
+```{r, eval=FALSE}
+aldex.plot(glm.effect[["B"]], test="effect", cutoff=2)
+sig <- glm.test[,20]<0.05
+points(glm.effect[["B"]]$diff.win[sig],
+    glm.effect[["B"]]$diff.btw[sig], col="blue")
+sig <- glm.test[,20]<0.2
+points(glm.effect[["B"]]$diff.win[sig],
+    glm.effect[["B"]]$diff.btw[sig], col="blue")
+```
+
 \clearpage
 
 # ALDEx2 outputs
 ## Expected values
-
-
+a
 `r Biocpkg("ALDEx2")` returns expected values for summary statistics. It is important to note that ALDEx uses Bayesian sampling from a Dirichlet distribution to estimate  the underlying technical variation. This is controlled by the number of \texttt{mc.samples}, in practice we find that setting this to 16 or 128 is sufficient for most cases as `r Biocpkg("ALDEx2")` is estimating the expected value of the distributions^[@fernandes:2013;@fernandes:2014;@gloorAJS:2016].
 
 In practical terms, `r Biocpkg("ALDEx2")` takes the biological observations as given, but infers technical variation (sequencing the same sample again) multiple times using the `aldex.clr` function. Thus, the expected values returned are those that would likely have been observed \emph{if the same samples had been run multiple times}. The user is cautioned that the number of features called as differential will vary somewhat between runs because of this sampling procedure. However, only features with values close to the chosen significance cutoff will vary between runs.
@@ -397,7 +410,7 @@ I am grateful that `r Biocpkg("ALDEx2")` has taken on a life of its own.
 * Ruth Grace Wong added function definitions and made the parallel code functional with BioConducter.
 * Jia Rong Wu developed and implemented the alternate denominator method to correct for asymmetric datasets.
 * Andrew Fernandes, Jean Macklaim and Ruth Grace Wong contributed to the Sum-FunctionsAitchison.R code.
-* Thom Quinn rewrote the t-test and Wilcoxon functions to make them substantially faster. He also wrote the current aldex.glm function. Tom's `r CRANpkg("propr")`^[@Quinn:2017] R package  is able to use the output from aldex.clr.
+* Thom Quinn rewrote the t-test and Wilcoxon functions to make them substantially faster. He also wrote the current aldex.glm function. Tom's `r CRANpkg("propr")`^[@Quinn:2017] R package  is able to integrate with the output from aldex.clr.
 * Vladimir Mikryukov and everyone named above have contributed bug fixes
 * Greg Gloor  currently maintains `r Biocpkg("ALDEx2")` and had and has roles in documentation, design, testing and implementation.
 

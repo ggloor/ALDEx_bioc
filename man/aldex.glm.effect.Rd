@@ -1,14 +1,15 @@
-\name{aldex.effect}
-\alias{aldex.effect}
-\title{calculate effect sizes and differences between conditions}
+\name{aldex.glm.effect}
+\alias{aldex.glm.effect}
+\title{calculate effect sizes and differences between all constrasts for the aldex.glm model matrix}
 \description{
+    data for this function is saved in a list with entries named by contrast
     determines the median clr abundance of the feature in all samples and in groups
     determines the median difference between the two groups
     determines the median variation within each two group
     determines the effect size, which is the median of the ratio of the between group difference and the larger of the variance within groups
 }
 \usage{
-aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE, CI=FALSE, glm.conds=NULL)
+aldex.glm.effect(clr, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE, CI=FALSE)
 }
 \arguments{
     \item{clr}{
@@ -25,9 +26,6 @@ aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE, C
     }
     \item{CI}{
         give effect 95% confidence intervals, defaults to FALSE
-    }
-    \item{glm.conds}{
-        give effect for glm contrasts, note: saved as list
     }
 }
 \details{
@@ -65,6 +63,7 @@ aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE, C
 }
 \seealso{
     \code{\link{aldex.clr}},
+    \code{\link{aldex.effect}},
     \code{\link{aldex.ttest}},
     \code{\link{aldex.glm}},
     \code{\link{selex}}
@@ -76,7 +75,11 @@ aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE, C
     data(selex)
     #subset for efficiency
     selex <- selex[1201:1600,]
-    conds <- c(rep("NS", 7), rep("S", 7))
-    x <- aldex.clr(selex, conds, mc.samples=2, denom="all")
-    effect.test <- aldex.effect(x)
+    covariates <- data.frame("A" = sample(0:1, 14, replace = TRUE),
+                  "B" = c(rep(0, 7), rep(1, 7)),
+                  "Z" = sample(c(1,2,3), 14, replace=TRUE))
+    mm <- model.matrix(~ A + Z + B, covariates)
+    x <- aldex.clr(selex, mm, mc.samples=8, denom="all")
+    glm.effect <- aldex.glm.effect(x)
+
 }
