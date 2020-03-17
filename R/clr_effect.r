@@ -18,7 +18,7 @@ aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=
 
     is.multicore = FALSE
 
-    if ("BiocParallel" %in% rownames(installed.packages()) & useMC){
+    if ("BiocParallel" %in% rownames(installed.packages()) & useMC==TRUE){
         message("multicore environment is OK -- using the BiocParallel package")
         #require(BiocParallel)
         is.multicore = TRUE
