@@ -12,8 +12,8 @@
     all.col=rgb(0,0,0,0.2), all.pch=19, all.cex=0.4,
     called.col=red, called.pch=20, called.cex=0.6,
     thres.line.col=darkgrey, thres.lwd=1.5,
-    test=welch, cutoff=0.1, rare.col=black, rare=0,
-    rare.pch=20, rare.cex=0.2 )
+    test=welch, cutoff.pval=0.1, cutoff.effect=1, rare.col=black,
+    rare=0, rare.pch=20, rare.cex=0.2 )
 }
 \arguments{
     \item{x}{
@@ -23,7 +23,9 @@
         optional, unused arguments included for compatibility with the S3 method signature
     }
     \item{type}{
-        which type of plot is to be produced. MA is a Bland-Altman style plot; MW is a difference between to a variance within plot as described in the paper
+        which type of plot is to be produced. MA is a Bland-Altman style plot; MW is a
+        difference between to a variance within plot as described in:
+        http://dx.doi.org/10.1080/10618600.2015.1131161
     }
     \item{test}{
         the method of calculating significance, one of:
@@ -32,8 +34,11 @@
         glm = glm;
         kruskal = Kruskal-Wallace test
     }
-    \item{cutoff}{
+    \item{cutoff.pval}{
         the Benjamini-Hochberg fdr cutoff, default 0.1
+    }
+    \item{cutoff.effect}{
+        the effect size cutoff for plotting, default 1
     }
     \item{xlab}{
         the x-label for the plot, as per the parent \code{plot} function
@@ -72,7 +77,7 @@
         the width of the threshold line where within and between group variation is equivalent
     }
     \item{rare}{
-        relative abundance cutoff for rare features, default 0 or the mean abundance 
+        relative abundance cutoff for rare features, default 0 or the mean abundance
     }
     \item{rare.col}{
         color for rare features, default black
