@@ -5,7 +5,7 @@
 aldex.glm.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE){
 
   if (is.vector(clr@conds)) {
-    stop("only a single condition vector detected\n    use aldex.effect instead")
+    stop("only a single condition vector detected\n  use aldex.effect instead")
   } else if (is.matrix(clr@conds)) {
     effect.out <- list()
     names <- colnames(clr@conds[,2:ncol(clr@conds)])

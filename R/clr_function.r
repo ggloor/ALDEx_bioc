@@ -50,7 +50,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 # force the use of either all for the denominator
 # or
 # the use of a user-supplied denominator
-  if(class(conds) == "matrix"){
+  if(is(conds, "matrix")){
     message("checking for condition length disabled!")
     if(is.vector(denom, mode="integer")){
       message("user-defined denominator used")

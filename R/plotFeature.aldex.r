@@ -1,7 +1,32 @@
-#' plotFeature.aldex
+#' Show dispersion of the expected values returned by \code{aldex.effect}
 #'
-#' Accepts the name of a feature and an aldex object to generate density plots
-#' of within group dispersions, between group differences, and effect sizes.
+#' \code{aldex.plotFeature} generates density plots showing the dispersion
+#'  of the expected values given in the output from \code{aldex.effect}.
+#'  The expected values are shown in the plots. This is a diagnostic
+#'  visualization to help determine if the expected values are trustworthy
+#'
+#' @param clrData the output object from \code{aldex.clr}
+#' @param featureName the name of the feature from the input data
+#' @param pooledOnly show only the pooled plots, default FALSE, shows all plots
+#' @param densityOnly show only the density plots, default FALSE includes expected values
+#'
+#' @author Brandon Lieng, Greg Gloor
+#'
+#' @seealso
+#'  \code{\link{aldex.clr}},
+#'  \code{\link{aldex.effect}},
+#'  \code{\link{selex}}
+#'
+#' @references Please use the citation given by
+#'  \code{citation(package="ALDEx2")}.
+#'
+#' @examples
+#' data(selex)
+#' #subset for efficiency
+#' selex <- selex[1201:1600,]
+#' conds <- c(rep("NS", 7), rep("S", 7))
+#' x <- aldex.clr(selex, conds, mc.samples=4, denom="all")
+#' aldex.plotFeature(x, "S:D:A:D")
 
 aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
                               densityOnly=FALSE) {

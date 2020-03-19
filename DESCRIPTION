@@ -1,7 +1,7 @@
 Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
-Version: 1.19.2
+Version: 1.19.2.1
 Date: 2019-11-12
 Author: Greg Gloor, Andrew Fernandes, Jean Macklaim, Arianne Albert, Matt Links,
     Thomas Quinn, Jia Rong Wu, Ruth Grace Wong, Brandon Lieng
@@ -22,7 +22,7 @@ Description: A differential abundance analysis for the comparison of two or more
 License: file LICENSE
 URL: https://github.com/ggloor/ALDEx_bioc
 BugReports: https://github.com/ggloor/ALDEx_bioc/issues
-RoxygenNote: 7.0.0
+RoxygenNote: 7.1.0
 VignetteBuilder: knitr
 Depends:
   methods,
