@@ -73,7 +73,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 #     }
   }
 
-  if(ncol(reads) != length(conds) & class(conds) != "matrix"){
+  if(ncol(reads) != length(conds) & !is(conds, "matrix")){
     print(length(conds))
     print(ncol(reads))
     stop("mismatch between number of samples and condition vector")
