@@ -114,7 +114,7 @@ iqlr.features <- function(reads, conds)
 
     if(!length(invariant.set)) stop("No intersecting features have typical variance")
     if(length(invariant.set) <= 5) stop("Five or less members in intersecting feature set")
-    
+
     return(as.vector(invariant.set))
 }
 
@@ -128,44 +128,31 @@ house.features <- function(reads, conds)
   invariant.set.list <- vector("list",
   length(unique(conds)))
 
+  reads.n0 <- cmultRepl(t(reads), label=0, method="CZM",
+     suppress.print=TRUE)
+
   # clr transform
-  reads.clr <- t(apply(reads + 0.5, 2,
+  reads.clr <- t(apply(reads.n0, 1,
   function(x){log2(x) - mean(log2(x))}))
 
   # per-condition offsets found
   for(i in 1:length(unique(conds))){
-	these.rows <- which(conds ==
-	  unique(conds)[i])
+	these.rows <- which(conds == unique(conds)[i])
 
   # find the least variable
 	reads.var <- apply(reads.clr[these.rows,],2, function(x){var(x)})
-	var.set <- which(reads.var
-	  < quantile(unlist(reads.var))[2])
+	var.set <- which(reads.var < quantile(unlist(reads.var))[2])
 
 	# find the most relative abundant
 	# top quartile in each sample
-	quantile.sample <- apply(reads.clr, 1, quantile)
-
-	abund.set <- apply(reads.clr, 2, function(x)
-      sum(x > quantile.sample[4,]) == length(quantile.sample[4,]))
+	rab.all <- apply(reads.clr[these.rows,], 2, function(x)
+	    sum(x/length(these.rows)))
+	abund.set <- which(rab.all > quantile(unlist(rab.all))[4])
 
 	invariant.set.list[[i]] <-
-	  intersect(var.set, which(abund.set == TRUE))
+	  intersect(var.set, abund.set)
   }
-  # find the least variable
-	reads.var <- apply(reads.clr[],2, function(x){var(x)})
-	var.set <- which(reads.var
-	  < quantile(unlist(reads.var))[2])
 
-	# find the most relative abundant
-	# top quartile in each sample
-	quantile.sample <- apply(reads.clr, 1, quantile)
-
-	abund.set <- apply(reads.clr, 2, function(x)
-      sum(x > quantile.sample[4,]) == length(quantile.sample[4,]))
-
-	invariant.set.list[[length(unique(conds))+1]] <-
-	  intersect(var.set, which(abund.set == TRUE))
   # get the intersect of all conditions
   # successive operations on the list elements
 
@@ -174,7 +161,7 @@ house.features <- function(reads, conds)
 
   if(!length(invariant.set)) stop("No intersecting features are low variance and high relative abundance")
   if(length(invariant.set) <= 5) stop("Five or less members in intersecting feature set")
-  
+
   return(invariant.set)
 }
 

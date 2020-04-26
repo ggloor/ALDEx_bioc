@@ -1,5 +1,6 @@
 import( BiocParallel )
 #import( parallel )
+import( zCompositions )
 import(methods)
 import(S4Vectors)
 import(IRanges)
