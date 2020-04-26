@@ -175,6 +175,9 @@ Validation of features that are differential under any of the variables identifi
 Note that `aldex.clr` will accept the `denom="all"` or a user-defined vector of denominator offsets when a model matrix is supplied. Therefore, when it is intended that the downstream analysis is the `aldex.glm` function only those two denominator options are available. This will be addressed in a future release.
 
 ```{r,fig=TRUE,echo=TRUE,width=7,height=4, message=F, error=F, warning=F, fig.cap="Comparing the glm and t-test. Plots of the expected P values for variables output from the glm function with model A (random predictors), and model B (actual study design groups) compared to the P values output by the Welch's t-test. This toy model shows how to use a generalized linear model within theALDEx2 framework. All values are the expected value of the test statistic after correction for multiple hypothesis testing."}
+
+data(selex)
+selex.sub <- selex[1:500, ]
  covariates <- data.frame("A" = sample(0:1, 14, replace = TRUE),
      "B" = c(rep(0, 7), rep(1, 7)),
      "Z" = sample(c(1,2,3), 14, replace=TRUE))
@@ -183,11 +186,6 @@ Note that `aldex.clr` will accept the `denom="all"` or a user-defined vector of 
  glm.test <- aldex.glm(x, mm)
  glm.effect <- aldex.glm.effect(x)
 
- par(mfrow=c(1,2))
- plot(glm.test[,"model.A Pr(>|t|).BH"], x.all$we.eBH, log="xy",
-     xlab="glm model A", ylab="Welch's t-test")
- plot(glm.test[,"model.B Pr(>|t|).BH"], x.all$we.eBH, log="xy",
-     xlab="glm model B", ylab="Welch's t-test")
 ```
 
 The `aldex.glm.effect` function will calculate the effect size for all models in the matrix that are binary. The effect size calculations for each binary predictor are output to a named list. These effect sizes, and outputs from `aldex.glm` can be plotted as in the example code block below which plots the BH-corrected glm values for the actual test case vs. the effect size for the binary predictor.
