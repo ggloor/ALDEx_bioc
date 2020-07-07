@@ -9,6 +9,10 @@ aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=
   # Use clr conditions slot instead of input
      if (is.vector(clr@conds)) {
        conditions <- clr@conds
+     } else if (is.factor(clr@conds)) {
+     	if (length(levels(clr@conds) == 2)) {
+     	  conditions <- clr@conds
+     	}
      } else if (is.matrix(clr@conds)){
        if(is.null(glm.conds)) stop("please provide a binary condition vector")
        conditions <- glm.conds
