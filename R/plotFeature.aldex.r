@@ -48,9 +48,9 @@ aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
     maxDensityB <- max(withinBDensity$y)
     # Block here ensures axis is scaled to the largest y-value in the pool
     if (maxDensityA > maxDensityB) {
-        plot(withinADensity, main="Within group clr values", xlab="clr Values", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
+        plot(withinADensity, main="Group clr values", xlab="clr values", ylab="Density", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
     } else {
-        plot(withinBDensity, main="Within group clr values", xlab="clr Values", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
+        plot(withinBDensity, main="Group clr values", xlab="clr values", ylab="Density", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
     }
     polygon(withinADensity, col=rgb(1,0,0,0.3), border="red")
     polygon(withinBDensity, col=rgb(0,0,1,0.3), border="cyan")
@@ -64,14 +64,14 @@ aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
 
     if (!pooledOnly) {
         differenceVectorDensity <- density(differenceVector)
-        plot(differenceVectorDensity, main="Diff. betw. groups", xlab="abs. difference", ylab="Density", xlim=as.numeric(quantile(differenceVector, probs=c(0.025,0.975))))
+        plot(differenceVectorDensity, main="Group Difference", xlab="difference", ylab="Density", xlim=as.numeric(quantile(differenceVector, probs=c(0.025,0.975))))
         polygon(differenceVectorDensity, col=rgb(1,0,1,0.3))
         if (!densityOnly) {
             boxplot(differenceVector, boxwex=max(differenceVectorDensity$y) / 6, at=max(differenceVectorDensity$y) / 2, horizontal=TRUE, add=TRUE, whisklty=0, staplelty=0, col=rgb(1,0,1,0), outline=FALSE)
         }
 
         dispersionVectorDensity <- density(dispersionVector)
-        plot(dispersionVectorDensity, main="Absolute diff. betw. dispersion vectors", xlab="abs. difference", ylab="Density", xlim=as.numeric(quantile(dispersionVector, probs=c(0.025,0.975))))
+        plot(dispersionVectorDensity, main="Max Dispersion", xlab="abs. dispersion", ylab="Density", xlim=as.numeric(quantile(dispersionVector, probs=c(0.025,0.975))))
         polygon(dispersionVectorDensity, col=rgb(1,1,0,0.3))
         if (!densityOnly) {
             boxplot(dispersionVector, boxwex=max(dispersionVectorDensity$y) / 6, at=max(dispersionVectorDensity$y) / 2, horizontal=TRUE, add=TRUE, whisklty=0, staplelty=0, col=rgb(1,1,0,0), outline=FALSE)
