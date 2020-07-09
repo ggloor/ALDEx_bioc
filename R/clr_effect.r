@@ -177,13 +177,17 @@ if (verbose == TRUE) message("between group difference calculated")
 if (verbose == TRUE) message("group summaries calculated")
 
     if(CI == FALSE) {
-      effect  <- t(apply( l2d$effect, 1, median ))
+      effect  <- t(apply( l2d$effect, 1, function(row){row[is.na(row)] <- 0 ; median(row) }))
     } else {
-      effectlow <- t(apply( l2d$effect, 1, function(x) quantile(x, probs=0.025, names=FALSE) ))
-      effecthigh <- t(apply( l2d$effect, 1, function(x) quantile(x, probs=0.975, names=FALSE) ))
+      effectlow <- t(apply( l2d$effect, 1, function(x) {x[is.na(x)] <- 0 ;
+          quantile( x, probs=0.025, names=FALSE)} ))
+      effecthigh <- t(apply( l2d$effect, 1, function(x) {x[is.na(x)] <- 0 ;
+          quantile( x, probs=0.975, names=FALSE)} ))
       effect  <- t(apply( l2d$effect, 1, median ))
     }
-    overlap <- apply( l2d$effect, 1, function(row) { min( aitchison.mean( c( sum( row < 0 ) , sum( row > 0 ) ) + 0.5 ) ) } )
+    overlap <- apply( l2d$effect, 1, function(row) { if(all(is.na(row))) warning("NAs in effect, ignore if using ALR");
+                row[is.na(row)] <- 0 ;
+                min( aitchison.mean( c( sum( row < 0 ) , sum( row > 0 ) ) + 0.5 ) ) } )
 if (verbose == TRUE) message("effect size calculated")
 
 # make and fill in the data table
