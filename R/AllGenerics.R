@@ -18,6 +18,10 @@ setGeneric("getReads", function(.object) standardGeneric("getReads"))
 
 setGeneric("numConditions", function(.object) standardGeneric("numConditions"))
 
+setGeneric("getDirichletReplicate", function(.object, i=-1) standardGeneric("getDirichletReplicate"))
+
+setGeneric("getDirichletSample", function(.object, i=-1) standardGeneric("getDirichletSample"))
+
 setGeneric("getMonteCarloReplicate", function(.object, i=-1) standardGeneric("getMonteCarloReplicate"))
 
 setGeneric("getMonteCarloSample", function(.object, i=-1) standardGeneric("getMonteCarloSample"))

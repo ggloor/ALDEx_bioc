@@ -232,7 +232,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
     }
 if (verbose == TRUE) message("transformation complete")
 
-    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,analysisData=l2p))
+    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,dirichletData=p,analysisData=l2p))
 }
 
 
@@ -255,6 +255,10 @@ setMethod("getFeatureNames", signature(.object="aldex.clr"), function(.object) r
 setMethod("getReads", signature(.object="aldex.clr"), function(.object) .object@reads)
 
 setMethod("numConditions", signature(.object="aldex.clr"), function(.object) length(names(.object@analysisData)))
+
+setMethod("getDirichletReplicate", signature(.object="aldex.clr",i="numeric"), function(.object,i) .object@dirichletData[[i]])
+
+setMethod("getDirichletSample", signature(.object="aldex.clr",i="numeric"), function(.object,i) sapply(.object@dirichletData, function(x) {x[,i]}))
 
 setMethod("getMonteCarloReplicate", signature(.object="aldex.clr",i="numeric"), function(.object,i) .object@analysisData[[i]])
 
