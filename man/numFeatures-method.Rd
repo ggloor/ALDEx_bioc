@@ -6,24 +6,27 @@
 \title{numFeatures}
 
 \description{
-  Returns the number of features associated with the data, for an \code{aldex.clr} object.
+  Returns the number of non-0 features associated with the data,
+  for an \code{aldex.clr} object.
 }
 
 \usage{
-numFeatures(.object)
+  numFeatures(.object)
 }
 
 \arguments{
-  \item{.object}{A \code{aldex.clr} object containing the Monte Carlo Dirochlet instances derived from estimating the technical variance of the raw read count data, along with sample and feature information.
+  \item{.object}{A \code{aldex.clr} object.
   }
 }
 
 \details{
-  Returns the number of features associated with the data.
+  Returns the number of features associated with the data that are
+  not 0 in all samples.
 }
 
 \value{
-  A numeric representing the number of features associated with the data.
+  A numeric representing the number of non-0 features associated
+  with the data.
 }
 
 \seealso{

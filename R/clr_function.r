@@ -242,15 +242,17 @@ if (verbose == TRUE) message("transformation complete")
 
 setMethod("getMonteCarloInstances", signature(.object="aldex.clr"), function(.object) .object@analysisData)
 
+setMethod("getDirichletInstances", signature(.object="aldex.clr"), function(.object) .object@dirichletData)
+
 setMethod("getSampleIDs", signature(.object="aldex.clr"), function(.object) names(.object@analysisData))
+
+setMethod("getFeatureNames", signature(.object="aldex.clr"), function(.object) rownames(.object@analysisData[[1]]))
 
 setMethod("getFeatures", signature(.object="aldex.clr"), function(.object) .object@analysisData[[1]][,1])
 
 setMethod("numFeatures", signature(.object="aldex.clr"), function(.object) length(.object@analysisData[[1]][,1]))
 
 setMethod("numMCInstances", signature(.object="aldex.clr"), function(.object) length(.object@analysisData[[1]][1,]))
-
-setMethod("getFeatureNames", signature(.object="aldex.clr"), function(.object) rownames(.object@analysisData[[1]]))
 
 setMethod("getReads", signature(.object="aldex.clr"), function(.object) .object@reads)
 

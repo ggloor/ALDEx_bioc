@@ -4,7 +4,7 @@
 # data is returned in a data frame
 # requires multicore
 
-aldex.effect2 <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE, glm.conds=NULL){
+aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE, glm.conds=NULL){
 
   # Use clr conditions slot instead of input
      if (is.vector(clr@conds)) {

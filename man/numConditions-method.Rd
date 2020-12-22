@@ -6,7 +6,8 @@
 \title{numConditions}
 
 \description{
-  Returns the number of conditions compared for analysis, for an \code{aldex.clr} object.
+  Returns the number of conditions compared for analysis,
+  for an \code{aldex.clr} object.
 }
 
 \usage{
@@ -14,16 +15,16 @@ numConditions(.object)
 }
 
 \arguments{
-  \item{.object}{A \code{aldex.clr} object containing the Monte Carlo Dirochlet instances derived from estimating the technical variance of the raw read count data, along with sample and feature information.
+  \item{.object}{A \code{aldex.clr} object.
   }
 }
 
 \details{
-  Returns the number of conditions compared.
+  Returns the number of samples compared.
 }
 
 \value{
-  A numeric representing the number of conditions compared.
+  A numeric representing the number of samples compared.
 }
 
 \seealso{

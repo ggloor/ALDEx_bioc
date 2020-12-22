@@ -15,6 +15,7 @@ setClass("aldex.clr",
         denom="vector",
         verbose="logical",
         useMC="logical",
+        dirichletData="list",
         analysisData="list"
         )
 )

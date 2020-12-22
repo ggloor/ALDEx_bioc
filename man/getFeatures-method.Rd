@@ -14,12 +14,14 @@ getFeatures(.object)
 }
 
 \arguments{
-  \item{.object}{A \code{aldex.clr} object containing the Monte Carlo Dirochlet instances derived from estimating the technical variance of the raw read count data, along with sample and feature information.
+  \item{.object}{A \code{aldex.clr} object.
   }
 }
 
 \details{
-  Returns the features as a vector, for an \code{aldex.clr} object.
+  Returns the features from the first sample and first Monte-Carlo
+  replicate as a vector, for an \code{aldex.clr} object. Used only
+  for troubleshooting purposes.
 }
 
 \value{

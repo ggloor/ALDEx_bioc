@@ -4,6 +4,8 @@
 
 setGeneric("getMonteCarloInstances", function(.object) standardGeneric("getMonteCarloInstances"))
 
+setGeneric("getDirichletInstances", function(.object) standardGeneric("getDirichletInstances"))
+
 setGeneric("getSampleIDs", function(.object) standardGeneric("getSampleIDs"))
 
 setGeneric("numFeatures", function(.object) standardGeneric("numFeatures"))

@@ -27,6 +27,7 @@ VignetteBuilder: knitr
 Depends:
   methods,
   stats,
+  matrixStats,
   zCompositions
 Imports:
   BiocParallel,
