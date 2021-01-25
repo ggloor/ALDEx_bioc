@@ -6,20 +6,24 @@
 \title{getSampleIDs}
 
 \description{
-  Returns the names of the samples for an \code{aldex.clr} object. These can be used to access the original reads, as in \code{reads\$sampleID} (if the reads are a data frame).
+  Returns the names of the samples for an \code{aldex.clr} object.
+  These can be used to access the original reads, as in
+  \code{reads\$sampleID} (if the reads are a data frame).
 }
 
 \usage{
-getSampleIDs(.object)
+  getSampleIDs(.object)
 }
 
 \arguments{
-  \item{.object}{A \code{aldex.clr} object containing the Monte Carlo Dirochlet instances derived from estimating the technical variance of the raw read count data, along with sample and feature information.
+  \item{.object}{A \code{aldex.clr} object.
   }
 }
 
 \details{
-  Returns the names of the samples. These can be used to access the original reads, as in \code{reads\$sampleID} (if the reads are a data frame).
+  Returns the names of the samples. These can be used to access
+  the original reads, as in \code{reads\$sampleID} (if the reads
+  are a data frame).
 }
 
 \value{

@@ -9,7 +9,8 @@
     Compute an \code{aldex.clr} Object
 }
 \description{
-    Generate Monte Carlo samples of the Dirichlet distribution for each sample. Convert each instance using the centred log-ratio transform
+    Generate Monte Carlo samples of the Dirichlet distribution for each sample.
+    Convert each instance using a log-ratio transform.
     This is the input for all further analyses.
 }
 \usage{
@@ -21,19 +22,20 @@
         A \code{data.frame} or \code{RangedSummarizedExperiment} object containing
         non-negative integers only and with unique names for all rows and columns,
         where each row is a different gene and each column represents a sequencing
-        read-count. Rows with 0 reads in each sample are deleted prior to analysis.
+        read-count sample. Rows with 0 reads in each sample are deleted prior to
+        analysis.
     }
     \item{conds}{
         A \code{vector} containing a descriptor for the samples, allowing them to
         be grouped and compared.
       }
       \item{mc.samples}{
-        The number of Monte Carlo samples to use to estimate the underlying
+        The number of Monte Carlo instances to use to estimate the underlying
         distributions; since we are estimating central tendencies, 128 is usually
-        sufficient.
+        sufficient, but larger numbers may be .
     }
       \item{denom}{
-          An \code{any} variable (all, iqlr, zero, lvha, median,user) indicating
+          An \code{any} variable (all, iqlr, zero, lvha, median, user) indicating
           features to use as the denominator for the Geometric Mean calculation
           The default "all" uses the geometric mean abundance of all features.
           Using "median" returns the median abundance of all features.
@@ -47,7 +49,10 @@
           possible to supply a vector of row indices to use as the denominator.
           Here, the experimentalist is determining a-priori which rows are thought
           to be invariant. In the case of RNA-seq, this could include ribosomal
-          protein genes and and other house-keeping genes.
+          protein genes and and other house-keeping genes. This should be used
+          with caution because the offsets may be different in the original data
+          and in the data used by the function because features that are 0 in all
+          samples are removed by \code{aldex.clr}.
       }
      \item{verbose}{
         Print diagnostic information while running. Useful only for debugging
@@ -56,15 +61,17 @@
     \item{useMC}{
         Use multicore by default (FALSE). Multi core processing will be attempted
         with the BiocParallel package. Serial processing will be used if this is
-        not possible.
+        not possible. In practice serial and multicore are nearly the same speed
+        because of overhead in setting up the parallel processes.
     }
 }
 \details{
     An explicit description of the input format for the \code{reads} object is
     shown under `Examples', below.}
 \value{
-    The object produced by the \code{clr} function contains the clr transformed
-    values for each Monte-Carlo Dirichlet instance, which can be accessed through \code{getMonteCarloInstances(x)}, where \code{x} is the \code{clr} function output.
+    The object produced by the \code{clr} function contains the log-ratio transformed
+    values for each Monte-Carlo Dirichlet instance, which can be accessed through
+    \code{getMonteCarloInstances(x)}, where \code{x} is the \code{clr} function output.
     Each list element is named by the sample ID. \code{getFeatures(x)} returns the
     features, \code{getSampleIDs(x)} returns sample IDs, and \code{getFeatureNames(x)}
     returns the feature names.

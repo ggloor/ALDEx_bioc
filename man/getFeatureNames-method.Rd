@@ -14,12 +14,13 @@ getFeatureNames(.object)
 }
 
 \arguments{
-  \item{.object}{A \code{aldex.clr} object containing the Monte Carlo Dirochlet instances derived from estimating the technical variance of the raw read count data, along with sample and feature information.
+  \item{.object}{A \code{aldex.clr} object.
   }
 }
 
 \details{
-  Returns the names of the \code{keys} that can be used to subset the data rows. The \code{keys} values are the rsid's.
+  Returns the names of the \code{keys} that can be used to
+  subset the data rows. The \code{keys} values are the rsid's.
 }
 
 \value{

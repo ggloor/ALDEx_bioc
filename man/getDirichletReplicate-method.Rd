@@ -1,18 +1,18 @@
-\name{getMonteCarloReplicate}
+\name{getDirichletReplicate}
 
-\alias{getMonteCarloReplicate}
-\alias{getMonteCarloReplicate,aldex.clr,numeric-method}
+\alias{getDirichletReplicate}
+\alias{getDirichletReplicate,aldex.clr,numeric-method}
 
-\title{getMonteCarloReplicate}
+\title{getDirichletReplicate}
 
 \description{
-  Returns the log-ratio transformed per-sample Monte Carlo Dirichlet
+  Returns the raw per-sample Monte Carlo Dirichlet
   replicates generated from analysis, for an \code{aldex.clr}
   object.
 }
 
 \usage{
-  getMonteCarloReplicate(.object,i)
+  getDirichletReplicate(.object,i)
 }
 
 \arguments{
@@ -25,7 +25,8 @@
 }
 
 \details{
-  Returns the log-ratio transformed per-sample Monte Carlo Dirichlet replicates.
+  Returns the raw per-sample Monte Carlo Dirichlet replicates. These
+  are estimated probabilities.
 }
 
 \value{
@@ -42,5 +43,5 @@ data(selex)
     selex <- selex[1201:1600,]
 conds <- c(rep("NS", 7), rep("S", 7))
 x <- aldex.clr(selex, conds, mc.samples = 2, denom = "all", verbose = FALSE)
-monteCarloReplicate <- getMonteCarloReplicate(x,1)
+DirichletReplicate <- getDirichletReplicate(x,1)
 }

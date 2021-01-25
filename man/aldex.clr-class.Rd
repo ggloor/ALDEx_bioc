@@ -10,66 +10,72 @@
 }
 
 \section{Methods}{
-  In the code below, \code{x} is an \code{aldex.clr} object, and \code{i}
-  is a numeric whole number.
+  In the code below, \code{x} is an \code{aldex.clr} object, and \code{i},
+  is a positive integer.
+  There are N samples, D features, and M Monte-Carlo instances.
   \describe{
     \item{}{
       \code{getMonteCarloInstances(x)}:
-      Returns \code{x}'s Monte Carlo Dirichlet instances.
+      Returns the clr transformed Monte Carlo Dirichlet instances as a list where
+      each list entry is a single sample containing a D x M matrix.
     }
     \item{}{
       \code{getSampleIDs(x)}:
       Returns the names of the samples. These can be used to access the
-      original reads, as in \code{reads\$sampleID} (if the reads are a data frame).
-    }
-    \item{}{
-      \code{getFeatures(x)}:
-      Returns the names of the features as a vector.
-    }
-    \item{}{
-      \code{numFeatures(x)}:
-      Returns the number of features associated with the data.
-    }
-    \item{}{
-      \code{numMCInstances(x)}:
-      Returns the names of the \code{keys} that can be used to subset the
-      data rows. The \code{keys} values are the rsid's.
+      original reads for a given sample, as in \code{x@reads\$sampleID}
+      (if the reads are a data frame).
     }
     \item{}{
       \code{getFeatureNames(x)}:
-      Returns the names of the \code{keys} that can be used to subset the
-      data rows. The \code{keys} values are the rsid's.
+      Returns the names of the \code{keys}. These can be used to subset the
+      data rows.
+    }
+    \item{}{
+      \code{getFeatures(x)}:
+      Returns the clr transformed values for the features in the first sample.
+    }
+    \item{}{
+      \code{numFeatures(x)}:
+      Returns the number of features that were non-0 in at least one sample.
+    }
+    \item{}{
+      \code{numMCInstances(x)}:
+      Returns the number of Monte-Carlo instances.
     }
     \item{}{
       \code{getReads(x)}:
-      Returns the names of the \code{keys} that can be used to subset the
-      data rows. The \code{keys} values are the rsid's.
+      Returns the input data as used by the method.
     }
     \item{}{
       \code{numConditions(x)}:
-      Returns the names of the \code{keys} that can be used to subset the
-      data rows. The \code{keys} values are the rsid's.
+      Returns the number of samples in the \code{conditions} analysis.
     }
     \item{}{
       \code{getMonteCarloReplicate(x, i)}:
-      Returns the names of the \code{keys} that can be used to subset the
-      data rows. The \code{keys} values are the rsid's.
+      Returns the D x M matrix containing the Monte-Carlo instances
+      for one sample.
+    }
+    \item{}{
+      \code{getMonteCarloSample(x, i)}:
+      Returns the N x D matrix containing  Monte-Carlo instance \code{i}
+      for for all samples.
     }
   }
 }
 
 \details{
-  An aldex.clr object contains the Monte Carlo Dirochlet instances derived
-  from estimating the technical variance of the raw read count data. It is
-  created by the \code{aldex.clr.function}, which is invoked by the aldex.clr method.
-  It consists of four attributes: the sample names, the feature names,
-  the conditions vector (assigns each sample to a condition),
-  and the Monte Carlo Dirochlet instances themselves. These can be accessed,
-  along with information about the length of some attributes. A single Monte Carlo
-  instance can also be retrieved.
+  An aldex.clr object contains the centre-log ratio transformed Monte Carlo
+  Dirichlet instances derived from estimating the technical variance of the
+  raw read count data. It is created by the \code{aldex.clr.function}, which
+  is invoked by the aldex.clr method. It consists of eight slots:
+  the reads, the condition information, the number of instances, the denominator,
+  whether it was invoked as verbose, and if multi-cores was used, the
+  Dirichlet Monte-Carlo probabilities, and the centre-log ratio transformed
+  Monte Carlo probabilities. These can be accessed along with information
+  about the length of some attributes.
 }
 \value{
-    The aldex.clr object contains the clr transformed values for each Monte-Carlo Dirichlet instance, which can be accessed through \code{getMonteCarloInstances(x)}, where \code{x} is the \code{clr} function output. Each list element is named by the sample ID. \code{getFeatures(x)} returns the features, \code{getSampleIDs(x)} returns sample IDs, and \code{getFeatureNames(x)} returns the feature names.
+    The aldex.clr object contains the raw data, the estimated probabilities drawn from a Dirichlet distribution, and the clr transformed values for each Monte-Carlo  instance. These can be accessed through getters outlined below.
 }
 
 \references{
@@ -102,12 +108,31 @@
     #subset for efficiency
     selex <- selex[1201:1600,]
     conds <- c(rep("NS", 7), rep("S", 7))
+    i=1
 
     # x is an object of type aldex.clr
     x <- aldex.clr(selex, conds, mc.samples = 2, denom="all", verbose = FALSE)
 
-    # get all of the Monte Carlo Dirochlet instances
+    # get reads plus uniform prior
+    reads <- getReads(x)
+
+    # get a list containing all of the clr transformed instances
     monteCarloInstances <- getMonteCarloInstances(x)
+
+    # get a list containing all of the Monte-Carlo Dirichlet instances
+    monteCarloDirInstances <- getDirichletInstances(x)
+
+    # retrieve the clr transformed instances for sample i.
+    monteCarloInstance <- getMonteCarloReplicate(x,i)
+
+    # retrieve the Monte-Carlo Dirichlet instances for sample i.
+    monteCarloDirInstance <- getDirichletReplicate(x,i)
+
+    # retrieve the clr transformed instance i for all samples
+    monteCarloSample <- getMonteCarloSample(x,i)
+
+    # retrieve the Monte-Carlo Dirichlet instance i for all samples
+    monteCarloDirSample <- getDirichletSample(x,i)
 
     # get sample names
     sampleIDs <- getSampleIDs(x)
@@ -115,10 +140,10 @@
     # get features
     features <- getFeatures(x)
 
-    # get number of features
+    # get number of features with at least one count
     numFeatures <- numFeatures(x)
 
-    # get number of Monte Carlo Dirochlet instances
+    # get number of Monte Carlo instances
     numInstances <- numMCInstances(x)
 
     # get names of features
@@ -127,11 +152,8 @@
     # get number of conditions
     conditions <- numConditions(x)
 
-    # get number of conditions
-    reads <- getReads(x)
-
-    # retrieve the first Monte Carlo Dirochlet instance.
-    monteCarloInstance <- getMonteCarloReplicate(x,1)
+    # get the offset of the features in the log-ratio  denominator
+    denom <- getDenom(x)
 
 }
 

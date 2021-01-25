@@ -6,20 +6,25 @@
 \title{getReads}
 
 \description{
-  Returns the count table used as input for analysis, for an \code{aldex.clr} object.
+  Returns the count table used as input for analysis, for
+  \code{aldex.clr} object. Note this count table has features
+  that are 0 in all samples removed, and a uniform prior of
+  0.5 is applied.
 }
 
 \usage{
-getReads(.object)
+  getReads(.object)
 }
 
 \arguments{
-  \item{.object}{A \code{aldex.clr} object containing the Monte Carlo Dirochlet instances derived from estimating the technical variance of the raw read count data, along with sample and feature information.
+  \item{.object}{A \code{aldex.clr} object containing the Monte Carlo Dirichlet instances derived from estimating the technical variance of the raw read count data, along with sample and feature information.
   }
 }
 
 \details{
-  Returns the count table.
+  Returns the count table.Note this count table has features
+  that are 0 in all samples removed, and a uniform prior of
+  0.5 is applied.
 }
 
 \value{

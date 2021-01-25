@@ -6,28 +6,27 @@
 \title{getDenom}
 
 \description{
-  Returns the denominator used as the basis for the log-ratio, for an \code{aldex.clr} object.
+  Returns the offset of the features used as the denominator
+  as the basis for the log-ratio, for an \code{aldex.clr} object.
 }
 
 \usage{
-getDenom(.object)
+  getDenom(.object)
 }
 
 \arguments{
-  \item{.object}{A \code{aldex.clr} object containing the Monte Carlo Dirochlet instances
-  derived from estimating the technical variance of the raw read count data, along with
-  sample and feature information.
+  \item{.object}{A \code{aldex.clr} object.
   }
 }
 
 \details{
-  Returns the denominator used to calculate the log-ratios. "all" is the centred
-  log-ratio. "iqlr" is the interquartile log-ratio. A vector of numbers is the offset
-  of the variables used in the denominator
+  Returns the offset of the features used as the denominator
+  as the basis for the log-ratio. A vector of numbers is the offset
+  of the non-0 features used in the denominator.
 }
 
 \value{
-  A vector of values.
+  A vector of integer row offsets.
 }
 
 \seealso{
