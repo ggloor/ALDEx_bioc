@@ -156,7 +156,9 @@ if (verbose == TRUE) message("between group difference calculated")
     options(warn=-1)
 
     for ( i in 1:nr ) {
-        win.max[i,] <- apply( ( rbind( l2d$win[[1]][i,] , l2d$win[[2]][i,] ) ) , 2 , max )
+        #mat <- rbind( l2d$win[[1]][i,] , l2d$win[[2]][i,] )
+        #win.max[i,] <- apply( mat , 2 , max )
+        win.max[i,] <- pmax( l2d$win[[1]][i,] , l2d$win[[2]][i,] )
         l2d$effect[i,] <- l2d$btw[i,] / win.max[i,]
         l2d$effect[i,][is.na(l2d$effect[i,])] <- 0
     }
