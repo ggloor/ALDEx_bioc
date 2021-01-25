@@ -12,7 +12,7 @@ importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
     "p.adjust", "rgamma", "t.test", "wilcox.test", "coef",
     "pnorm", "psignrank", "pt", "pwilcox", "as.dist", "density", "dist")
 importFrom("utils", "installed.packages")
-importFrom("matrixStats", "rowMedians", "colMedians")
+importFrom("Rfast", "rowMedians", "colMedians")
 #importFrom("BiocParallel", "bplapply")
 
 export( aldex )

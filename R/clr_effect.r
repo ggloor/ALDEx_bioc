@@ -3,7 +3,7 @@
 # returns the median effect size and proportion of effect that overlaps 0
 # data is returned in a data frame
 # requires multicore
-
+# this uses Rfast
 aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE, glm.conds=NULL){
 
   # Use clr conditions slot instead of input
@@ -61,29 +61,27 @@ if (verbose == TRUE) message("sanity check complete")
     rab$win <- list()
 
     #this is the median value across all monte carlo replicates
+    # for loops replaced with do.call
     cl2p <- NULL
-    for ( m in getMonteCarloInstances(clr) ) cl2p <- cbind( cl2p, m )
-    #RMV rab$all <- t(apply( cl2p, 1, median ))
-    rab$all <- matrixStats::rowMedians(cl2p)
+    cl2p <- do.call(cbind, getMonteCarloInstances(clr))
+    rab$all <- Rfast::rowMedians(cl2p)
     names(rab$all) <- rownames(cl2p)
     rm(cl2p)
-    gc()
+
  if (verbose == TRUE) message("rab.all  complete")
 
-    #this is the median value across all monte carlo replicates per level
-    for ( level in levels(conditions) ) {
-        cl2p <- NULL
-        for ( i in levels[[level]] ) cl2p <- cbind( cl2p, getMonteCarloReplicate(clr,i) )
-        #RMV rab$win[[level]] <- t(apply( cl2p, 1, median ))
-        rab$win[[level]] <-  matrixStats::rowMedians(cl2p)
-        rm(cl2p)
-        gc()
-    }
+    for(level in levels(conditions)){
+      cl2p <- NULL
+      cl2p <- do.call(cbind, getMonteCarloInstances(clr)[levels[[level]]] )
+      rab$win[[level]] <-  Rfast::rowMedians(cl2p)
+      rm(cl2p)
+ }
+
  if (verbose == TRUE) message("rab.win  complete")
 
     if (is.multicore == TRUE)  rab$spl <- bplapply( getMonteCarloInstances(clr), function(m) { t(apply( m, 1, median )) } )
     #RMV if (is.multicore == FALSE) rab$spl <- lapply( getMonteCarloInstances(clr), function(m) { t(apply( m, 1, median )) } )
-    if (is.multicore == FALSE) rab$spl <- lapply( getMonteCarloInstances(clr), function(m) { matrixStats::rowMedians(m) } )
+    if (is.multicore == FALSE) rab$spl <- lapply( getMonteCarloInstances(clr), function(m) { Rfast::rowMedians(m) } )
 if (verbose == TRUE) message("rab of samples complete")
 
     # ---------------------------------------------------------------------
@@ -94,7 +92,7 @@ if (verbose == TRUE) message("rab of samples complete")
     l2d$win <- list()
 
     # abs( win-conditions diff ), btw smps
-#this generates a linear sample of the values rather than an exhaustive sample
+    #this generates a linear sample of the values rather than an exhaustive sample
     for ( level in levels(conditions) ) {
         concat <- NULL
         for ( l1 in sort( levels[[level]] ) ) {
@@ -113,13 +111,13 @@ if (verbose == TRUE) message("rab of samples complete")
         l2d$win[[level]] <- cbind( l2d$win[[level]] , abs( sampl1 - sampl2 ) )
         rm(sampl1)
         rm(sampl2)
-        gc()
     }
 if (verbose == TRUE) message("within sample difference calculated")
+
     # Handle the case when the groups have different spl sizes
     # get the minimum number of win spl comparisons
     ncol.wanted <- min( sapply( l2d$win, ncol ) )
-# apply multicore paradigm ML
+    # apply multicore paradigm ML
     if (is.multicore == TRUE) l2d$win  <- bplapply( l2d$win, function(arg) { arg[,1:ncol.wanted] } )
     if (is.multicore == FALSE) l2d$win  <- lapply( l2d$win, function(arg) { arg[,1:ncol.wanted] } )
 
@@ -143,7 +141,7 @@ if (verbose == TRUE) message("within sample difference calculated")
 
     rm(smpl1)
     rm(smpl2)
-    gc()
+
 if (verbose == TRUE) message("between group difference calculated")
 
     win.max <- matrix( 0 , nrow=nr , ncol=ncol.wanted )
@@ -177,14 +175,14 @@ if (verbose == TRUE) message("between group difference calculated")
     l2s$win <- list()
 
     #RMV l2s$btw <- t(apply( l2d$btw, 1, median ))
-    l2s$btw <- matrixStats::rowMedians(l2d$btw)
+    l2s$btw <- Rfast::rowMedians(l2d$btw)
     #RMV l2s$win  <- t(apply( attr(l2d$win,"max"), 1, median ))
-    l2s$win  <- matrixStats::rowMedians( attr(l2d$win,"max"))
+    l2s$win  <- Rfast::rowMedians( attr(l2d$win,"max"))
 if (verbose == TRUE) message("group summaries calculated")
 
     if(CI == FALSE) {
     #  effect  <- t(apply( l2d$effect, 1, function(row){row[is.na(row)] <- 0 ; median(row) }))
-      effect <- matrixStats::rowMedians(l2d$effect)
+      effect <- Rfast::rowMedians(l2d$effect)
     } else {
       effectlow <- t(apply( l2d$effect, 1, function(x) {x[is.na(x)] <- 0 ;
           quantile( x, probs=0.025, names=FALSE)} ))
