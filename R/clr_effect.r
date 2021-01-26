@@ -64,6 +64,7 @@ if (verbose == TRUE) message("sanity check complete")
     # for loops replaced with do.call
     cl2p <- NULL
     cl2p <- do.call(cbind, getMonteCarloInstances(clr))
+    # this is a 2X speedup
     rab$all <- Rfast::rowMedians(cl2p)
     names(rab$all) <- rownames(cl2p)
     rm(cl2p)
@@ -158,6 +159,7 @@ if (verbose == TRUE) message("between group difference calculated")
     for ( i in 1:nr ) {
         #mat <- rbind( l2d$win[[1]][i,] , l2d$win[[2]][i,] )
         #win.max[i,] <- apply( mat , 2 , max )
+        # this is a 2x speedup
         win.max[i,] <- pmax( l2d$win[[1]][i,] , l2d$win[[2]][i,] )
         l2d$effect[i,] <- l2d$btw[i,] / win.max[i,]
         l2d$effect[i,][is.na(l2d$effect[i,])] <- 0
