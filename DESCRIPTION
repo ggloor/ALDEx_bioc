@@ -27,7 +27,6 @@ VignetteBuilder: knitr
 Depends:
   methods,
   stats,
-  rlang,
   zCompositions,
 Imports:
   Rfast,

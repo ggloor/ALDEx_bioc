@@ -84,7 +84,7 @@ aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
         boxplotAWidths = 0.25 * withinVectors[[1]]
         boxplotBWidths = 0.25 * withinVectors[[2]]
         widths <- c(maxDensityA / 6, maxDensityB / 6)
-        boxplot(withinVectors[[1]], withinVectors[[2]], boxwex=widths, at=c(maxDensityA / 2, maxDensityB / 2), horizontal=TRUE, add=TRUE, col=c(rgb(1,0,0,0), rgb(0,0,1,0)))
+        boxplot(withinVectors[[1]], withinVectors[[2]], boxwex=widths, at=c(maxDensityA / 2, maxDensityB / 2), horizontal=TRUE, add=TRUE, whisklty=0, staplelty=0, col=c(rgb(1,0,0,0), rgb(0,0,1,0)))
     }
 
     if (!pooledOnly) {
