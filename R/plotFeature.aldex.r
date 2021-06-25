@@ -73,9 +73,9 @@ aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
     maxDensityB <- max(withinBDensity$y)
     # Block here ensures axis is scaled to the largest y-value in the pool
     if (maxDensityA > maxDensityB) {
-        plot(withinADensity, main="Within group clr values", xlab="clr Values", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
+        plot(withinADensity, main="Group Distribution", xlab="clr Values", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
     } else {
-        plot(withinBDensity, main="Within group clr values", xlab="clr Values", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
+        plot(withinBDensity, main="Group Distribution", xlab="clr Values", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
     }
     polygon(withinADensity, col=rgb(1,0,0,0.3), border="red")
     polygon(withinBDensity, col=rgb(0,0,1,0.3), border="cyan")
@@ -84,26 +84,26 @@ aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
         boxplotAWidths = 0.25 * withinVectors[[1]]
         boxplotBWidths = 0.25 * withinVectors[[2]]
         widths <- c(maxDensityA / 6, maxDensityB / 6)
-        boxplot(withinVectors[[1]], withinVectors[[2]], boxwex=widths, at=c(maxDensityA / 2, maxDensityB / 2), horizontal=TRUE, add=TRUE, col=c(rgb(1,0,0,0), rgb(0,0,1,0)))
+        boxplot(withinVectors[[1]], withinVectors[[2]], boxwex=widths, at=c(maxDensityA / 2, maxDensityB / 2), horizontal=TRUE, add=TRUE, whisklty=0, staplelty=0, col=c(rgb(1,0,0,0), rgb(0,0,1,0)))
     }
 
     if (!pooledOnly) {
         differenceVectorDensity <- density(differenceVector)
-        plot(differenceVectorDensity, main="Diff. betw. groups", xlab="abs. difference", ylab="Density", xlim=as.numeric(quantile(differenceVector, probs=c(0.025,0.975))))
+        plot(differenceVectorDensity, main="Btw Grp Difference", xlab="Difference", ylab="Density", xlim=as.numeric(quantile(differenceVector, probs=c(0.025,0.975))))
         polygon(differenceVectorDensity, col=rgb(1,0,1,0.3))
         if (!densityOnly) {
             boxplot(differenceVector, boxwex=max(differenceVectorDensity$y) / 6, at=max(differenceVectorDensity$y) / 2, horizontal=TRUE, add=TRUE, whisklty=0, staplelty=0, col=rgb(1,0,1,0), outline=FALSE)
         }
 
         dispersionVectorDensity <- density(dispersionVector)
-        plot(dispersionVectorDensity, main="Absolute diff. betw. dispersion vectors", xlab="abs. difference", ylab="Density", xlim=as.numeric(quantile(dispersionVector, probs=c(0.025,0.975))))
+        plot(dispersionVectorDensity, main="Win Grp Dispersion", xlab="abs. Dispersion", ylab="Density", xlim=as.numeric(quantile(dispersionVector, probs=c(0.025,0.975))))
         polygon(dispersionVectorDensity, col=rgb(1,1,0,0.3))
         if (!densityOnly) {
             boxplot(dispersionVector, boxwex=max(dispersionVectorDensity$y) / 6, at=max(dispersionVectorDensity$y) / 2, horizontal=TRUE, add=TRUE, whisklty=0, staplelty=0, col=rgb(1,1,0,0), outline=FALSE)
         }
 
         effectVectorDensity <- density(effectVector)
-        plot(effectVectorDensity, main="Effect sizes", xlab="Effect size", ylab="Density", xlim=as.numeric(quantile(effectVector, probs=c(0.025,0.975))))
+        plot(effectVectorDensity, main="Effect size", xlab="Effect size", ylab="Density", xlim=as.numeric(quantile(effectVector, probs=c(0.025,0.975))))
         polygon(effectVectorDensity, col=rgb(0,1,1,0.3))
         if (!densityOnly) {
             boxplot(effectVector, boxwex=max(effectVectorDensity$y) / 6, at=max(effectVectorDensity$y) / 2, horizontal=TRUE, add=TRUE, whisklty=0, staplelty=0, col=rgb(0,1,1,0), outline=FALSE)

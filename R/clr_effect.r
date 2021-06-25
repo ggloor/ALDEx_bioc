@@ -192,7 +192,7 @@ if (verbose == TRUE) message("group summaries calculated")
           quantile( x, probs=0.025, names=FALSE)} ))
       effecthigh <- t(apply( l2d$effect, 1, function(x) {x[is.na(x)] <- 0 ;
           quantile( x, probs=0.975, names=FALSE)} ))
-      effect  <- t(apply( l2d$effect, 1, median ))
+      effect <- Rfast::rowMedians(l2d$effect)
     }
     overlap <- apply( l2d$effect, 1, function(row) { if(all(is.na(row))) warning("NAs in effect, ignore if using ALR");
                 row[is.na(row)] <- 0 ;

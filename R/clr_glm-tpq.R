@@ -43,11 +43,11 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
 
   lr2glm <- function(lr, conditions, ...){
 
-    if( !is(conditions, "matrix") &&
+    if( !is(conditions, "matrix") &
        !("assign" %in% names(attributes(conditions)))){
 
       stop("Please define the aldex.clr object for a model.matrix 'conditions'.")
-    }
+     }
 
     if(nrow(lr) != nrow(conditions)){
 
@@ -89,13 +89,14 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
   }
 
   # Keep a running sum of lr2glm instances
-  if(verbose) message("running tests for each MC instance:")
+  # verbose was throwing an error 'the condition has length > 1'
+  if(verbose[1] == TRUE) message("running tests for each MC instance:")
   mc <- ALDEx2::getMonteCarloInstances(clr)
   k <- ALDEx2::numMCInstances(clr)
   r <- 0
   for(i in 1:k){
 
-    if(verbose == TRUE ) numTicks <- progress(i, k, numTicks)
+    if(verbose[1] == TRUE ){ numTicks <- progress(i, k, numTicks) }
     mci_lr <- t(sapply(mc, function(x) x[, i]))
     r <- r + lr2glm(mci_lr, conditions, ...)
   }

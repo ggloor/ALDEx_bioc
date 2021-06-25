@@ -1,8 +1,8 @@
 Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
-Version: 1.25.0
-Date: 2020-04-20
+Version: 1.25.1
+Date: 2020-06-25
 Author: Greg Gloor, Andrew Fernandes, Jean Macklaim, Arianne Albert, Matt Links,
     Thomas Quinn, Jia Rong Wu, Ruth Grace Wong, Brandon Lieng
 Maintainer: Greg Gloor <ggloor@uwo.ca>
@@ -28,8 +28,8 @@ Depends:
   methods,
   stats,
   zCompositions,
-  Rfast
 Imports:
+  Rfast,
   BiocParallel,
   GenomicRanges,
   IRanges,
