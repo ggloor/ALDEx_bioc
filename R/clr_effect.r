@@ -230,7 +230,8 @@ if (verbose == TRUE) message("summarizing output")
    if (include.sample.summary == TRUE){
     for(i in names(rv$rab$spl)){
        nm <- paste("rab.sample", i, sep=".")
-       y.rv[,nm] <- data.frame(t(rv$rab$spl[[i]]))
+       if (is.multicore == TRUE) y.rv[,nm] <- data.frame(t(rv$rab$spl[[i]]))
+       if (is.multicore == FALSE) y.rv[,nm] <- data.frame(rv$rab$spl[[i]])
    }
 
    }
