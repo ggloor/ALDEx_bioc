@@ -14,7 +14,7 @@ bibentry(
     journal = "*** Microbiome, 2014, volume 2, 15 ",
     year    = "2014",
     url     = "*** http://dx.doi.org/10.1186/2049-2618-2-15"
-
+)
 bibentry(
     bibtype = "Article",
     title   = "*** Displaying Variation in Large Datasets: a Visual Summary of Effect Sizes",
