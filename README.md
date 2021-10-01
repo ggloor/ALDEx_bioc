@@ -13,8 +13,10 @@ Quick start
 You can install the developmental branch of `ALDEx2` from GitHub:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("ggloor/ALDEx_bioc")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("ALDEx2")
 ```
 
 Getting started with `ALDEx2` is easy. All you need is a matrix (with rows as variables and columns as samples) and a character vector of group labels. Finally, use the `denom` argument to choose a set of variables to use as the reference for the analysis. You can provide a user-defined reference set (e.g., known house-keeping genes), or choose a method that finds references from the data (`denom = "iqlr"` usually performs well!).

@@ -5,7 +5,7 @@ bibentry(
     journal = "*** PLoS ONE, 2013, volume 8, issue 7, e67019",
     isbn    = "*** 3-900051-07-0",
     year    = "2013",
-    url     = "*** http://dx.doi.org/10.1371%2/journal.pone.0067019"
+    url     = "*** http://dx.doi.org/10.1371/journal.pone.0067019"
 )
 bibentry(
     bibtype = "Article",
@@ -13,8 +13,8 @@ bibentry(
     author  = as.person("Fernandes, A. D. and Reid, J. and Macklaim, J. M. and McMurrough, T.A and Edgell, D.R. and Gloor, G. B."),
     journal = "*** Microbiome, 2014, volume 2, 15 ",
     year    = "2014",
-    url     = "*** http://doi:10.1186/2049-2618-2-15"
-)
+    url     = "*** http://dx.doi.org/10.1186/2049-2618-2-15"
+
 bibentry(
     bibtype = "Article",
     title   = "*** Displaying Variation in Large Datasets: a Visual Summary of Effect Sizes",

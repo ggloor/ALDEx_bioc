@@ -50,8 +50,10 @@ devtools::install_github("ggloor/ALDEx_bioc")
 - Install stable version from Bioconductor
 
 ```{r, eval=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite("ALDEx2")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("ALDEx2")
 ```
 
 
