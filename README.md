@@ -23,10 +23,10 @@ Getting started with `ALDEx2` is easy. All you need is a matrix (with rows as va
 
 Example input table `selex[1:3,1:5]
 
-| |        X1_ANS | X1_BNS | X1_CNS | X1_DNS | X2_ANS | ... |
-| A:D:A:D |   347 |   271  |  396 |    317 |   391  | ... |
-| A:D:A:E |   436  |  361   | 461  |  241   | 410  | ... |
-| A:E:A:D |   476   | 288    |378   | 215   | 412  | ... |
+          X1_ANS X1_BNS X1_CNS X1_DNS X2_ANS
+  A:D:A:D    347    271    396    317    391
+  A:D:A:E    436    361    461    241    410
+  A:E:A:D    476    288    378    215    412
 
 ``` r
 library(ALDEx2)
