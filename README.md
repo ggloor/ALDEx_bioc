@@ -19,7 +19,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("ALDEx2")
 ```
 
-Getting started with `ALDEx2` is easy. All you need is a matrix (with rows as variables and columns as samples) and a character vector of group labels. Finally, use the `denom` argument to choose a set of variables to use as the reference for the analysis. You can provide a user-defined reference set (e.g., known house-keeping genes), or choose a method that finds references from the data (`denom = "iqlr"` usually performs well!).
+Getting started with `ALDEx2` is easy. All you need is a matrix (with rows as variables and columns as samples) and a character vector of group labels. It is crucial to be able to access the table of raw counts because ALDEx2 infers the uncertainty of sampling using the raw counts. Finally, use the `denom` argument to choose a set of variables to use as the reference for the analysis. You can provide a user-defined reference set (e.g., known house-keeping genes), or choose a method that finds references from the data (`denom = "iqlr"` usually performs well!).
 
 ```r
 library(ALDEx2)
