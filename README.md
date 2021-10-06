@@ -32,6 +32,8 @@ Getting started with `ALDEx2` is easy. All you need is a matrix (with rows as va
 
 library(ALDEx2)
 data(selex)
+# Example input table selex[1:3,1:5]
+selex[1:3,1:5]
 group <- c(rep("A", 7), rep("B", 7))
 res <- aldex(selex, group, denom = "iqlr")
 #> [1] "aldex.clr: generating Monte-Carlo instances and clr values"
