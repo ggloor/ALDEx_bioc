@@ -88,14 +88,14 @@
 #'            test="t", effect=FALSE)
 aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
                   include.sample.summary=FALSE, verbose=FALSE,
-                  denom="all", iterate=FALSE, ...){
+                  denom="all", iterate=FALSE, scale.samples = NULL, ...){
 
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
 
   # wrapper function for the entire set of
   message("aldex.clr: generating Monte-Carlo instances and clr values")
   x <- aldex.clr(reads=reads, conds=conditions, mc.samples=mc.samples,
-                 denom=denom, verbose=verbose, useMC=FALSE)
+                 denom=denom, verbose=verbose, useMC=FALSE, scale.samples = scale.samples)
 
   if(test == "t") {
 
