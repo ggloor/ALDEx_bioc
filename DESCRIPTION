@@ -46,4 +46,5 @@ Suggests:
   ggpattern,
   ggplot2
 Remotes:
-    jsilve24/driver
+  jsilve24/driver,
+  coolbutuseless/ggpattern
