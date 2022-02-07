@@ -42,6 +42,8 @@ Suggests:
   knitr,
   rmarkdown,
   tidyverse,
-  driver
+  driver,
+  ggpattern,
+  ggplot2
 Remotes:
     jsilve24/driver
