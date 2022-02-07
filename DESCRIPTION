@@ -40,4 +40,8 @@ Suggests:
   testthat,
   BiocStyle,
   knitr,
-  rmarkdown
+  rmarkdown,
+  tidyverse,
+  driver
+Remotes:
+    jsilve24/driver
