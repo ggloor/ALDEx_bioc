@@ -44,7 +44,9 @@ Suggests:
   tidyverse,
   driver,
   ggpattern,
-  ggplot2
+  ggplot2,
+  cowplot
 Remotes:
   jsilve24/driver,
   coolbutuseless/ggpattern
+

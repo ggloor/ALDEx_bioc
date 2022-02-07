@@ -29,6 +29,11 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
+      - name: Configue Linux
+
+      - if: runner.os == 'Linux'
+        run: sudo apt-get install -y libudunits2-dev
+
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-pandoc@v1
