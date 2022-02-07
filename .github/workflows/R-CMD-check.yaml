@@ -29,7 +29,8 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - name: Configue Linux
+      - name: Configure git
+        run: git config --global core.autocrlf false
 
       - if: runner.os == 'Linux'
         run: sudo apt-get install -y libudunits2-dev
