@@ -44,6 +44,8 @@
 #' @param verbose A boolean. Toggles whether to print diagnostic information while
 #'  running. Useful for debugging errors on large datasets. Applies to
 #'  \code{effect = TRUE}.
+#' @param scale.samples A (number of samples) times (number of Monte Carlo samples) matrix of scale samples if using scale simuation is desired.
+#'  If \code{NULL} (default), ALDEx2 is run without scale simulation.
 #' @param ... Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).
 #'
 #' @return Returns a number of values that depends on the set of options.

@@ -7,9 +7,9 @@ author:
   email: ggloor@uwo.ca
 bibliography: aldex.bib
 output:
-  BiocStyle::html_document:
+  html_document:
     toc_float: true
-  BiocStyle::pdf_document: default
+  pdf_document: default
 package: ALDEx2
 abstract: |
     Instructions on installing and using probabilisitic modelling and compositional data analysis using ALDEx2.

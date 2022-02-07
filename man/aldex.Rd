@@ -14,6 +14,7 @@ aldex(
   verbose = FALSE,
   denom = "all",
   iterate = FALSE,
+  scale.samples = NULL,
   ...
 )
 }
@@ -57,6 +58,9 @@ using the set of per-group non-zero features.}
 \item{iterate}{A boolean. Toggles whether to iteratively perform a test. For example,
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
+
+\item{scale.samples}{A (number of samples) times (number of Monte Carlo samples) matrix of scale samples if using scale simuation is desired.
+If \code{NULL} (default), ALDEx2 is run without scale simulation.}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }
