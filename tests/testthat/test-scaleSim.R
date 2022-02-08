@@ -21,7 +21,7 @@ create_true_abundances <- function(d, n){
 
 ##Function to resample data to an arbitrary size
 resample_data <- function(dat, seq.depth){
-  ddat <- driver::miniclo(as.matrix(dat[,-1]))
+  ddat <- as.matrix(dat[,-1])/rowSums(as.matrix(dat[,-1]))
   for (i in 1:nrow(dat)){
     dat[i,-1] <- rmultinom(1, size=seq.depth, prob=ddat[i,])
   }
