@@ -20,4 +20,4 @@ exportPattern( "^aldex[.]*" )
 exportMethods(getMonteCarloInstances,getDirichletInstances,getSampleIDs,getFeatures,
     numFeatures,numMCInstances,getFeatureNames,getReads,numConditions,
     getDirichletReplicate, getDirichletSample,
-    getMonteCarloReplicate, getMonteCarloSample, getDenom)
+    getMonteCarloReplicate, getMonteCarloSample, getDenom, getScaleSamples)

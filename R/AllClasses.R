@@ -16,7 +16,8 @@ setClass("aldex.clr",
         verbose="logical",
         useMC="logical",
         dirichletData="list",
-        analysisData="list"
+        analysisData="list",
+        scaleSamps = "ANY"
         )
 )
 

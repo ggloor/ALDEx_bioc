@@ -22,7 +22,7 @@ Description: A differential abundance analysis for the comparison of two or more
 License: file LICENSE
 URL: https://github.com/ggloor/ALDEx_bioc
 BugReports: https://github.com/ggloor/ALDEx_bioc/issues
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 Depends:
   methods,
@@ -40,4 +40,11 @@ Suggests:
   testthat,
   BiocStyle,
   knitr,
-  rmarkdown
+  rmarkdown,
+  tidyverse,
+  ggpattern,
+  ggplot2,
+  cowplot
+Remotes:
+  coolbutuseless/ggpattern
+
