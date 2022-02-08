@@ -1,3 +1,5 @@
+citHeader("To cite ALDEx2 in publications use, use any of the first three citations. To cite scale simulation, please use the last reference (Nixon et. al. (2022)).")
+
 bibentry(
     bibtype = "Article",
     title   = "*** ANOVA-Like Differential Gene Expression Analysis of Single-Organism and Meta-RNA-Seq",
@@ -22,4 +24,13 @@ bibentry(
     journal = "*** Journal of Computational and Graphical Statistics, ",
     year    = "2016",
     url     = "*** http://dx.doi.org/10.1080/10618600.2015.1131161"
+)
+
+bibentry(
+    bibtype = "Article",
+    title   = "*** A Statistical Analysis of Compositional Surveys",
+    author  = as.person("Michelle Pistner Nixon and Jeffrey Letourneau and Lawrence A. David and Sayan Mukherjee and Justin D. Silverman"),
+    journal = "*** ArVix Preprint: 2201.03616, ",
+    year    = "2022",
+    url     = "*** https://arxiv.org/abs/2201.03616"
 )
