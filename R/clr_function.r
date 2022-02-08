@@ -183,7 +183,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
         stop("Scale samples are of incorrect size!")
       }
       for(i in 1:length(p)){
-        p[[i]] = log(sweep(p[[i]], 2,  scale.samples[i,], "*"))
+        p[[i]] = sweep(log(p[[i]]), 2,  log(scale.samples[i,]), "+")
       }
       l2p = p
     }
