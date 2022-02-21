@@ -10,7 +10,7 @@
 #' @export
 aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
                               include.sample.summary=FALSE, verbose=FALSE,
-                              iterate=FALSE, plot.alpha = FALSE, ...){
+                              iterate=FALSE, ...){
   lambda <- sort(lambda)
   sen_results <- list()
   for(j in 1:length(lambda)){
@@ -70,7 +70,9 @@ aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
 #' @param test A character string. What test was used to calculate the results
 #' @param thresh A numeric between 0 and 1. What threshold should be used for significance?
 #' @param taxa_to_label A positive integer. How many taxa should be labeled in the plot?
+#' @param glmVar If `test = "glm"`, what variable do you want plotted?
 #' @return A ggplot2 object
+#' @importFrom tidyr %>%
 #' @export
 plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL){
   if(thresh < 0 | thresh > 1){

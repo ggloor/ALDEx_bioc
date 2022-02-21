@@ -210,6 +210,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale.samples[i,]), "+")
         }
       }
+      names(l2p) <- names(p)
     }
     
     # ---------------------------------------------------------------------

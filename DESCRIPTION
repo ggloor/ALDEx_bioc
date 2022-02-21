@@ -35,13 +35,16 @@ Imports:
   IRanges,
   S4Vectors,
   SummarizedExperiment,
-  multtest
+  multtest,
+  tidyr,
+  dplyr,
+  plyr
 Suggests:
   testthat,
   BiocStyle,
   knitr,
   rmarkdown,
-  tidyverse,
+  purrr,
   ggpattern,
   ggplot2,
   cowplot
