@@ -177,15 +177,30 @@ if (verbose == TRUE) message("dirichlet samples complete")
     
     if(!is.null(scale.samples)){
       message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
-      Q <- nrow(scale.samples)
-      N <- ncol(scale.samples)
-      if(Q != ncol(reads) | N != mc.samples){
-        stop("Scale samples are of incorrect size!")
+      if(length(scale.samples) == 1){ ##Add uncertainty around the scale samples
+        lambda <- scale.samples
+        scale.samples <-matrix(ncol = mc.samples)
+        for(i in 1:length(p)){
+          gm_sample <- log(apply(p[[i]],2,gm))
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
+          p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
+          scale.samples = rbind(scale.samples, scale_for_sample)
+        }
+        scale.samples <- scale.samples[-1,]
+        l2p <- p
+      } else if(length(scale.samples) >1 & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
+        l2p <- p
+      } else{ ##User input of scale samples
+        Q <- nrow(scale.samples)
+        N <- ncol(scale.samples)
+        if(Q != ncol(reads) | N != mc.samples){
+          stop("Scale samples are of incorrect size!")
+        }
+        for(i in 1:length(p)){
+          p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale.samples[i,]), "+")
+        }
+        l2p <- p
       }
-      for(i in 1:length(p)){
-        p[[i]] = sweep(log(p[[i]]), 2,  log(scale.samples[i,]), "+")
-      }
-      l2p = p
     }
     
     # ---------------------------------------------------------------------

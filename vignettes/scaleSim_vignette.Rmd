@@ -159,24 +159,17 @@ sig.aldexScaleSim
 
 To recapture the behavior of ALDEx2 using scale simulation, we also drew samples from the scale model using the geometric mean. Here, $c = 0$, $\mu_j = 1/gm(W(j)^\parallel)$, and $\alpha = 1e-3$. In addition, we recaptured the behavior of scale invariant models through samples from a CoDA inspired model. Here, $c$ and $\mu_j$ are the same as before, but $\alpha = 10$.
 
-```{r ALDEX2ScaleSimOtherModsSamples}
-mu.vec = 1/apply(rdat[,-1],1,gm)
-##Samples from the CLR model
-scale.sampsCLR = t(sapply(mu.vec, FUN = function(mu){rlnorm(2000, mu, sdlog = 1e-3)}))
-##Samples from the CoDA model
-scale.sampsCoDA = t(sapply(mu.vec, FUN = function(mu){rlnorm(2000, mu, sdlog = 10)}))
-```
 
 We pass these scale samples to `aldex` as before. As expected, the CLR model returns all 21 taxa as significant whereas the CoDA model returns none as significant.
 
 ```{r ALDEX2ScaleSimOtherMods}
-aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), scale.samples = scale.sampsCLR, mc.samples = 2000)
+aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), scale.samples = 1e-3, mc.samples = 2000)
  
 sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(wi.eBH <= 0.05)
 head(sig.aldexScaleSimCLR)
 dim(sig.aldexScaleSimCLR)
 
-aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), scale.samples = scale.sampsCoDA, mc.samples = 2000)
+aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), scale.samples = 10, mc.samples = 2000)
  
 sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(wi.eBH <= 0.05)
 head(sig.aldexScaleSimCoDA)
@@ -188,7 +181,7 @@ head(sig.aldexScaleSimCoDA)
 We also added functionality to return the scale samples from an `aldex.clr` object similar to other functions in ALDEx2. Scale samples can be returned using the function `getScaleSamples()`.
 
 ```{r getScaleSamps}
-x <- aldex.clr(countdata, as.character(rdat$Condition), scale.samples = scale.sampsCoDA, mc.samples = 2000)
+x <- aldex.clr(countdata, as.character(rdat$Condition), scale.samples = 10, mc.samples = 2000)
 
 getScaleSamples(x)[1:5,1:5]
 ```
@@ -284,6 +277,53 @@ p1 <- plot_count(dat)
 p2 <- plot_sig2(rrs, truth=truth2)
 p <- plot_grid(p1, p2, nrow=2, align="v", rel_heights=c(1.7, 1))
 p
+```
+
+## Checking Compatibility
+
+Now, we are going to do a small experiment to make sure that the CLR model is return similar effect sizes as the `selex` data.
+
+```{r selex}
+data(selex)
+
+conds <- c(rep('N', 7), rep('S', 7))
+x <- aldex.clr(selex, conds)
+x.e <- aldex.effect(x)
+
+selex.scale <- matrix(rlnorm(128*14, 1, sdlog=0.5), nrow=14)
+x.s <- aldex.clr(selex, conds, scale.samples=selex.scale)
+x.s.e <- aldex.effect(x.s)
+sig <- which(abs(x.e$effect) > 2)
+sig.s <- which(abs(x.s.e$effect) > 2)
+
+plot(x.e$diff.win, x.e$diff.btw, pch=19, cex=0.4, col='grey', ylim=c(-10,15), 
+  xla='dispersion', ylab='difference')
+points(x.e$diff.win[sig], x.e$diff.btw[sig], pch=19, cex=0.2, col='red')
+points(x.s.e$diff.win, x.s.e$diff.btw, col='grey')
+points(x.s.e$diff.win[sig.s], x.s.e$diff.btw[sig.s], pch=19, cex=0.2,col='cyan')
+abline(0,1, lty=2)
+abline(0,-1, lty=2)
+legend(3,15, legend=c('normal', 'normal+sig', 'scaled', 'scaled + sig'), pch=c(19,19, 1,19), col=c('grey', 'red', 'grey', 'cyan'))
+
+data(selex)
+
+conds <- c(rep('N', 7), rep('S', 7))
+x <- aldex.clr(selex, conds)
+x.e <- aldex.effect(x)
+
+x.s <- aldex.clr(selex, conds, scale.samples=1e-3)
+x.s.e <- aldex.effect(x.s)
+sig <- which(abs(x.e$effect) > 2)
+sig.s <- which(abs(x.s.e$effect) > 2)
+
+plot(x.e$diff.win, x.e$diff.btw, pch=19, cex=0.4, col='grey', ylim=c(-10,15), 
+  xla='dispersion', ylab='difference')
+points(x.e$diff.win[sig], x.e$diff.btw[sig], pch=19, cex=0.2, col='red')
+points(x.s.e$diff.win, x.s.e$diff.btw, col='grey')
+points(x.s.e$diff.win[sig.s], x.s.e$diff.btw[sig.s], pch=19, cex=0.2,col='cyan')
+abline(0,1, lty=2)
+abline(0,-1, lty=2)
+legend(3,15, legend=c('normal', 'normal+sig', 'scaled', 'scaled + sig'), pch=c(19,19, 1,19), col=c('grey', 'red', 'grey', 'cyan'))
 ```
 
 ## Session Info
