@@ -12,7 +12,6 @@ aldex.senAnalysis(
   include.sample.summary = FALSE,
   verbose = FALSE,
   iterate = FALSE,
-  plot.alpha = FALSE,
   ...
 )
 }

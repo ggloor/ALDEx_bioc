@@ -47,7 +47,8 @@ Suggests:
   purrr,
   ggpattern,
   ggplot2,
-  cowplot
+  cowplot,
+  tidyverse
 Remotes:
   coolbutuseless/ggpattern
 

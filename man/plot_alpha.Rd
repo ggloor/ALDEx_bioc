@@ -20,6 +20,8 @@ plot_alpha(
 \item{thresh}{A numeric between 0 and 1. What threshold should be used for significance?}
 
 \item{taxa_to_label}{A positive integer. How many taxa should be labeled in the plot?}
+
+\item{glmVar}{If `test = "glm"`, what variable do you want plotted?}
 }
 \value{
 A ggplot2 object
