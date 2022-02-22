@@ -13,6 +13,7 @@ importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
     "pnorm", "psignrank", "pt", "pwilcox", "as.dist", "density", "dist")
 importFrom("utils", "installed.packages")
 importFrom("Rfast", "rowMedians", "colMedians")
+importFrom("stringr", "str_detect")
 #importFrom("BiocParallel", "bplapply")
 
 export( aldex )

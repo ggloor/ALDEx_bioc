@@ -38,7 +38,8 @@ Imports:
   multtest,
   tidyr,
   dplyr,
-  plyr
+  plyr,
+  stringr
 Suggests:
   testthat,
   BiocStyle,

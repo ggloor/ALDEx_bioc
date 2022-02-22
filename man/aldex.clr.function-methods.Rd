@@ -14,7 +14,8 @@
     This is the input for all further analyses.
 }
 \usage{
-    aldex.clr(reads, conds, mc.samples = 128, denom="all", verbose=FALSE, useMC=FALSE)
+    aldex.clr(reads, conds, mc.samples = 128, denom="all", 
+          verbose=FALSE, useMC=FALSE, scale.samples = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -63,6 +64,13 @@
         with the BiocParallel package. Serial processing will be used if this is
         not possible. In practice serial and multicore are nearly the same speed
         because of overhead in setting up the parallel processes.
+    }
+    \item{scale.samples}{
+        Use scale simulation if not `NULL`. If a matrix is supplied, scale simulation
+        will be used assuming that matrix denotes the scale samples. If a numeric is
+        supplied, scale simulation will be applied by relaxing the geometric mean 
+        assumption with the numeric representing the standard deviation of the
+        scale distribution.
     }
 }
 \details{

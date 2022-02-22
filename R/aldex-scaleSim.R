@@ -73,6 +73,7 @@ aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
 #' @param glmVar If `test = "glm"`, what variable do you want plotted?
 #' @return A ggplot2 object
 #' @importFrom tidyr %>%
+#' @importFrom stringr str_detect
 #' @export
 plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL){
   if(thresh < 0 | thresh > 1){
@@ -124,7 +125,7 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
   B %>% 
     as.data.frame() %>%
     dplyr::mutate("lambda" = lambda) %>%
-    dplyr::select(lambda, everything()) %>%
+    dplyr::select(lambda, dplyr::everything()) %>%
     tidyr::pivot_longer(cols = !lambda, names_to = "Sequence", values_to = "Effect") %>%
     plyr::join(P, by = c("lambda", "Sequence")) %>%
     dplyr::mutate("Sequence" = sub("V", "", Sequence)) %>%
