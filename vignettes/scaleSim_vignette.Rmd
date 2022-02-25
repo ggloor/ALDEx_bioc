@@ -197,7 +197,7 @@ We also added sensitivity analysis functionality (should be considered in develo
 ```{r senAnalysis}
 x <- aldex.clr(countdata, as.character(rdat$Condition), scale.samples = 1e-3, mc.samples = 2000)
 
-senAnalysis = aldex.senAnalysis(x, lambda = seq(1e-3,3,by=.5))
+senAnalysis = aldex.senAnalysis(x, lambda = c(1e-3, .1, .25, .5, 1, 2, 3))
 
 plot_alpha(senAnalysis, taxa_to_label = 4)
 ```
