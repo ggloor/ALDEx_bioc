@@ -281,7 +281,7 @@ p
 
 ## Checking Compatibility
 
-Now, we are going to do a small experiment to make sure that the CLR model is return similar effect sizes as the `selex` data.
+Now, we are going to do a small experiment to make sure that the CLR model is return similar effect sizes as the `selex` data. First, using the CLR-equivalent scale simulation.
 
 ```{r selex}
 data(selex)
@@ -290,8 +290,7 @@ conds <- c(rep('N', 7), rep('S', 7))
 x <- aldex.clr(selex, conds)
 x.e <- aldex.effect(x)
 
-selex.scale <- matrix(rlnorm(128*14, 1, sdlog=0.5), nrow=14)
-x.s <- aldex.clr(selex, conds, scale.samples=selex.scale)
+x.s <- aldex.clr(selex, conds, scale.samples=1e-3)
 x.s.e <- aldex.effect(x.s)
 sig <- which(abs(x.e$effect) > 2)
 sig.s <- which(abs(x.s.e$effect) > 2)
@@ -304,14 +303,13 @@ points(x.s.e$diff.win[sig.s], x.s.e$diff.btw[sig.s], pch=19, cex=0.2,col='cyan')
 abline(0,1, lty=2)
 abline(0,-1, lty=2)
 legend(3,15, legend=c('normal', 'normal+sig', 'scaled', 'scaled + sig'), pch=c(19,19, 1,19), col=c('grey', 'red', 'grey', 'cyan'))
+```
 
-data(selex)
+Next, relaxing the geometric mean assumption:
 
-conds <- c(rep('N', 7), rep('S', 7))
-x <- aldex.clr(selex, conds)
-x.e <- aldex.effect(x)
+```{r selex2}
 
-x.s <- aldex.clr(selex, conds, scale.samples=1e-3)
+x.s <- aldex.clr(selex, conds, scale.samples=1)
 x.s.e <- aldex.effect(x.s)
 sig <- which(abs(x.e$effect) > 2)
 sig.s <- which(abs(x.s.e$effect) > 2)

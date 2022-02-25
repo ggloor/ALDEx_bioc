@@ -145,5 +145,5 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
 }
 
 gm <- function(x, na.rm = TRUE){
-  exp(sum(log2(x[x > 0]), na.rm=na.rm) / length(x))
+  exp(mean(log(x[x > 0]), na.rm=na.rm))
 }
