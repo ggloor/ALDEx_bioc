@@ -186,6 +186,24 @@ x <- aldex.clr(countdata, as.character(rdat$Condition), scale.samples = 10, mc.s
 getScaleSamples(x)[1:5,1:5]
 ```
 
+### Sensitivity Analysis
+
+We also added sensitivity analysis functionality (should be considered in development mode). To use this feature:
+
+* Run `aldex.clr`.
+* Pass that object to the `aldex.senAnalysis` function. Also specify what values of $\lambda$ you want to use.
+* If desired, use `plot_alpha` to plot.
+
+```{r senAnalysis}
+x <- aldex.clr(countdata, as.character(rdat$Condition), scale.samples = 1e-3, mc.samples = 2000)
+
+senAnalysis = aldex.senAnalysis(x, lambda = seq(1e-3,3,by=.5))
+
+plot_alpha(senAnalysis, taxa_to_label = 4)
+```
+
+
+
 ### Comparing Results
 
 Now, let's graphically compare results. The top pane shows the true scaled abundances, and it makes it (abundantly!) clear that taxon 3, 4, 15, and 21 are only those that are changing before and after treatment. The differences between models are reflected in the lower plot which shows that both ALDEx2 and the CLR scale simulation have achieved the maximum false discovery rate of 81%. On the contrary, the relaxed scale simulation recovers 3 out of 4 significant taxa at the expense of no false positives.
