@@ -6,6 +6,8 @@ import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
 import(SummarizedExperiment)
+import(ggplot2)
+import(gghighlight)
 importFrom("grDevices", "rgb")
 importFrom("graphics", "abline","hist","par","plot","points","mtext","polygon","boxplot")
 importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
@@ -16,6 +18,7 @@ importFrom("Rfast", "rowMedians", "colMedians")
 #importFrom("BiocParallel", "bplapply")
 
 export( aldex )
+export(plot_alpha)
 exportPattern( "^aldex[.]*" )
 exportMethods(getMonteCarloInstances,getDirichletInstances,getSampleIDs,getFeatures,
     numFeatures,numMCInstances,getFeatureNames,getReads,numConditions,

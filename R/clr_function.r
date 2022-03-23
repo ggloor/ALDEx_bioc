@@ -177,15 +177,40 @@ if (verbose == TRUE) message("dirichlet samples complete")
     
     if(!is.null(scale.samples)){
       message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
-      Q <- nrow(scale.samples)
-      N <- ncol(scale.samples)
-      if(Q != ncol(reads) | N != mc.samples){
-        stop("Scale samples are of incorrect size!")
+      l2p <- list()
+      if(length(scale.samples) == 1){ ##Add uncertainty around the scale samples
+        lambda <- scale.samples
+        scale.samples <-matrix(ncol = mc.samples)
+        for(i in 1:length(p)){
+          gm_sample <- log(apply(p[[i]],2,gm))
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
+          scale.samples = rbind(scale.samples, scale_for_sample)
+        }
+        scale.samples <- scale.samples[-1,]
+      } else if(length(scale.samples) >1 & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
+        warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
+        warning("Using only the first item in vector for scale simulation.")
+        lambda <- scale.samples[1]
+        scale.samples <-matrix(ncol = mc.samples)
+        for(i in 1:length(p)){
+          gm_sample <- log(apply(p[[i]],2,gm))
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
+          scale.samples = rbind(scale.samples, scale_for_sample)
+        }
+        scale.samples <- scale.samples[-1,]
+      } else{ ##User input of scale samples
+        Q <- nrow(scale.samples)
+        N <- ncol(scale.samples)
+        if(Q != ncol(reads) | N != mc.samples){
+          stop("Scale samples are of incorrect size!")
+        }
+        for(i in 1:length(p)){
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale.samples[i,]), "+")
+        }
       }
-      for(i in 1:length(p)){
-        p[[i]] = sweep(log(p[[i]]), 2,  log(scale.samples[i,]), "+")
-      }
-      l2p = p
+      names(l2p) <- names(p)
     }
     
     # ---------------------------------------------------------------------
