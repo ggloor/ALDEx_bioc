@@ -181,21 +181,21 @@ if (verbose == TRUE) message("dirichlet samples complete")
       if(length(scale.samples) == 1){ ##Add uncertainty around the scale samples
         lambda <- scale.samples
         scale.samples <-matrix(ncol = mc.samples)
-        for(i in 1:length(p)){
-          gm_sample <- log(apply(p[[i]],2,gm))
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
-          scale.samples = rbind(scale.samples, scale_for_sample)
+        for(i in 1:length(p)){ # run through each sample
+          gm_sample <- log(apply(p[[i]],2,gm)) # gm of dir instance per sample, used as input for rlnorm
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)}) # get a random scale based on gm
+          # effectively, this is randomizing the value of the gm based on the DIR instance
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-") # get the log-ratio of the random Dir and random rlnorm(gm), now in log2
+          scale.samples = rbind(scale.samples, scale_for_sample) # archive the scale-gm
         }
-        scale.samples <- scale.samples[-1,]
-      } else if(length(scale.samples) >1 & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
-        warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
-        warning("Using only the first item in vector for scale simulation.")
-        lambda <- scale.samples[1]
+        scale.samples <- scale.samples[-1,] # remove the null row
+      } else if(length(scale.samples) == length(conds) & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
+        message("A vector was supplied for scale.samples, adjusting with per-sample scale")
+        lambda <- scale.samples
         scale.samples <-matrix(ncol = mc.samples)
         for(i in 1:length(p)){
           gm_sample <- log(apply(p[[i]],2,gm))
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda[i])})
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
           scale.samples = rbind(scale.samples, scale_for_sample)
         }
