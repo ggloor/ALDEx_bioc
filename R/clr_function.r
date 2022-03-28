@@ -181,11 +181,11 @@ if (verbose == TRUE) message("dirichlet samples complete")
       if(length(scale.samples) == 1){ ##Add uncertainty around the scale samples
         lambda <- scale.samples
         scale.samples <-matrix(ncol = mc.samples)
-        for(i in 1:length(p)){
-          gm_sample <- log(apply(p[[i]],2,gm))
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
-          scale.samples = rbind(scale.samples, scale_for_sample)
+        for(i in 1:length(p)){ # run through each sample
+          gm_sample <- log(apply(p[[i]],2,gm)) # gm of DIR instance per sample
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)}) # random value for GM with lambda variance
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-") # log-ratio of frequency and randomized gm
+          scale.samples = rbind(scale.samples, scale_for_sample) # archive these for output in clr object.
         }
         scale.samples <- scale.samples[-1,]
       } else if(length(scale.samples) >1 & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
