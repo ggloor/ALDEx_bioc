@@ -188,14 +188,15 @@ if (verbose == TRUE) message("dirichlet samples complete")
           scale.samples = rbind(scale.samples, scale_for_sample) # archive these for output in clr object.
         }
         scale.samples <- scale.samples[-1,]
-      } else if(length(scale.samples) >1 & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
-        warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
-        warning("Using only the first item in vector for scale simulation.")
-        lambda <- scale.samples[1]
+      } else if(length(scale.samples) == length(conds) & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
+        message('a vector was supplied for scale samples')
+        #warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
+        #warning("Using only the first item in vector for scale simulation.")
+        lambda <- scale.samples
         scale.samples <-matrix(ncol = mc.samples)
         for(i in 1:length(p)){
           gm_sample <- log(apply(p[[i]],2,gm))
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda[i])})
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
           scale.samples = rbind(scale.samples, scale_for_sample)
         }
