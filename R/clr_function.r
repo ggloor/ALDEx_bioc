@@ -176,7 +176,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
     # Checking the size of the scale samples
     
     if(!is.null(scale.samples)){
-      message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
+      if(verbose == TRUE) message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
       l2p <- list()
       if(length(scale.samples) == 1){ ##Add uncertainty around the scale samples
         lambda <- scale.samples
@@ -189,7 +189,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
         }
         scale.samples <- scale.samples[-1,]
       } else if(length(scale.samples) == length(conds) & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
-        message('a vector was supplied for scale samples')
+        if(verbose == TRUE) message('a vector was supplied for scale samples')
         #warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
         #warning("Using only the first item in vector for scale simulation.")
         lambda <- scale.samples
