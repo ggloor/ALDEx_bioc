@@ -39,8 +39,8 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
   # make sure the conditions vector or matrix is reasonable
   if(missing(conds)){
 
-    message("no conditions provided: forcing denom = 'all'")
-    message("no conditions provided: forcing conds = 'NA'")
+    if(verbose == TRUE) message("no conditions provided: forcing denom = 'all'")
+    if(verbose == TRUE) message("no conditions provided: forcing conds = 'NA'")
     denom <- "all"
     conds <- rep("NA", ncol(reads))
 
@@ -51,11 +51,11 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 # or
 # the use of a user-supplied denominator
   if(is(conds, "matrix")){
-    message("checking for condition length disabled!")
+    if(verbose == TRUE) message("checking for condition length disabled!")
     if(is.vector(denom, mode="integer")){
-      message("user-defined denominator used")
+      if(verbose == TRUE) message("user-defined denominator used")
     } else if (denom == "all"){
-      message("using all features for denominator")
+      if(verbose == TRUE) message("using all features for denominator")
     } else {
       stop("please supply a vector of indices for the denominator")
     }
@@ -82,12 +82,12 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     # make sure that the multicore package is in scope and return if available
     has.BiocParallel <- FALSE
     if ("BiocParallel" %in% rownames(installed.packages()) & useMC){
-        message("multicore environment is is OK -- using the BiocParallel package")
+        if(verbose == TRUE) message("multicore environment is is OK -- using the BiocParallel package")
         #require(BiocParallel)
         has.BiocParallel <- TRUE
     }
     else {
-        message("operating in serial mode")
+        if(verbose == TRUE) message("operating in serial mode")
     }
 
     # make sure that mc.samples is an integer, despite it being a numeric type value
@@ -269,7 +269,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
           }
         }
       }  else {
-        message("the denominator is not recognized, use a different denominator")
+        warning("the denominator is not recognized, use a different denominator")
       }
       
       # sanity check on data
