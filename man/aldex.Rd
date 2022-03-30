@@ -60,11 +60,11 @@ using the set of per-group non-zero features.}
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
 
-\item{scale.lambda}{A single number or numeric vector for the log variance of the scale. 
+\item{scale.lambda}{A number or vector that contains scale uncertainty to test.
 If \code{NULL} (default), ALDEx2 is run without scale variance simulation.}
 
-\item{scale.mu}{A single number or numeric vectro for the log offset  of the scale. Not recommended.
-If \code{NULL} (default), ALDEx2 is run without scale offset simulation.}
+\item{scale.mu}{A number or vector that contains scale offset to test.
+If \code{NULL} (default), ALDEx2 is run without scale offset.}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }

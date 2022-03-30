@@ -111,7 +111,7 @@
     i=1
 
     # x is an object of type aldex.clr
-    x <- aldex.clr(selex, conds, mc.samples = 2, denom="all", verbose = FALSE, scale.samples=NULL)
+    x <- aldex.clr(selex, conds, mc.samples = 2, denom="all", verbose = FALSE, scale.lambda=NULL, scale.mu=NULL)
 
     # get reads plus uniform prior
     reads <- getReads(x)

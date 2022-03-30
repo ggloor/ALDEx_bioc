@@ -38,14 +38,11 @@ dat <- create_true_abundances(d, n=50)
 ##Create resampled data
 rdat <- resample_data(dat, seq.depth=5000)
 
-scale.sampsWrongDim = matrix(rlnorm(128*10, 1, sdlog = 0.75), nrow = 10)
-scale.sampsRightDim = matrix(rlnorm(128*100, 1, sdlog = 0.75), nrow = 100)
-
 countdata <- t(rdat[,-1,drop=F])
 colnames(countdata) <- paste0("n", 1:ncol(countdata))
 
-test_that("scale simulation errors when wrong dimensions are passed", {
-  expect_error(aldex(countdata, as.character(rdat$Condition), scale.samples = scale.sampsWrongDim, mc.samples = 128), "Scale samples are of incorrect size!")
+test_that("scale simulation errors when wrong vector lengths are passed", {
+  expect_error(aldex(countdata, as.character(rdat$Condition), scale.lambda = c(1,1), mc.samples = 128), "Scale.lambda is of incorrect length!")
 })
 
 test_that("aldex2 works without scale samples passed", {
@@ -53,7 +50,7 @@ test_that("aldex2 works without scale samples passed", {
 })
 
 test_that("aldex2 works with scale samples passed", {
-  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), scale.samples = scale.sampsRightDim, mc.samples = 128))) # expect no error
+  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), scale.lambda = rep(1,14), mc.samples = 128))) # expect no error
   aldex.fit <- aldex(countdata, as.character(rdat$Condition), scale.samples = scale.sampsRightDim, mc.samples = 128) %>%
     filter(wi.eBH <= 0.05)
   truth <- row.names(aldex.fit)
@@ -64,7 +61,7 @@ test_that("aldex2 works with scale samples passed", {
 
 test_that("aldex2 works with coda scale samples passed", {
   scale.sampsCoDA = matrix(rlnorm(128*100, 1, sdlog = 10), nrow = 100)
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), scale.samples = scale.sampsCoDA, mc.samples = 128) %>%
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 1, mc.samples = 128) %>%
     filter(wi.eBH <= 0.05)
   truth <- row.names(aldex.fit)
   expect_true(length(truth) == 0)
