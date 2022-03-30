@@ -4,7 +4,7 @@
 #  this function generates the centre log-ratio transform of Monte-Carlo instances
 #  drawn from the Dirichlet distribution.
 
-aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, scale.samples = NULL) {
+aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, scale.lambda = NULL, scale.mu=NULL) {
 
 # INPUT
 # The 'reads' data.frame MUST have row
@@ -118,6 +118,9 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     if ( length(colnames(reads)) != length(unique(colnames(reads))) ) stop ("col names are not unique")
     if ( mc.samples < 128 ) warning("values are unreliable when estimated with so few MC smps")
 
+    if(!is.null(dim(scale.lambda)) stop("scale.lambda must be NULL or a single number or vector of numbers")
+    if(!is.null(dim(scale.mu)) stop("scale.mu must be NULL or a single number or vector of numbers'")
+      
     # add a prior expection to all remaining reads that are 0
     # this should be by a Count Zero Multiplicative approach, but in practice
     # this is not necessary because of the large number of features
@@ -125,7 +128,8 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 
     # This extracts the set of features to be used in the geometric mean computation
     # returns a list of features
-    if(is.null(scale.samples)){
+    # TO DO integrate scale into feature.subset
+    if(is.null(scale.lambda)){
       feature.subset <- aldex.set.mode(reads, conds, denom)
       if ( length(feature.subset[[1]]) == 0 ) stop("No low variance, high abundance features in common between conditions\nPlease choose another denomiator.")
     } else{
@@ -175,41 +179,45 @@ if (verbose == TRUE) message("dirichlet samples complete")
     # Add scale samples (if desired)
     # Checking the size of the scale samples
     
-    if(!is.null(scale.samples)){
+    if(!is.null(scale.lambda) | !is.null(scale.mu)){
       if(verbose == TRUE) message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
       l2p <- list()
-      if(length(scale.samples) == 1){ ##Add uncertainty around the scale samples
-        lambda <- scale.samples
+      if(length(scale.lambda) == 1 & is.null(scale.mu)){ ##Add uncertainty around the scale samples
         scale.samples <-matrix(ncol = mc.samples)
         for(i in 1:length(p)){ # run through each sample
           gm_sample <- log(apply(p[[i]],2,gm)) # gm of DIR instance per sample
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)}) # random value for GM with lambda variance
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, scale.lambda)}) # random value for GM with lambda variance
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-") # log-ratio of frequency and randomized gm
           scale.samples = rbind(scale.samples, scale_for_sample) # archive these for output in clr object.
         }
         scale.samples <- scale.samples[-1,]
-      } else if(length(scale.samples) == length(conds) & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
-        if(verbose == TRUE) message('a vector was supplied for scale samples')
+      } else if(length(scale.mu == 1) & is.null(scale.lambda)){ # subtract the mu offset: should never be used except for testing
+        scale.samples <-matrix(ncol = mc.samples)
+        scale.lambda = 0
+        for(i in 1:length(p)){ # run through each sample
+          gm_sample <- log(apply(p[[i]],2,gm)) - mu # gm of DIR instance per sample
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, scale.lambda)}) # random value for GM with lambda variance
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-") # log-ratio of frequency and randomized gm
+          scale.samples = rbind(scale.samples, scale_for_sample) # archive these for output in clr object.
+        }
+        scale.samples <- scale.samples[-1,]   
+      } else if(length(scale.lambda) == length(conds) | length(scale.mu) == length(conds)){ ##Vector case/scale sim + senstitivity
+      # add in mu vector with default mu of 0, this is the offset for each sample from the gm; these will be in log space
+        if(verbose == TRUE & length(scale.lambda) == length(conds)) message('a vector was supplied for scale.lambda')
+        if(verbose == TRUE & length(scale.mu) == length(conds)) message('a vector was supplied for scale.mu')
         #warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
         #warning("Using only the first item in vector for scale simulation.")
-        lambda <- scale.samples
         scale.samples <-matrix(ncol = mc.samples)
+        if(is.null(scale.lambda)){ scale.lambda = rep(0,length(conds)) # no variance per sample
+        if(is.null(scale.mu)){ scale.mu = rep(0,length(conds)) # no offset per sample
         for(i in 1:length(p)){
-          gm_sample <- log(apply(p[[i]],2,gm))
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda[i])})
+          gm_sample <- log(apply(p[[i]],2,gm)) - scale.mu[i]
+          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, scale.lambda[i])})
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
           scale.samples = rbind(scale.samples, scale_for_sample)
         }
         scale.samples <- scale.samples[-1,]
-      } else{ ##User input of scale samples
-        Q <- nrow(scale.samples)
-        N <- ncol(scale.samples)
-        if(Q != ncol(reads) | N != mc.samples){
-          stop("Scale samples are of incorrect size!")
-        }
-        for(i in 1:length(p)){
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale.samples[i,]), "+")
-        }
+      } else{ stop("something went wrong, check your scale.lambda and scale.mu inputs")
       }
       names(l2p) <- names(p)
     }
@@ -317,8 +325,8 @@ setMethod("getDenom", signature(.object="aldex.clr"), function(.object) .object@
 
 setMethod("getScaleSamples", signature(.object="aldex.clr"), function(.object) .object@scaleSamps)
 
-setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, scale.samples) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, scale.samples))
+setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, scale.lambda, scale.mu) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, scale.lambda, scale.mu))
 
-setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, scale.samples) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, scale.samples))
+setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, scale.lambda, scale.mu) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, scale.lambda, scale.mu))
 
-setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, scale.samples) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE, scale.samples))
+setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, scale.lambda, scale.mu) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE, scale.lambda, scale.mu))

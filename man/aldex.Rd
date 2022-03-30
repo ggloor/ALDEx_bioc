@@ -14,7 +14,8 @@ aldex(
   verbose = FALSE,
   denom = "all",
   iterate = FALSE,
-  scale.samples = NULL,
+  scale.lambda = NULL,
+  scale.mu = NULL,
   ...
 )
 }
@@ -59,8 +60,11 @@ using the set of per-group non-zero features.}
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
 
-\item{scale.samples}{A (number of samples) times (number of Monte Carlo samples) matrix of scale samples if using scale simuation is desired.
-If \code{NULL} (default), ALDEx2 is run without scale simulation.}
+\item{scale.lambda}{A single number or numeric vector for the log variance of the scale. 
+If \code{NULL} (default), ALDEx2 is run without scale variance simulation.}
+
+\item{scale.mu}{A single number or numeric vectro for the log offset  of the scale. Not recommended.
+If \code{NULL} (default), ALDEx2 is run without scale offset simulation.}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }

@@ -154,6 +154,9 @@
 
     # get the offset of the features in the log-ratio  denominator
     denom <- getDenom(x)
+    
+    # get the scale simulation matrix
+    scale <- getScaleSamples(x)
 
 }
 
