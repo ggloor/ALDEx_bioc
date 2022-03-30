@@ -42,7 +42,7 @@ countdata <- t(rdat[,-1,drop=F])
 colnames(countdata) <- paste0("n", 1:ncol(countdata))
 
 test_that("scale simulation errors when wrong vector lengths are passed", {
-  expect_error(aldex(countdata, as.character(rdat$Condition), scale.lambda = c(1,1), mc.samples = 128), "Scale.lambda is of incorrect length!")
+  expect_error(aldex(countdata, as.character(rdat$Condition), scale.lambda = c(1,1), mc.samples = 128), "something went wrong, check your scale.lambda and scale.mu inputs")
 })
 
 test_that("aldex2 works without scale samples passed", {
@@ -50,19 +50,17 @@ test_that("aldex2 works without scale samples passed", {
 })
 
 test_that("aldex2 works with scale samples passed", {
-  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), scale.lambda = rep(1,14), mc.samples = 128))) # expect no error
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), scale.samples = scale.sampsRightDim, mc.samples = 128) %>%
-    filter(wi.eBH <= 0.05)
-  truth <- row.names(aldex.fit)
+  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), scale.lambda = 1, mc.samples = 128))) # expect no error
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), scale.lambda = .75, mc.samples = 128)
+  truth <- rownames(aldex.fit)[aldex.fit$wi.eBH < 0.05]
   expect_true("Taxa4" %in% truth)
   expect_true("Taxa15" %in% truth)
   expect_true("Taxa21" %in% truth)
 })
 
-test_that("aldex2 works with coda scale samples passed", {
-  scale.sampsCoDA = matrix(rlnorm(128*100, 1, sdlog = 10), nrow = 100)
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 1, mc.samples = 128) %>%
-    filter(wi.eBH <= 0.05)
+test_that("aldex2 works with wrong scale passed", {
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), scale.mu = 1, scale.lambda = 10, mc.samples = 128) 
+  truth <- rownames(aldex.fit)[aldex.fit$wi.eBH < 0.05]
   truth <- row.names(aldex.fit)
   expect_true(length(truth) == 0)
 })
