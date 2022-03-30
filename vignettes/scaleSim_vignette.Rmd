@@ -1,0 +1,353 @@
+---
+title: "Incorporating Scale Simulation into ALDEx2"
+shorttitle: "Scale Sim + ALDEx2"
+author:
+- name: Michelle Nixon
+  affiliation: College of IST, Penn State
+  email: pistner@psu.edu
+bibliography: aldex.bib
+output:
+  BiocStyle::html_document:
+    toc_float: true
+  BiocStyle::pdf_document: default
+package: ALDEx2
+abstract: |
+    In this vignette, we show how scale simulation can be used within the `ALDEx2` package.
+    We discuss how scale simulation is different and show how to run a simple example using the `ALDEx2` package.
+vignette: |
+    %\VignetteIndexEntry{Incorporating Scale Simulation into ALDEx2}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+# Introduction to Scale Simulation using `ALDEx2`
+
+`ALDEx2` is a method for differential expression detailed in @fernandes:2013. In words, `ALDEx2` works by testing Centered log ratio (CLR)-transformed Dirichlet samples. In more detail, for each taxa $j$, it proceeds by:
+
+1. Adding a small prior count to the observed counts for taxa $j$ across all samples.
+2. Drawing Monte Carlo samples using the Dirichlet distribution.
+3. Transforming the samples using the Centered log ratio (CLR) transform.
+4. Conducting a hypothesis test (e.g., t-test, Kruskal-Wallis, etc.)
+5. Averaging across test statistics and p-values to test significance for each taxa.
+
+The p-values obtained in Step 5 can be corrected to control false discovery rate, if desired. In addition, `ALDEx2` supports several modifications, including modifications to the CLR transformation and hypothesis tests to support more complex designs.
+
+## How scale simulation changes `ALDEx2`
+
+Introduced and developed in @nixon:2022, scale simulation argues that many different types of analyses (including differential expression) are *scale reliant*, meaning that they inherently rely on the scale (e.g., total) of the system under study. Ignoring the scale can lead to incorrect inference or results that might not answer the right question.
+
+To circumvent this, @nixon:2022 develops *scale simulation* which, in essence, provides the framework to directly incorporate scale uncertainty in the modeling process and, in doing so, can greatly improve inference (i.e., control Type-I error). In addition, they develop the methodology to incorporate scale simulation within the context of ALDEx2.
+
+Scale simulation subtly (but importantly) changes ALDEx2 in Step 3 above. After drawing Monte Carlo samples from the Dirichlet distribution, scale simulation augments these samples with samples drawn from the scale model (as opposed to apply the CLR). This results in samples that better represent the scaled samples. See @nixon:2022 for complete details.
+
+## Installing `ALDEx2` with Scale Simulation
+
+Currently, scale simulation within ALDEx2 is implemented in a development branch on Github. To install this version, run the following code:
+
+```{r installScaleSim}
+##If needed, install devtools
+##install.packages("devtools")
+##devtools::install_github("michellepistner/ALDEx_bioc")
+```
+
+## A simple example
+
+To show how scale simulation works, we will run a simple example. In this example, we will:
+
+1. Create a small simulated contingency table to represent the lack of a meaningful scale in sequencing data.
+2. Run ALDEx2 and a few variants of ALDEx2 + scale simulation.
+3. Compare the results.
+
+### Simulating data
+
+First, we will simulate data. Our simulation is meant to replicate a simple experiment with 21 taxa. There are 100 samples total, split equally between two conditions. Suppose that these conditions are both pre- and post- some medical treatment. The goal of our analyses is to find which of the 21 taxa change in abundance before and after this treatment.
+
+On a technical level, to do so, we use Poisson sampling to create our true abundances. This is done by running the function `create_true_abudances`, and the output is `dat`. To reflect the loss of the true scale from sequencing, we re-sample the data to an arbitrary scale using the function `resample_data`. This results in a data set `rdat` that is used in all of our downstream analyses (e.g., ALDEx2 with and without scale simulation). Note that, since we sampled the data, we know which taxa are truly different between conditions. The taxa that are different are 3, 4, 15, and 21. This is reflected in the specification of `d`.
+
+```{r dataSim, message = FALSE}
+library(ALDEx2)
+library(tidyverse)
+set.seed(1)
+
+##Function to create the true abundances via Poisson resampling
+create_true_abundances <- function(d, n){
+  dd <- length(d)/2
+  dat <- d %>%
+    sapply(function(x) rpois(n, lambda=x)) %>% 
+    t() %>%
+    as.data.frame() %>%
+    split(rep(1:2, each=dd)) %>%
+    purrr::map(~`rownames<-`(.x, paste0("Taxa", 1:dd))) %>%
+    purrr::map(t) %>%
+    do.call(rbind, .) %>%
+    as.data.frame() %>%
+    cbind(Condition=factor(rep(c("Pre", "Post"), each=n), levels = c("Pre", "Post")), .) %>%
+    `rownames<-`(., NULL)
+  return(dat)
+}
+
+##Function to resample data to an arbitrary size
+resample_data <- function(dat, seq.depth){
+  ddat <- as.matrix(dat[,-1])/rowSums(as.matrix(dat[,-1]))
+  for (i in 1:nrow(dat)){
+    dat[i,-1] <- rmultinom(1, size=seq.depth, prob=ddat[i,])
+  }
+  return(dat)
+}
+
+##Helper function to calculate the geometric mean
+gm <- function(x, na.rm = TRUE){
+  exp(sum(log(x[x > 0]), na.rm=na.rm) / length(x))
+}
+
+###Setting the data parameters for the simulation
+##Denotes the mean for the 21 taxa
+##First 21 values: pre-conditions
+##Last 21 values: post-conditions
+##Note only taxa 3, 4, 15, and 21 change
+d <- c(4000, 4000, 4000, 4000, 4000, 400,400,400,400,4000,400,500,500,500,400,400,400,400,400,100,400, # Pre
+       4000, 4000, 3000, 2000, 4000, 400,400,400,400,4000,400,500,500,500,200,400,400,400,400,100,100) # Post
+
+##Create scale abundances
+dat <- create_true_abundances(d, n=50)
+##Create resampled data
+rdat <- resample_data(dat, seq.depth=5000)
+```
+
+
+
+### Running `ALDEx2` without scale simulation
+
+We begin by running `aldex` without scale simulation as a baseline. We use the CLR as is for this simulation. Note that all 21 taxa were declared significant by `ALDEx2`, leading to a false discovery rate of $17/21 \approx 81\%$.
+
+```{r ALDEX2}
+
+countdata <- t(rdat[,-1,drop=F])
+colnames(countdata) <- paste0("n", 1:ncol(countdata))
+aldex.fit <- aldex(countdata, as.character(rdat$Condition), denom="all")
+ 
+sig.aldex = aldex.fit %>% filter(wi.eBH <= 0.05)
+head(sig.aldex)
+dim(sig.aldex)
+```
+
+### Running `ALDEx2` with scale simulation
+
+#### Relaxed Model
+
+First, we run ALDEx2 with scale simulation using a relaxed model. Specifically, we are assuming a model fo the form:
+
+\begin{equation}
+\log f(\mathcal{W}(j)^\perp | \mu, \alpha) \sim N(c + \mu_j, \alpha^2).
+\end{equation}
+
+For this simulation, we set $\mu_j = 0$, $c=1$, and $\alpha = 0.5$. First, we simulate the samples from the scale model. This must be a matrix with the number of rows equaling the number of samples in the experiment and the number of columns equaling the number of Monte Carlo samples in `ALDEx2`. We then pass this matrix to the `aldex` function. Three out of 21 taxa were found to be significant.
+
+```{r ALDEX2ScaleSim}
+##Simulate samples from a scale model
+scale.lambda=0.5
+scale.mu = 1
+
+##Pass to ALDEx2
+aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), scale.lambda=0.5, scale.mu =1, mc.samples = 2000)
+ 
+sig.aldexScaleSim = aldexScaleSim.fit %>% filter(wi.eBH <= 0.05)
+sig.aldexScaleSim
+```
+
+
+#### The CLR and CoDA Models
+
+To recapture the behavior of ALDEx2 using scale simulation, we also drew samples from the scale model using the geometric mean. Here, $c = 0$, $\mu_j = 1/gm(W(j)^\parallel)$, and $\alpha = 1e-3$. In addition, we recaptured the behavior of scale invariant models through samples from a CoDA inspired model. Here, $c$ and $\mu_j$ are the same as before, but $\alpha = 10$.
+
+
+We pass these scale samples to `aldex` as before. As expected, the CLR model returns all 21 taxa as significant whereas the CoDA model returns none as significant.
+
+```{r ALDEX2ScaleSimOtherMods}
+aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 1e-3, mc.samples = 2000)
+ 
+sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(wi.eBH <= 0.05)
+head(sig.aldexScaleSimCLR)
+dim(sig.aldexScaleSimCLR)
+
+aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 10, mc.samples = 2000)
+ 
+sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(wi.eBH <= 0.05)
+head(sig.aldexScaleSimCoDA)
+```
+
+
+### Other Functionality
+
+We also added functionality to return the scale samples from an `aldex.clr` object similar to other functions in ALDEx2. Scale samples can be returned using the function `getScaleSamples()`.
+
+```{r getScaleSamps}
+x <- aldex.clr(countdata, as.character(rdat$Condition), scale.lambda = 10, mc.samples = 2000)
+
+getScaleSamples(x)[1:5,1:5]
+```
+
+### Sensitivity Analysis
+
+We also added sensitivity analysis functionality (should be considered in development mode). To use this feature:
+
+* Run `aldex.clr`.
+* Pass that object to the `aldex.senAnalysis` function. Also specify what values of $\lambda$ you want to use.
+* If desired, use `plot_alpha` to plot.
+
+```{r senAnalysis}
+x <- aldex.clr(countdata, as.character(rdat$Condition), scale.lambda = 1e-3, mc.samples = 2000)
+
+senAnalysis = aldex.senAnalysis(x, lambda = c(1e-3, .1, .25, .5, 1, 2, 3))
+
+plot_alpha(senAnalysis, taxa_to_label = 4)
+```
+
+
+
+### Comparing Results
+
+Now, let's graphically compare results. The top pane shows the true scaled abundances, and it makes it (abundantly!) clear that taxon 3, 4, 15, and 21 are only those that are changing before and after treatment. The differences between models are reflected in the lower plot which shows that both ALDEx2 and the CLR scale simulation have achieved the maximum false discovery rate of 81%. On the contrary, the relaxed scale simulation recovers 3 out of 4 significant taxa at the expense of no false positives.
+
+```{r graph}
+library(ggplot2)
+library(ggpattern)
+library(cowplot)
+
+##Function to plot abudances
+plot_count <- function(dat){
+  gather(dat, Taxa, Count, -Condition) %>% 
+    mutate(Taxa=as.numeric(sub("Taxa", "", Taxa))) %>% 
+    mutate(Taxa=factor(Taxa)) %>% 
+    ggplot(aes(x=Taxa, y=Count)) +
+    geom_boxplot(aes(fill = Condition, color = Condition), position=position_dodge(width=1), 
+                size=1)+
+    scale_y_log10() +
+    theme_bw() +
+    scale_fill_manual(values = c("#fdae61", "#2b83ba")) + 
+    scale_color_manual(values = c("#fdae61", "#2b83ba")) +
+    labs(color='Antibiotic\nTreatment') +
+    labs(fill='Antibiotic\nTreatment') +
+    theme(axis.title.x = element_blank(), 
+                 axis.text.x = element_blank(), 
+                 axis.ticks.x=element_blank(),
+                 text = element_text(size=16))
+}
+
+##Function to label True/false positive/negatives
+sig_code <- function(sig, Taxa, truth){
+  out <- rep("TN", length(Taxa))
+  out[sig &(Taxa %in% truth)] <- "TP" # True Positives
+  out[sig & (out!="TP")] <- "FP" # False Positives
+  out[!sig & (Taxa %in% truth)] <- "FN" # False Negatives
+  return(out)
+}
+
+##Function to summarize aldex2 output
+summary_aldex2 <- function(fit, pval = 0.05){
+  fit %>% 
+    as.data.frame() %>% 
+    rownames_to_column("category") %>% 
+    dplyr::select(category, effect, wi.eBH) %>% 
+    mutate(padj=wi.eBH) %>% 
+    mutate(mean=effect) %>% 
+    mutate(low=NA, high=NA) %>%
+    mutate(sig = ifelse(padj <= pval, TRUE, FALSE))
+}
+
+##Function to create the grid plot
+plot_sig2 <- function(rrs, truth, ...){
+  names(rrs) <- model.names[names(rrs)]
+  bind_rows(rrs, .id="Model") %>% 
+    dplyr::select(Model, category, sig) %>% 
+    mutate(Taxa = category) %>% 
+    mutate(Taxa=as.numeric(sub("Taxa", "", Taxa))) %>%  
+    mutate(sigcode = sig_code(sig, Taxa, truth)) %>% 
+    mutate(Taxa=factor(Taxa), sigcode=factor(sigcode, 
+                                             levels=c("TP", "TN", 
+                                                      "FP", "FN"))) %>% 
+    mutate(Model=factor(Model, levels=model.name.levels)) %>% 
+    ggplot(aes(x=Taxa, y=Model)) +
+    geom_tile_pattern(aes(fill=sigcode, pattern = sigcode), color="darkgrey",pattern_fill = 'grey',pattern_colour  = 'grey', pattern_density = 0.015) +
+    theme_minimal() +
+    theme(panel.grid = element_blank(), 
+          legend.title=element_blank(),
+          text = element_text(size=16),
+          axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+    scale_pattern_manual(values = c(TP = "none", TN = "none", FP = "none", FN = "stripe")) +
+    scale_fill_manual(values= c("black", "white", "grey", "white"))
+}
+
+##Plotting the results
+##Pvalue at default of 0.05
+model.names <- c("afit"="ALDEx2",
+                 "sfit.clr" = "CLR",
+                 "sfit.relaxed"= "Relaxed",
+                 "sfit.coda" = "CoDA")
+model.name.levels <- c("CoDA", "Relaxed",  "CLR", "ALDEx2")
+
+rrs <- list(afit=summary_aldex2(aldex.fit), sfit.clr = summary_aldex2(aldexScaleSim.fitCLR), sfit.relaxed = summary_aldex2(aldexScaleSim.fit), sfit.coda = summary_aldex2(aldexScaleSim.fitCoDA))
+
+dd <- length(d)/2
+truth1 <- !(d[1:dd]==d[(dd+1):(2*dd)])##testing if the mean is different
+truth2 <- (1:dd)[truth1]##Locations of the differences
+  
+p1 <- plot_count(dat)
+p2 <- plot_sig2(rrs, truth=truth2)
+p <- plot_grid(p1, p2, nrow=2, align="v", rel_heights=c(1.7, 1))
+p
+```
+
+## Checking Compatibility
+
+Now, we are going to do a small experiment to make sure that the CLR model is return similar effect sizes as the `selex` data. First, using the CLR-equivalent scale simulation.
+
+```{r selex}
+data(selex)
+
+conds <- c(rep('N', 7), rep('S', 7))
+x <- aldex.clr(selex, conds)
+x.e <- aldex.effect(x)
+
+x.s <- aldex.clr(selex, conds, scale.lambda=1e-3)
+x.s.e <- aldex.effect(x.s)
+sig <- which(abs(x.e$effect) > 2)
+sig.s <- which(abs(x.s.e$effect) > 2)
+
+plot(x.e$diff.win, x.e$diff.btw, pch=19, cex=0.4, col='grey', ylim=c(-10,15), 
+  xla='dispersion', ylab='difference')
+points(x.e$diff.win[sig], x.e$diff.btw[sig], pch=19, cex=0.2, col='red')
+points(x.s.e$diff.win, x.s.e$diff.btw, col='grey')
+points(x.s.e$diff.win[sig.s], x.s.e$diff.btw[sig.s], pch=19, cex=0.2,col='cyan')
+abline(0,1, lty=2)
+abline(0,-1, lty=2)
+legend(3,15, legend=c('normal', 'normal+sig', 'scaled', 'scaled + sig'), pch=c(19,19, 1,19), col=c('grey', 'red', 'grey', 'cyan'))
+```
+
+Next, relaxing the geometric mean assumption:
+
+```{r selex2}
+
+x.s <- aldex.clr(selex, conds, scale.lambda=1)
+x.s.e <- aldex.effect(x.s)
+sig <- which(abs(x.e$effect) > 2)
+sig.s <- which(abs(x.s.e$effect) > 2)
+
+plot(x.e$diff.win, x.e$diff.btw, pch=19, cex=0.4, col='grey', ylim=c(-10,15), 
+  xla='dispersion', ylab='difference')
+points(x.e$diff.win[sig], x.e$diff.btw[sig], pch=19, cex=0.2, col='red')
+points(x.s.e$diff.win, x.s.e$diff.btw, col='grey')
+points(x.s.e$diff.win[sig.s], x.s.e$diff.btw[sig.s], pch=19, cex=0.2,col='cyan')
+abline(0,1, lty=2)
+abline(0,-1, lty=2)
+legend(3,15, legend=c('normal', 'normal+sig', 'scaled', 'scaled + sig'), pch=c(19,19, 1,19), col=c('grey', 'red', 'grey', 'cyan'))
+```
+
+## Session Info
+
+```{r session}
+sessionInfo()
+```
+
+
+## References

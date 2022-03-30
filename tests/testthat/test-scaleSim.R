@@ -46,7 +46,7 @@ test_that("scale simulation errors when wrong vector lengths are passed", {
 })
 
 test_that("aldex2 works without scale samples passed", {
-  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), scale.samples = NULL, mc.samples = 128))) # expect no error
+  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), mc.samples = 128))) # expect no error
 })
 
 test_that("aldex2 works with scale samples passed", {
