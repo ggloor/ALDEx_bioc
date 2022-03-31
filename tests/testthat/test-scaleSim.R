@@ -59,8 +59,7 @@ test_that("aldex2 works with scale samples passed", {
 })
 
 test_that("aldex2 works with wrong scale passed", {
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), scale.mu = 1, scale.lambda = 10, mc.samples = 128) 
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), scale.mu=1, scale.lambda = 10, mc.samples = 128) 
   truth <- rownames(aldex.fit)[aldex.fit$wi.eBH < 0.05]
-  truth <- row.names(aldex.fit)
   expect_true(length(truth) == 0)
 })
