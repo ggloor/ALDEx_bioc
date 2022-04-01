@@ -130,7 +130,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     # returns a list of features
     # TO DO integrate scale into feature.subset
     if(is.null(scale.lambda)){
-      feature.subset <- aldex.set.mode(reads, conds, denom)
+      feature.subset <- aldex.set.mode(reads, conds, denom, verbose)
       if ( length(feature.subset[[1]]) == 0 ) stop("No low variance, high abundance features in common between conditions\nPlease choose another denomiator.")
     } else{
       feature.subset <- vector()
@@ -181,59 +181,35 @@ if (verbose == TRUE) message("dirichlet samples complete")
     
     if(!is.null(scale.lambda) | !is.null(scale.mu)){
       if(verbose == TRUE) message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
-      l2p <- list()
-      if(length(scale.lambda) == 1 & is.null(scale.mu)){ ##Add uncertainty around the scale samples
-        message('if 1')
-        scale.samples <- matrix(ncol = mc.samples)
-        for(i in 1:length(p)){ # run through each sample
-          gm_sample <- log(apply(p[[i]],2,gm)) # gm of DIR instance per sample
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, scale.lambda)}) # random value for GM with lambda variance
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-") # log-ratio of frequency and randomized gm
-          scale.samples = rbind(scale.samples, scale_for_sample) # archive these for output in clr object.
+		# set up the vectors for lambda and mu for gm, and rlnorm
+		if(is.null(scale.lambda)) { s.lambda <- rep(0, length(conds))  # no variance
+		} else if(length(scale.lambda) == 1){ s.lambda <- rep(scale.lambda, length(conds)) 
+		} else if(length(scale.lambda) == length(conds)) { s.lambda <- scale.lambda 
+		} else { stop("something went wrong, check your scale.lambda input")
         }
-        scale.samples <- scale.samples[-1,]
-      } else if(length(scale.mu) == 1 & is.null(scale.lambda)){ # subtract the mu offset: should never be used except for testing
-        message('if 2')
-        scale.samples <- matrix(ncol = mc.samples)
-        scale.lambda = 0
-        for(i in 1:length(p)){ # run through each sample
-          gm_sample <- log(apply(p[[i]],2,gm)) - scale.mu # gm of DIR instance per sample
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, scale.lambda)}) # random value for GM with lambda variance
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-") # log-ratio of frequency and randomized gm
-          scale.samples = rbind(scale.samples, scale_for_sample) # archive these for output in clr object.
+
+		if(is.null(scale.mu)) { s.mu <- rep(0, length(conds))  # no offset
+		} else if(length(scale.mu) == 1){ s.mu <- rep(scale.mu, length(conds)) 
+		} else if(length(scale.mu) == length(conds)) { s.mu <- scale.mu 
+		} else { stop("something went wrong, check your scale.mu input")
         }
-        scale.samples <- scale.samples[-1,]   
-      } else if(length(scale.mu) == 1 & length(scale.lambda) == 1){ # subtract the mu offset: should never be used except for testing
-        message('if 3')
-        scale.samples <- matrix(ncol = mc.samples)
-        for(i in 1:length(p)){ # run through each sample
-          gm_sample <- log(apply(p[[i]],2,gm)) - scale.mu # gm of DIR instance per sample
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, scale.lambda)}) # random value for GM with lambda variance
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-") # log-ratio of frequency and randomized gm
-          scale.samples = rbind(scale.samples, scale_for_sample) # archive these for output in clr object.
-        }
-        scale.samples <- scale.samples[-1,]   
-      } else if(length(scale.lambda) == length(conds) | length(scale.mu) == length(conds)){ ##Vector case/scale sim + senstitivity
-        message('if 4')
-      # add in mu vector with default mu of 0, this is the offset for each sample from the gm; these will be in log space
-        if(verbose == TRUE & length(scale.lambda) == length(conds)) message('a vector was supplied for scale.lambda')
-        if(verbose == TRUE & length(scale.mu) == length(conds)) message('a vector was supplied for scale.mu')
-        #warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
-        #warning("Using only the first item in vector for scale simulation.")
-        scale.samples <- matrix(ncol = mc.samples)
-        if(is.null(scale.lambda)){ scale.lambda = rep(1e-3,length(conds)) } # no variance per sample
-        if(is.null(scale.mu)){ scale.mu = rep(0, length(conds)) }# no offset per sample
-        for(i in 1:length(p)){
-          gm_sample <- log(apply(p[[i]],2,gm))  - scale.mu[i] 
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, scale.lambda[i])})
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
-          scale.samples = rbind(scale.samples, scale_for_sample)
-        }
-        scale.samples <- scale.samples[-1,]
-      } else{ stop("something went wrong, check your scale.lambda and scale.mu inputs")
-      }
+        
+		l2p <- list()
+
+		scale.samples <- matrix(ncol = mc.samples, nrow=length(p))
+
+		for(i in 1:length(p)){
+		  gm_sample <- log(apply(p[[i]],2,gm))  - s.mu[i] 
+		  scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, s.lambda[i])})
+		  l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
+          #scale.samples = rbind(scale.samples, scale_for_sample) # archive these for output in clr object.
+          scale.samples[i,] <- scale_for_sample
+		}
+      # scale.samples <- scale.samples[-1,]   
+
       names(l2p) <- names(p)
     }
+		
     
     # ---------------------------------------------------------------------
     # Take the log2 of the frequency and subtract the geometric mean log2 frequency per sample

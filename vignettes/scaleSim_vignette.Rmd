@@ -106,7 +106,7 @@ gm <- function(x, na.rm = TRUE){
 ##Last 21 values: post-conditions
 ##Note only taxa 3, 4, 15, and 21 change
 d <- c(4000, 4000, 4000, 4000, 4000, 400,400,400,400,4000,400,500,500,500,400,400,400,400,400,100,400, # Pre
-       4000, 4000, 3000, 2000, 4000, 400,400,400,400,4000,400,500,500,500,200,400,400,400,400,100,100) # Post
+       4000, 4000, 3000, 256, 4000, 400,400,400,400,4000,400,500,500,500,200,400,400,400,400,100,100) # Post
 
 ##Create scale abundances
 dat <- create_true_abundances(d, n=50)
@@ -149,7 +149,7 @@ scale.lambda=0.5
 scale.mu = 1
 
 ##Pass to ALDEx2
-aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), scale.lambda=0.5, scale.mu =1, mc.samples = 2000)
+aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), scale.lambda=0.5, scale.mu =1, mc.samples = 256)
  
 sig.aldexScaleSim = aldexScaleSim.fit %>% filter(wi.eBH <= 0.05)
 sig.aldexScaleSim
@@ -164,13 +164,13 @@ To recapture the behavior of ALDEx2 using scale simulation, we also drew samples
 We pass these scale samples to `aldex` as before. As expected, the CLR model returns all 21 taxa as significant whereas the CoDA model returns none as significant.
 
 ```{r ALDEX2ScaleSimOtherMods}
-aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 1e-3, mc.samples = 2000)
+aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 1e-3, mc.samples = 256)
  
 sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(wi.eBH <= 0.05)
 head(sig.aldexScaleSimCLR)
 dim(sig.aldexScaleSimCLR)
 
-aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 10, mc.samples = 2000)
+aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 10, mc.samples = 256)
  
 sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(wi.eBH <= 0.05)
 head(sig.aldexScaleSimCoDA)
@@ -182,7 +182,7 @@ head(sig.aldexScaleSimCoDA)
 We also added functionality to return the scale samples from an `aldex.clr` object similar to other functions in ALDEx2. Scale samples can be returned using the function `getScaleSamples()`.
 
 ```{r getScaleSamps}
-x <- aldex.clr(countdata, as.character(rdat$Condition), scale.lambda = 10, mc.samples = 2000)
+x <- aldex.clr(countdata, as.character(rdat$Condition), scale.lambda = 10, mc.samples = 256)
 
 getScaleSamples(x)[1:5,1:5]
 ```
@@ -196,7 +196,7 @@ We also added sensitivity analysis functionality (should be considered in develo
 * If desired, use `plot_alpha` to plot.
 
 ```{r senAnalysis}
-x <- aldex.clr(countdata, as.character(rdat$Condition), scale.lambda = 1e-3, mc.samples = 2000)
+x <- aldex.clr(countdata, as.character(rdat$Condition), scale.lambda = 1e-3, mc.samples = 256)
 
 senAnalysis = aldex.senAnalysis(x, lambda = c(1e-3, .1, .25, .5, 1, 2, 3))
 

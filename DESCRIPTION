@@ -1,7 +1,7 @@
 Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
-Version: 1.27.1.1
+Version: 1.27.1.2
 Date: 2022-04-01
 Author: Greg Gloor, Andrew Fernandes, Jean Macklaim, Arianne Albert, Matt Links,
     Thomas Quinn, Jia Rong Wu, Ruth Grace Wong, Brandon Lieng, Michelle Pistner, Justin Silverman
@@ -14,7 +14,8 @@ Description: A differential abundance analysis for the comparison of two or more
     as well as selected and unselected values from in-vitro sequence selections.
     Uses a Dirichlet-multinomial model to infer abundance from counts, optimized for
     three or more experimental replicates. The method infers biological and sampling
-    variation to calculate the expected false discovery rate, given the variation, based
+    variation and can estimate the impact of scale uncertainty. These estimates are used
+    to calculate the expected false discovery rate, given the variation, based
     on a Wilcoxon Rank Sum test and Welch's t-test (via aldex.ttest), a Kruskal-Wallis test
     (via aldex.kw), a generalized linear model (via aldex.glm), or a correlation test
     (via aldex.corr). All tests report p-values and Benjamini-Hochberg

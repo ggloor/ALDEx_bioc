@@ -41,9 +41,14 @@ rdat <- resample_data(dat, seq.depth=5000)
 countdata <- t(rdat[,-1,drop=F])
 colnames(countdata) <- paste0("n", 1:ncol(countdata))
 
-test_that("scale simulation errors when wrong vector lengths are passed", {
-  expect_error(aldex(countdata, as.character(rdat$Condition), scale.lambda = c(1,1), mc.samples = 128), "something went wrong, check your scale.lambda and scale.mu inputs")
+test_that("scale simulation errors when wrong lambda vector lengths are passed", {
+  expect_error(aldex(countdata, as.character(rdat$Condition), scale.lambda = c(1,1), mc.samples = 128), "something went wrong, check your scale.lambda input")
 })
+
+test_that("scale simulation errors when wrong lambda vector lengths are passed", {
+  expect_error(aldex(countdata, as.character(rdat$Condition), scale.mu = c(1,1), mc.samples = 128), "something went wrong, check your scale.mu input")
+})
+
 
 test_that("aldex2 works without scale samples passed", {
   expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), mc.samples = 128))) # expect no error
