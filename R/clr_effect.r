@@ -76,7 +76,7 @@ if (verbose == TRUE) message("sanity check complete")
       cl2p <- do.call(cbind, getMonteCarloInstances(clr)[levels[[level]]] )
       rab$win[[level]] <-  Rfast::rowMedians(cl2p)
       rm(cl2p)
- }
+    }
 
  if (verbose == TRUE) message("rab.win  complete")
 
