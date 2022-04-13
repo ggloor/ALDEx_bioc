@@ -77,7 +77,7 @@ aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
 #' @export
 plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL){
   if(thresh < 0 | thresh > 1){
-    stop("Please return a valid value for threshold")
+    stop("Please return a valid value for threshold between zero and 1.")
   }
   
   lambda <- as.numeric(sub("lambda_", "", names(sen_results)))
@@ -93,8 +93,8 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
     if(is.null(glmVar)){
       stop("Please supply what variable you want to plot!")
     }
-    nameEffect = names(sen_results[[1]])[stringr::str_detect(names(sen_results[[1]]), paste0(glmVar, ".Estimate"))]
-    namePval = names(sen_results[[1]])[stringr::str_detect(names(sen_results[[1]]), paste0(glmVar, ".Pr...t...BH"))]
+    nameEffect = names(sen_results[[1]])[base::grepl(paste0(glmVar, ".Estimate"), names(sen_results[[1]]))]
+    namePval = names(sen_results[[1]])[base::grepl(paste0(glmVar, ".Pr...t...BH"), names(sen_results[[1]]))]
     for(i in 1:length(sen_results)){
       B[i,] <- sen_results[[i]][,nameEffect]
       pvals[i,] <- sen_results[[i]][,namePval]
@@ -108,30 +108,34 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
     taxa_to_label <- dim(sen_results[[1]])
   }
   
-  P = pvals %>% as.data.frame %>%
-    as.data.frame() %>%
-    dplyr::mutate("lambda" = lambda) %>%
-    dplyr::select(lambda, everything()) %>%
-    tidyr::pivot_longer(cols = !lambda, names_to = "Sequence", values_to = "pval")
+  P <- as.data.frame(pvals) 
+  P$lambda <- lambda
+  P <- P[,c(ncol(P), 1:(ncol(P)-1))]
+  P <- reshape(P, idvar = "lambda",
+               varying = list(2:ncol(P)),
+               timevar = "Sequence",
+               v.names = "pval", direction = "long")
+  P$Sequence = paste0("V", P$Sequence)
   
-  P.toLabel = P %>% dplyr::filter(pval < 0.1) %>%
-    dplyr::arrange(desc(lambda)) %>%
-    dplyr::select(Sequence) %>%
-    unique() %>%
-    dplyr::mutate(Sequence = as.numeric(sub("V","",Sequence)))
+  P.toLabel <- P[(P$pval < 0.1),]
+  P.toLabel <- P.toLabel[order(-P.toLabel$lambda),]
+  seq_to_label <- as.numeric(sub("V", "", unique(P.toLabel$Sequence)))
   
-  taxa_to_label = P.toLabel$Sequence[1:taxa_to_label]
+  taxa_to_label = as.vector(na.omit(seq_to_label[1:taxa_to_label]))
   
-  B %>% 
-    as.data.frame() %>%
-    dplyr::mutate("lambda" = lambda) %>%
-    dplyr::select(lambda, dplyr::everything()) %>%
-    tidyr::pivot_longer(cols = !lambda, names_to = "Sequence", values_to = "Effect") %>%
-    plyr::join(P, by = c("lambda", "Sequence")) %>%
-    dplyr::mutate("Sequence" = sub("V", "", Sequence)) %>%
-    dplyr::mutate("labl" = sub("V", "", Sequence)) %>%
-    dplyr::mutate("labl" = ifelse(labl %in% taxa_to_label, labl, NA)) %>%
-    ggplot(aes(x=lambda, y = Effect, group=Sequence)) +
+  B.graph <- as.data.frame(B)
+  B.graph$lambda <- lambda
+  B.graph <- B.graph[,c(ncol(B.graph), 1:(ncol(B.graph)-1))]
+  B.graph <- reshape(B.graph, idvar = "lambda",
+               varying = list(2:ncol(B.graph)),
+               timevar = "Sequence",
+               v.names = "Effect", direction = "long")
+  B.graph$Sequence <- paste0("V", B.graph$Sequence)
+  B.graph <- base::merge(B.graph, P, by = c("lambda", "Sequence"))
+  B.graph$Sequence <- sub("V", "", B.graph$Sequence)
+  B.graph$labl = ifelse(B.graph$Sequence %in% taxa_to_label, B.graph$Sequence, NA)
+
+  ggplot(B.graph, aes(x=lambda, y = Effect, group=Sequence)) +
     geom_line() +
     gghighlight((pval <= thresh), use_direct_label  = FALSE) +
     gghighlight(!is.na(labl), unhighlighted_params = list(colour = NULL)) +
