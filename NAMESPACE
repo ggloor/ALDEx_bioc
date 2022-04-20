@@ -6,8 +6,6 @@ import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
 import(SummarizedExperiment)
-import(ggplot2)
-import(gghighlight)
 importFrom("grDevices", "rgb")
 importFrom("graphics", "abline","hist","par","plot","points","mtext","polygon","boxplot")
 importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
@@ -16,6 +14,8 @@ importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
 importFrom("utils", "installed.packages")
 importFrom("Rfast", "rowMedians", "colMedians")
 #importFrom("BiocParallel", "bplapply")
+importFrom("graphics", "grid", "text")
+importFrom("stats", "reshape", "runif")
 
 export( aldex )
 export(plot_alpha)
