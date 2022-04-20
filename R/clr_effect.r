@@ -4,7 +4,7 @@
 # data is returned in a data frame
 # requires multicore
 # this uses Rfast
-aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE, glm.conds=NULL){
+aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE, glm.conds=NULL, paired=FALSE){
 
   # Use clr conditions slot instead of input
      if (is.vector(clr@conds)) {
@@ -88,6 +88,7 @@ if (verbose == TRUE) message("rab of samples complete")
     # ---------------------------------------------------------------------
     # Compute diffs btw and win groups
 
+if (paired == FALSE ){
     l2d <- vector( "list", 2 )
     names( l2d ) <- c( "btw", "win" )
     l2d$win <- list()
@@ -198,10 +199,30 @@ if (verbose == TRUE) message("group summaries calculated")
                 row[is.na(row)] <- 0 ;
                 min( aitchison.mean( c( sum( row < 0 ) , sum( row > 0 ) ) + 0.5 ) ) } )
 if (verbose == TRUE) message("effect size calculated")
+} else if (paired == TRUE) {
+  l2s <- vector( "list",2 )
+  names( l2s ) <- c( "btw", "win" )
+  
+  diff <- NULL
+  for(i in 1:length(levels[[1]])){
+    jnk1 <- getMonteCarloReplicate(x,i)
+    jnk2 <- getMonteCarloReplicate(x,(i + length(levels[[1]])) )
+    diff <- cbind(diff, jnk2-jnk1)
+  }
+  
+  overlap <- apply( diff, 1, function(row) { if(all(is.na(row))) warning("NAs in effect, ignore if using ALR");
+                row[is.na(row)] <- 0 ;
+                min( aitchison.mean( c( sum( row < 0 ) , sum( row > 0 ) ) + 0.5 ) ) } )
+
+  l2s$btw <- apply(diff, 1, mean)
+  l2s$win <- apply(diff, 1, sd)
+  
+  effect <- paired.diff/paired.sd
+}
 
 # make and fill in the data table
 # i know this is inefficient, but it works and is not a bottleneck
-   if(CI == FALSE) {
+   if(CI == FALSE | paired == TRUE) {
     rv <- list(
         rab = rab,
         diff = l2s,
@@ -239,7 +260,7 @@ if (verbose == TRUE) message("summarizing output")
        nm <- paste("diff", i, sep=".")
        y.rv[,nm] <- data.frame(rv$diff[[i]])
    }
-   if(CI == FALSE) {
+   if(CI == FALSE | paired == TRUE) {
      y.rv[,"effect"] <- data.frame(rv$effect)
      y.rv[,"overlap"] <- data.frame(rv$overlap)
    } else {
