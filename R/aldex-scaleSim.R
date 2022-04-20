@@ -134,18 +134,26 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
   B.graph <- base::merge(B.graph, P, by = c("lambda", "Sequence"))
   B.graph$Sequence <- sub("V", "", B.graph$Sequence)
   B.graph$labl = ifelse(B.graph$Sequence %in% taxa_to_label, B.graph$Sequence, NA)
-
-  ggplot(B.graph, aes(x=lambda, y = Effect, group=Sequence)) +
-    geom_line() +
-    gghighlight((pval <= thresh), use_direct_label  = FALSE) +
-    gghighlight(!is.na(labl), unhighlighted_params = list(colour = NULL)) +
-    geom_hline(yintercept=0, color="red", linetype = "dashed") +
-    theme_bw() +
-    ylab("Effect Size") +
-    scale_y_reverse() +
-    xlab("Lambda") +
-    theme(text = element_text(size=18))+
-    theme(legend.position = "none") 
+  
+  ##Looping graph
+  seq_max = unique(B.graph$Sequence)
+  top = max(B.graph$Effect) + .5
+  bottom = min(B.graph$Effect) - .5
+  plot(1, type="n", xlab="Lambda", ylab="Effect Size", xlim=c(min(lambda), max(lambda)), ylim=c(bottom, top), panel.first = grid())
+  for(i in seq_max){
+    B.tmp = B.graph[B.graph$Sequence == i,]
+    points(B.tmp$lambda, B.tmp$Effect, type = "l", col = "grey")
+    B.tmp = B.tmp[B.tmp$pval <= thresh, ]
+    points(B.tmp$lambda, B.tmp$Effect, type = "l", col = "black")
+    
+    B.tmp = B.tmp[nrow(B.tmp),]
+    if(nrow(B.tmp) > 0){
+      if(!is.na(B.tmp$labl)){
+        text(x = B.tmp$lambda + runif(1,-.05,.05) , y = B.tmp$Effect + runif(1,-.25,.25), label = B.tmp$labl)
+      }
+    }
+  }
+  abline(h = 0, type = "l", col = "red", lty = "dashed")
 }
 
 gm <- function(x, na.rm = TRUE){

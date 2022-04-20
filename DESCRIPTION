@@ -36,13 +36,7 @@ Imports:
   IRanges,
   S4Vectors,
   SummarizedExperiment,
-  multtest,
-  tidyr,
-  dplyr,
-  plyr,
-  stringr,
-  ggplot2,
-  gghighlight
+  multtest
 Suggests:
   testthat,
   BiocStyle,
