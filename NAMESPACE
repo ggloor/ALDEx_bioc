@@ -14,6 +14,8 @@ importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
 importFrom("utils", "installed.packages")
 importFrom("Rfast", "rowMedians", "colMedians")
 #importFrom("BiocParallel", "bplapply")
+importFrom("graphics", "grid", "text")
+importFrom("stats", "reshape", "runif")
 
 export( aldex )
 export(plot_alpha)
