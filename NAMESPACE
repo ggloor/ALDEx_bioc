@@ -6,8 +6,6 @@ import(S4Vectors)
 import(IRanges)
 import(GenomicRanges)
 import(SummarizedExperiment)
-import(ggplot2)
-import(gghighlight)
 importFrom("grDevices", "rgb")
 importFrom("graphics", "abline","hist","par","plot","points","mtext","polygon","boxplot")
 importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
