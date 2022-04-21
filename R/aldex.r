@@ -41,6 +41,8 @@
 #'  Applies to \code{test = "t"} and \code{test = "iterative"}.
 #' @param include.sample.summary A boolean. Toggles whether to include median clr
 #'  values for each sample. Applies to \code{effect = TRUE}.
+#' @param paired.test A boolean. Toggles whether to do paired-sample tests.
+#'  Applies to \code{effect = TRUE} and \code{test = "t"}.
 #' @param verbose A boolean. Toggles whether to print diagnostic information while
 #'  running. Useful for debugging errors on large datasets. Applies to
 #'  \code{effect = TRUE}.
@@ -85,10 +87,10 @@
 #' selex <- selex[1201:1600,] # subset for efficiency
 #' conds <- c(rep("NS", 7), rep("S", 7))
 #' x <- aldex(selex, conds, mc.samples=2, denom="all",
-#'            test="t", effect=FALSE)
+#'            test="t", effect=TRUE, paired.test=FALSE)
 aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
                   include.sample.summary=FALSE, verbose=FALSE,
-                  denom="all", iterate=FALSE, ...){
+                  denom="all", paired.test=FALSE, iterate=FALSE, ...){
 
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
 
@@ -100,7 +102,7 @@ aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
   if(test == "t") {
 
     message("aldex.ttest: doing t-test")
-    x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose)
+    x.tt <- aldex.ttest(x, paired.test=paired.test, hist.plot=FALSE, verbose=verbose)
 
   }else if(test == "kw"){
 
@@ -136,7 +138,7 @@ aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
   if(test == "t" && effect && !iterate){
 
     message("aldex.effect: calculating effect sizes")
-    x.effect <- aldex.effect(x, include.sample.summary=include.sample.summary, verbose=verbose)
+    x.effect <- aldex.effect(x, include.sample.summary=include.sample.summary, verbose=verbose, paired.test=paired.test)
     z <- data.frame(x.effect, x.tt, check.names=F)
 
   }else{

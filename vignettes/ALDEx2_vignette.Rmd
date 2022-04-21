@@ -79,7 +79,7 @@ selex.sub <- selex[1:400,]
 
 conds <- c(rep("NS", 7), rep("S", 7))
 x.all <- aldex(selex.sub, conds, mc.samples=16, test="t", effect=TRUE,
-     include.sample.summary=FALSE, denom="all", verbose=FALSE)
+     include.sample.summary=FALSE, denom="all", verbose=FALSE, paired.test=FALSE)
 
 par(mfrow=c(1,2))
 aldex.plot(x.all, type="MA", test="welch", xlab="Log-ratio abundance",
@@ -119,10 +119,10 @@ x.kw <- aldex.kw(x)
 ```
 
 ## The `aldex.effect` module
-Finally, we estimate effect size and the within and between condition values in the case of two conditions. This step is required for plotting, in our lab we base our conclusions primarily on the output of this function^[@macklaim:2013;@mcmurrough:2014;@bian:2017].. There is one input: the aldex object from aldex.clr,  ; and several parameters: a flag as to whether to include values for all samples or not are used as the denominator, and the level of verbosity. It is also possible to include the 95% confidence interval information for the effect size estimate with the flag `CI=TRUE`. This can be helpful when deciding whether to include or exclude specific features from consideration. We find that a large effect but that is an outlier for the extremes of the effect distribution can be false positives.
+Finally, we estimate effect size and the within and between condition values in the case of two conditions. This step is required for plotting, in our lab we base our conclusions primarily on the output of this function^[@macklaim:2013;@mcmurrough:2014;@bian:2017]. There is one input: the aldex object from aldex.clr; and several parameters: a flag as to whether to include values for all samples or not are used as the denominator, and the level of verbosity. It is also possible to include the 95% confidence interval information for the effect size estimate with the flag `CI=TRUE`. This can be helpful when deciding whether to include or exclude specific features from consideration. We find that a large effect but that is an outlier for the extremes of the effect distribution can be false positives. New is the option to calculate effect sizes for paired t-tests or repeated samples with the paired.test=TRUE option. Note that confidence intervals for effect sizes are not calculated when paired.test = TRUE.
 
 ```{r,echo=T, eval=TRUE, message=F, error=F, warning=F, results="hide"}
-x.effect <- aldex.effect(x, CI=T, verbose=FALSE)
+x.effect <- aldex.effect(x, CI=T, verbose=FALSE, paired.test=FALSE)
 ```
 
 ## The `aldex.plot` module

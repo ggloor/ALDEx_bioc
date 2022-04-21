@@ -1,8 +1,8 @@
 Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
-Version: 1.27.0
-Date: 2020-10-01
+Version: 1.27.1
+Date: 2022-04-21
 Author: Greg Gloor, Andrew Fernandes, Jean Macklaim, Arianne Albert, Matt Links,
     Thomas Quinn, Jia Rong Wu, Ruth Grace Wong, Brandon Lieng
 Maintainer: Greg Gloor <ggloor@uwo.ca>
@@ -18,11 +18,12 @@ Description: A differential abundance analysis for the comparison of two or more
     on a Wilcoxon Rank Sum test and Welch's t-test (via aldex.ttest), a Kruskal-Wallis test
     (via aldex.kw), a generalized linear model (via aldex.glm), or a correlation test
     (via aldex.corr). All tests report p-values and Benjamini-Hochberg
-    corrected p-values.
+    corrected p-values. ALDEx2 also calculates expected standardized effect sizes for
+    paired or unpaired study designs.
 License: file LICENSE
 URL: https://github.com/ggloor/ALDEx_bioc
 BugReports: https://github.com/ggloor/ALDEx_bioc/issues
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 Depends:
   methods,

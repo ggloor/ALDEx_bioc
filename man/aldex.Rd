@@ -13,6 +13,7 @@ aldex(
   include.sample.summary = FALSE,
   verbose = FALSE,
   denom = "all",
+  paired.test = FALSE,
   iterate = FALSE,
   ...
 )
@@ -53,6 +54,9 @@ variance that is between the lower and upper quartile of variance. Using "zero"
 is a more extreme case where there are many non-zero features in one condition but
 many zeros in another. In this case the geometric mean of each group is calculated
 using the set of per-group non-zero features.}
+
+\item{paired.test}{A boolean. Toggles whether to do paired-sample tests.
+Applies to \code{effect = TRUE} and \code{test = "t"}.}
 
 \item{iterate}{A boolean. Toggles whether to iteratively perform a test. For example,
 this will use the results from an initial "t" routine to seed the reference
@@ -96,7 +100,7 @@ data(selex)
 selex <- selex[1201:1600,] # subset for efficiency
 conds <- c(rep("NS", 7), rep("S", 7))
 x <- aldex(selex, conds, mc.samples=2, denom="all",
-           test="t", effect=FALSE)
+           test="t", effect=TRUE, paired.test=FALSE)
 }
 \references{
 Please use the citation given by
