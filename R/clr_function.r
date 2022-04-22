@@ -179,15 +179,40 @@ if (verbose == TRUE) message("dirichlet samples complete")
       message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
       l2p <- list()
       if(length(scale.samples) == 1){ ##Add uncertainty around the scale samples
+        # lambda <- scale.samples
+        # scale.samples <-matrix(ncol = mc.samples)
+        # for(i in 1:length(p)){
+        #   gm_sample <- log(apply(p[[i]],2,gm))
+        #   scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
+        #   l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
+        #   scale.samples = rbind(scale.samples, scale_for_sample)
+        # }
+        # scale.samples <- scale.samples[-1,]
         lambda <- scale.samples
         scale.samples <-matrix(ncol = mc.samples)
+        geo_means = c()
+        conds_mat = matrix()
+        conds_used <- as.matrix(as.numeric(as.factor(conds)))
         for(i in 1:length(p)){
-          gm_sample <- log(apply(p[[i]],2,gm))
-          scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
-          scale.samples = rbind(scale.samples, scale_for_sample)
+          geo_means <- c(geo_means,log(apply(p[[i]],2,gm)))
+          conds_mat = rbind(conds_mat, matrix(rep(conds_used[i,], mc.samples), nrow=mc.samples))
         }
-        scale.samples <- scale.samples[-1,]
+        conds_mat = conds_mat[-1,]
+        ##Fit the OLS
+        scale_mod = lm(log(geo_means)~as.factor(conds_mat))
+        
+        mmX = model.matrix(~as.factor(conds))
+        coefs = coefficients(scale_mod)
+        cv = lambda*colMeans(mmX)
+        ##Draw scale samples
+        ##First-- the matrix of fitted values
+        scale_samples <- matrix(NA, length(p), mc.samples)
+        for(i in 1:length(p)){
+          tmp_mu = mapply(function(mu,sd, mc.samples) stats::rnorm(mc.samples, mu, sd),coefs, cv, mc.samples = mc.samples) ##Create a bunch of fits
+          mu_to_use = tmp_mu %*% mmX[i,]
+          scale_samples[i,] <- sapply(mu_to_use, FUN = function(mu){stats::rnorm(1, mu, lambda)})
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
+        }
       } else if(length(scale.samples) >1 & is.null(dim(scale.samples))){ ##Vector case/scale sim + senstitivity
         warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
         warning("Using only the first item in vector for scale simulation.")
