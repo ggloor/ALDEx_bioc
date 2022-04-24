@@ -148,7 +148,7 @@ For this simulation, we set $\mu_j = 0$, $c=1$, and $\alpha = 0.5$. First, we si
 scale.samps = matrix(rlnorm(2000*100, 1, sdlog = .5), nrow = 100)
 
 ##Pass to ALDEx2
-aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), scale.samples = scale.samps, mc.samples = 2000)
+aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), lambda = scale.samps, mc.samples = 2000)
  
 sig.aldexScaleSim = aldexScaleSim.fit %>% filter(wi.eBH <= 0.05)
 sig.aldexScaleSim
@@ -163,13 +163,13 @@ To recapture the behavior of ALDEx2 using scale simulation, we also drew samples
 We pass these scale samples to `aldex` as before. As expected, the CLR model returns all 21 taxa as significant whereas the CoDA model returns none as significant.
 
 ```{r ALDEX2ScaleSimOtherMods}
-aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), scale.samples = 1e-3, mc.samples = 2000)
+aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), lambda = 1e-3, cv = 1e-3, mc.samples = 2000)
  
 sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(wi.eBH <= 0.05)
 head(sig.aldexScaleSimCLR)
 dim(sig.aldexScaleSimCLR)
 
-aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), scale.samples = 10, mc.samples = 2000)
+aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), lambda = 10, cv = 0.2, mc.samples = 2000)
  
 sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(wi.eBH <= 0.05)
 head(sig.aldexScaleSimCoDA)
@@ -181,7 +181,7 @@ head(sig.aldexScaleSimCoDA)
 We also added functionality to return the scale samples from an `aldex.clr` object similar to other functions in ALDEx2. Scale samples can be returned using the function `getScaleSamples()`.
 
 ```{r getScaleSamps}
-x <- aldex.clr(countdata, as.character(rdat$Condition), scale.samples = 10, mc.samples = 2000)
+x <- aldex.clr(countdata, as.character(rdat$Condition), lambda = 10, cv = 1, mc.samples = 2000)
 
 getScaleSamples(x)[1:5,1:5]
 ```
@@ -195,7 +195,7 @@ We also added sensitivity analysis functionality (should be considered in develo
 * If desired, use `plot_alpha` to plot.
 
 ```{r senAnalysis}
-x <- aldex.clr(countdata, as.character(rdat$Condition), scale.samples = 1e-3, mc.samples = 2000)
+x <- aldex.clr(countdata, as.character(rdat$Condition), lambda = 1e-3, cv = 0.2, mc.samples = 2000)
 
 senAnalysis = aldex.senAnalysis(x, lambda = c(1e-3, .1, .25, .5, 1, 2, 3))
 
@@ -308,7 +308,7 @@ conds <- c(rep('N', 7), rep('S', 7))
 x <- aldex.clr(selex, conds)
 x.e <- aldex.effect(x)
 
-x.s <- aldex.clr(selex, conds, scale.samples=1e-3)
+x.s <- aldex.clr(selex, conds, lambda=1e-3, cv = 0.2)
 x.s.e <- aldex.effect(x.s)
 sig <- which(abs(x.e$effect) > 2)
 sig.s <- which(abs(x.s.e$effect) > 2)
@@ -327,7 +327,7 @@ Next, relaxing the geometric mean assumption:
 
 ```{r selex2}
 
-x.s <- aldex.clr(selex, conds, scale.samples=1)
+x.s <- aldex.clr(selex, conds, lambda=0.5, cv = 0.2)
 x.s.e <- aldex.effect(x.s)
 sig <- which(abs(x.e$effect) > 2)
 sig.s <- which(abs(x.s.e$effect) > 2)

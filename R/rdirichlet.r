@@ -36,3 +36,4 @@ rdirichlet<-function(n,a)
     # sm<-x%*%rep(1,l);
     return(x/rowSums(x) );
 }
+
