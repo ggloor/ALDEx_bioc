@@ -65,7 +65,7 @@
         not possible. In practice serial and multicore are nearly the same speed
         because of overhead in setting up the parallel processes.
     }
-    \item{scale.samples}{
+    \item{gamma}{
         Use scale simulation if not `NULL`. If a matrix is supplied, scale simulation
         will be used assuming that matrix denotes the scale samples. If a numeric is
         supplied, scale simulation will be applied by relaxing the geometric mean 

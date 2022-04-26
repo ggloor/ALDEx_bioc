@@ -44,7 +44,6 @@
 #' @param verbose A boolean. Toggles whether to print diagnostic information while
 #'  running. Useful for debugging errors on large datasets. Applies to
 #'  \code{effect = TRUE}.
-#' @param lambda A numeric. The standard deviation on the between sample variation.
 #' @param gamma A numeric. The standard deviation on the within sample variation.
 #' @param ... Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).
 #'
@@ -90,14 +89,14 @@
 #'            test="t", effect=FALSE)
 aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
                   include.sample.summary=FALSE, verbose=FALSE,
-                  denom="all", iterate=FALSE, lambda = NULL, cv = NULL, ...){
+                  denom="all", iterate=FALSE, gamma = NULL, ...){
 
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
 
   # wrapper function for the entire set of
   message("aldex.clr: generating Monte-Carlo instances and clr values")
   x <- aldex.clr(reads=reads, conds=conditions, mc.samples=mc.samples,
-                 denom=denom, verbose=verbose, useMC=FALSE, lambda = lambda, cv = cv)
+                 denom=denom, verbose=verbose, useMC=FALSE, gamma = gamma)
 
   if(test == "t") {
 

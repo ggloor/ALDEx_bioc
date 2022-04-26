@@ -4,7 +4,7 @@
 #  this function generates the centre log-ratio transform of Monte-Carlo instances
 #  drawn from the Dirichlet distribution.
 
-aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, lambda = NULL, cv = NULL) {
+aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, gamma = NULL) {
 
 # INPUT
 # The 'reads' data.frame MUST have row
@@ -125,7 +125,7 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 
     # This extracts the set of features to be used in the geometric mean computation
     # returns a list of features
-    if(is.null(lambda)){
+    if(is.null(gamma)){
       feature.subset <- aldex.set.mode(reads, conds, denom)
       if ( length(feature.subset[[1]]) == 0 ) stop("No low variance, high abundance features in common between conditions\nPlease choose another denomiator.")
     } else{
@@ -175,10 +175,10 @@ if (verbose == TRUE) message("dirichlet samples complete")
     # Add scale samples (if desired)
     # Checking the size of the scale samples
     
-    if(!is.null(lambda)){
+    if(!is.null(gamma)){
       message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
       l2p <- list()
-      if(length(lambda) == 1){ ##Add uncertainty around the scale samples
+      if(length(gamma) == 1){ ##Add uncertainty around the scale samples
         # lambda <- scale.samples
         # scale.samples <-matrix(ncol = mc.samples)
         # for(i in 1:length(p)){
@@ -188,67 +188,50 @@ if (verbose == TRUE) message("dirichlet samples complete")
         #   scale.samples = rbind(scale.samples, scale_for_sample)
         # }
         # scale.samples <- scale.samples[-1,]
-        geo_means = c()
-        conds_mat = matrix()
-        conds_used <- as.matrix(as.numeric(as.factor(conds)))
-        for(i in 1:length(p)){
-          geo_means <- c(geo_means,log(apply(p[[i]],2,gm)))
-          conds_mat = rbind(conds_mat, matrix(rep(conds_used[i,], mc.samples), nrow=mc.samples))
-        }
-        conds_mat = conds_mat[-1,]
-        ##Fit the OLS
-        scale_mod = lm(geo_means~as.factor(conds_mat))
-        
-        mmX = model.matrix(~as.factor(conds))
-        coefs = coefficients(scale_mod)
-        gamma = cv*colMeans(mmX)
-        ##Draw scale samples
-        ##First-- the matrix of fitted values
+        conds_mat <- matrix(conds, nrow = length(p))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) as.numeric(as.factor(vec)))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) vec - mean(vec))##Centering
+        col_var <- gamma^2/apply(conds_mat, 2, var)
         scale_samples <- matrix(NA, length(p), mc.samples)
+        
         for(i in 1:length(p)){
-          tmp_mu = mapply(function(mu,sd, mc.samples) stats::rnorm(mc.samples, mu, sd),coefs, gamma, mc.samples = mc.samples) ##Create a bunch of fits
-          mu_to_use = tmp_mu %*% mmX[i,]
-          scale_samples[i,] <- sapply(mu_to_use, FUN = function(mu){stats::rnorm(1, mu, lambda)})
+          geo_means <- log(apply(p[[i]],2,gm))
+          noise <- sapply(col_var, FUN = function(sd){stats::rnorm(mc.samples, 0, sqrt(sd))})
+          noise_mean <- rowMeans(noise)
+
+          scale_samples[i,] <- geo_means + noise_mean
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
         }
-      } else if(length(lambda) >1 & is.null(dim(lambda))){ ##Vector case/scale sim + senstitivity
+      } else if(length(gamma) >1 & is.null(dim(gamma))){ ##Vector case/scale sim + senstitivity
         warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
         warning("Using only the first item in vector for scale simulation.")
-        lambda <- lambda[1]
+        gamma <- gamma[1]
         geo_means = c()
-        conds_mat = matrix()
-        conds_used <- as.matrix(as.numeric(as.factor(conds)))
-        for(i in 1:length(p)){
-          geo_means <- c(geo_means,log(apply(p[[i]],2,gm)))
-          conds_mat = rbind(conds_mat, matrix(rep(conds_used[i,], mc.samples), nrow=mc.samples))
-        }
-        conds_mat = conds_mat[-1,]
-        ##Fit the OLS
-        scale_mod = lm(geo_means~as.factor(conds_mat))
-        
-        mmX = model.matrix(~as.factor(conds))
-        coefs = coefficients(scale_mod)
-        gamma = cv*colMeans(mmX)
-        ##Draw scale samples
-        ##First-- the matrix of fitted values
+        conds_mat <- matrix(conds, nrow = length(p))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) as.numeric(as.factor(vec)))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) vec - mean(vec))##Centering
+        col_var <- gamma^2/apply(conds_mat, 2, var)
         scale_samples <- matrix(NA, length(p), mc.samples)
+        
         for(i in 1:length(p)){
-          tmp_mu = mapply(function(mu,sd, mc.samples) stats::rnorm(mc.samples, mu, sd),coefs, gamma, mc.samples = mc.samples) ##Create a bunch of fits
-          mu_to_use = tmp_mu %*% mmX[i,]
-          scale_samples[i,] <- sapply(mu_to_use, FUN = function(mu){stats::rnorm(1, mu, lambda)})
+          geo_means <- log(apply(p[[i]],2,gm))
+          noise <- sapply(col_var, FUN = function(sd){stats::rnorm(mc.samples, 0, sqrt(sd))})
+          noise_mean <- rowMeans(noise)
+          
+          scale_samples[i,] <- geo_means + noise_mean
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
         }
         
       } else{ ##User input of scale samples
-        Q <- nrow(lambda)
-        N <- ncol(lambda)
+        Q <- nrow(gamma)
+        N <- ncol(gamma)
         if(Q != ncol(reads) | N != mc.samples){
           stop("Scale samples are of incorrect size!")
         }
         for(i in 1:length(p)){
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(lambda[i,]), "+")
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(gamma[i,]), "+")
         }
-        scale_samples <- lambda
+        scale_samples <- gamma
         
       }
       names(l2p) <- names(p)
@@ -259,7 +242,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
     # i.e., do a centered logratio transformation as per Aitchison
     
     # apply the function over elements in a list, that contains an array
-    if(is.null(lambda)){
+    if(is.null(gamma)){
       scale_samples <- NULL
       # DEFAULT
       if (is.list(feature.subset)) {
@@ -356,10 +339,12 @@ setMethod("getMonteCarloSample", signature(.object="aldex.clr",i="numeric"), fun
 
 setMethod("getDenom", signature(.object="aldex.clr"), function(.object) .object@denom)
 
+setMethod("getConditions", signature(.object="aldex.clr"), function(.object) .object@conds)
+
 setMethod("getScaleSamples", signature(.object="aldex.clr"), function(.object) .object@scaleSamps)
 
-setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, lambda, cv) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, lambda, cv))
+setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma))
 
-setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, lambda, cv) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, lambda, cv))
+setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma))
 
-setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, lambda, cv) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE, lambda, cv))
+setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE, gamma))

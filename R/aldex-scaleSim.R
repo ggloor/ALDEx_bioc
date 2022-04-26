@@ -1,29 +1,41 @@
 #' Sensitivity analysis using scale simulation
 #' 
-#' Performs scale simulation over a range of values for lambda.
+#' Performs scale simulation over a range of values for gamma
 #' Dirichlet samples are reused for computational convenience.
 #' 
 #' @param aldex_clr An `aldex.clr` object
-#' @param lambda A vector of positive numeric components. Used as the standard deviation of the scale simulation model.
+#' @param gamma A vector of positive numeric components. Used as the standard deviation of the scale simulation model.
 #' @inheritParams aldex
-#' @return A list of results. Each element corresponds to a single result for a given value of lambda
+#' @return A list of results. Each element corresponds to a single result for a given value of gamma
 #' @export
-aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
+aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
                               include.sample.summary=FALSE, verbose=FALSE,
                               iterate=FALSE, ...){
-  lambda <- sort(lambda)
+  gamma <- sort(gamma)
   sen_results <- list()
-  for(j in 1:length(lambda)){
+  p <- getDirichletInstances(aldex_clr)
+  mc.samples <- ncol(p[[1]])
+  conds <- getConditions(aldex_clr)
+  for(j in 1:length(gamma)){
     p <- getDirichletInstances(aldex_clr)
     l2p <- list()
+    conds_mat <- matrix(conds, nrow = length(p))
+    conds_mat <- apply(conds_mat, 2, FUN = function(vec) as.numeric(as.factor(vec)))
+    conds_mat <- apply(conds_mat, 2, FUN = function(vec) vec - mean(vec))##Centering
+    col_var <- gamma^2/apply(conds_mat, 2, var)
+    scale_samples <- matrix(NA, length(p), mc.samples)
+    
     for(i in 1:length(p)){
-      gm_sample <- log(apply(p[[i]],2,gm))
-      scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda[j])})
-      l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
+      geo_means <- log(apply(p[[i]],2,gm))
+      noise <- sapply(col_var, FUN = function(sd){stats::rnorm(mc.samples, 0, sqrt(sd))})
+      noise_mean <- rowMeans(noise)
+      
+      scale_samples[i,] <- geo_means + noise_mean
+      l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
     }
     names(l2p) <- names(aldex_clr@dirichletData)
     x <-  new("aldex.clr",reads=x@reads,mc.samples=x@mc.samples,conds=x@conds,
-              denom=getDenom(aldex_clr),verbose=verbose,useMC=FALSE,dirichletData=getDirichletInstances(aldex_clr),analysisData=l2p, scaleSamps = lambda[j])
+              denom=getDenom(aldex_clr),verbose=verbose,useMC=FALSE,dirichletData=getDirichletInstances(aldex_clr),analysisData=l2p, scaleSamps = gamma[j])
     if(test == "t") {
       
       message("aldex.ttest: doing t-test")
@@ -60,7 +72,7 @@ aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
     }
     sen_results[[j]] <- z
   }
-  names(sen_results) = paste0("lambda_", lambda)
+  names(sen_results) = paste0("gamma_", gamma)
   return(sen_results)
 }
 
@@ -80,7 +92,7 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
     stop("Please return a valid value for threshold")
   }
   
-  lambda <- as.numeric(sub("lambda_", "", names(sen_results)))
+  gamma <- as.numeric(sub("gamma_", "", names(sen_results)))
   B <- matrix(NA, nrow = length(sen_results), ncol = dim(sen_results[[1]])[1])
   pvals <- matrix(NA, nrow = length(sen_results), ncol = dim(sen_results[[1]])[1])
   
@@ -110,12 +122,12 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
   
   P = pvals %>% as.data.frame %>%
     as.data.frame() %>%
-    dplyr::mutate("lambda" = lambda) %>%
-    dplyr::select(lambda, everything()) %>%
-    tidyr::pivot_longer(cols = !lambda, names_to = "Sequence", values_to = "pval")
+    dplyr::mutate("gamma" = gamma) %>%
+    dplyr::select(gamma, everything()) %>%
+    tidyr::pivot_longer(cols = !gamma, names_to = "Sequence", values_to = "pval")
   
   P.toLabel = P %>% dplyr::filter(pval < 0.1) %>%
-    dplyr::arrange(desc(lambda)) %>%
+    dplyr::arrange(desc(gamma)) %>%
     dplyr::select(Sequence) %>%
     unique() %>%
     dplyr::mutate(Sequence = as.numeric(sub("V","",Sequence)))
@@ -124,14 +136,14 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
   
   B %>% 
     as.data.frame() %>%
-    dplyr::mutate("lambda" = lambda) %>%
-    dplyr::select(lambda, dplyr::everything()) %>%
-    tidyr::pivot_longer(cols = !lambda, names_to = "Sequence", values_to = "Effect") %>%
-    plyr::join(P, by = c("lambda", "Sequence")) %>%
+    dplyr::mutate("gamma" = gamma) %>%
+    dplyr::select(gamma, dplyr::everything()) %>%
+    tidyr::pivot_longer(cols = !gamma, names_to = "Sequence", values_to = "Effect") %>%
+    plyr::join(P, by = c("gamma", "Sequence")) %>%
     dplyr::mutate("Sequence" = sub("V", "", Sequence)) %>%
     dplyr::mutate("labl" = sub("V", "", Sequence)) %>%
     dplyr::mutate("labl" = ifelse(labl %in% taxa_to_label, labl, NA)) %>%
-    ggplot(aes(x=lambda, y = Effect, group=Sequence)) +
+    ggplot(aes(x=gamma, y = Effect, group=Sequence)) +
     geom_line() +
     gghighlight((pval <= thresh), use_direct_label  = FALSE) +
     gghighlight(!is.na(labl), unhighlighted_params = list(colour = NULL)) +
@@ -139,7 +151,7 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
     theme_bw() +
     ylab("Effect Size") +
     scale_y_reverse() +
-    xlab("Lambda") +
+    xlab("Gamma") +
     theme(text = element_text(size=18))+
     theme(legend.position = "none") 
 }

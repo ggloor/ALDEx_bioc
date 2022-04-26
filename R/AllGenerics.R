@@ -20,6 +20,8 @@ setGeneric("getReads", function(.object) standardGeneric("getReads"))
 
 setGeneric("numConditions", function(.object) standardGeneric("numConditions"))
 
+setGeneric("getConditions", function(.object) standardGeneric("getConditions"))
+
 setGeneric("getDirichletReplicate", function(.object, i=-1) standardGeneric("getDirichletReplicate"))
 
 setGeneric("getDirichletSample", function(.object, i=-1) standardGeneric("getDirichletSample"))
@@ -32,4 +34,4 @@ setGeneric("getDenom", function(.object) standardGeneric("getDenom"))
 
 setGeneric("getScaleSamples", function(.object) standardGeneric("getScaleSamples"))
 
-setGeneric("aldex.clr", function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, lambda = NULL, cv = NULL) standardGeneric("aldex.clr"), signature=c("reads"))
+setGeneric("aldex.clr", function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma = NULL) standardGeneric("aldex.clr"), signature=c("reads"))
