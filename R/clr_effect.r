@@ -189,10 +189,10 @@ if (verbose == TRUE) message("group summaries calculated")
     #  effect  <- t(apply( l2d$effect, 1, function(row){row[is.na(row)] <- 0 ; median(row) }))
       effect <- Rfast::rowMedians(l2d$effect)
     } else {
-      effectlow <- t(apply( l2d$effect, 1, function(x) {x[is.na(x)] <- 0 ;
-          quantile( x, probs=0.025, names=FALSE)} ))
-      effecthigh <- t(apply( l2d$effect, 1, function(x) {x[is.na(x)] <- 0 ;
-          quantile( x, probs=0.975, names=FALSE)} ))
+      effectlow <- as.vector(t(apply( l2d$effect, 1, function(x) {x[is.na(x)] <- 0 ;
+          quantile( x, probs=0.025, names=FALSE)} )))
+      effecthigh <- as.vector(t(apply( l2d$effect, 1, function(x) {x[is.na(x)] <- 0 ;
+          quantile( x, probs=0.975, names=FALSE)} )))
       effect <- Rfast::rowMedians(l2d$effect)
     }
     overlap <- apply( l2d$effect, 1, function(row) { if(all(is.na(row))) warning("NAs in effect, ignore if using ALR");
@@ -214,8 +214,15 @@ if (verbose == TRUE) message("unpaired effect size calculated")
                 row[is.na(row)] <- 0 ;
                 min( aitchison.mean( c( sum( row < 0 ) , sum( row > 0 ) ) + 0.5 ) ) } )
 
-  l2s$btw <- apply(diff, 1, mean)
-  l2s$win <- apply(diff, 1, sd)
+  l2s$btw <- apply(diff, 1, median) # robust estimator
+  l2s$win <- apply(diff, 1, function(x) mad(x, constant=1.428))
+  
+  # get the 95% CI bounds on the difference 
+  effect.low <- apply(diff, 1, function(x) quantile(x, probs=0.025))
+  effect.high <- apply(diff, 1, function(x) quantile(x, probs=0.975))
+  
+  effectlow <- as.vector(effect.low/l2s$win)
+  effecthigh <- as.vector(effect.high/l2s$win)
   
   effect <- l2s$btw/l2s$win
   if (verbose == TRUE) message("paired effect size calculated")
@@ -224,7 +231,7 @@ if (verbose == TRUE) message("unpaired effect size calculated")
 
 # make and fill in the data table
 # i know this is inefficient, but it works and is not a bottleneck
-   if(CI == FALSE | paired.test == TRUE) {
+   if(CI == FALSE) {
     rv <- list(
         rab = rab,
         diff = l2s,
@@ -262,13 +269,13 @@ if (verbose == TRUE) message("summarizing output")
        nm <- paste("diff", i, sep=".")
        y.rv[,nm] <- data.frame(rv$diff[[i]])
    }
-   if(CI == FALSE | paired.test == TRUE) {
+   if(CI == FALSE) {
      y.rv[,"effect"] <- data.frame(rv$effect)
      y.rv[,"overlap"] <- data.frame(rv$overlap)
    } else {
      y.rv[,"effect"] <- data.frame(rv$effect)
-     y.rv[,"effect.low"] <- data.frame(t(rv$effectlow))
-     y.rv[,"effect.high"] <- data.frame(t(rv$effecthigh))
+     y.rv[,"effect.low"] <- data.frame(rv$effectlow)
+     y.rv[,"effect.high"] <- data.frame(rv$effecthigh)
      y.rv[,"overlap"] <- data.frame(rv$overlap)
    }
     return(y.rv)
