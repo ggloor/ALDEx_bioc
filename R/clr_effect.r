@@ -202,11 +202,17 @@ if (verbose == TRUE) message("unpaired effect size calculated")
 } else if (paired.test == TRUE) {
   l2s <- vector( "list",2 )
   names( l2s ) <- c( "btw", "win" )
+
+  # generate the comparison sets from the condition levels
+  
+  sets <- names(levels)
+  setA <- which(conditions == sets[1])
+  setB <- which(conditions == sets[2])
   
   diff <- NULL
-  for(i in 1:length(levels[[1]])){
-    jnk1 <- getMonteCarloReplicate(clr,i)
-    jnk2 <- getMonteCarloReplicate(clr,(i + length(levels[[1]])) )
+  for(i in 1:length(setA)){
+    jnk1 <- getMonteCarloReplicate(clr,setA[i])
+    jnk2 <- getMonteCarloReplicate(clr,setB[i])
     diff <- cbind(diff, jnk2-jnk1)
   }
   
