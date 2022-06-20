@@ -3,34 +3,60 @@
 #  * assumes unequal variance
 #  * optional paired test
 #  * uses multtest
-t.fast <- function(data, group, paired){
+t.fast <- function(data, group, paired, bayesEst){
   
   grp1 <- group == unique(group)[1]
   grp2 <- group == unique(group)[2]
   n1 <- sum(grp1)
   n2 <- sum(grp2)
   
-  if(paired){
-    
-    # Order pairs for the mt.teststat function
-    if(n1 != n2) stop("Cannot pair uneven groups.")
-    i.1 <- which(grp1)
-    i.2 <- which(grp2)
-    paired.order <- unlist(lapply(1:length(i.1), function(i) c(i.1[i], i.2[i])))
-    
-    t <- multtest::mt.teststat(data[, paired.order], as.numeric(grp1)[paired.order],
-                               test = "pairt", nonpara = "n")
-    df <- length(i.1) - 1
-    return(pt(abs(t), df = df, lower.tail = FALSE) * 2)
-    
-  }else{
-    
-    t <- multtest::mt.teststat(data, as.numeric(grp1), test = "t", nonpara = "n")
-    s1 <- apply(data[, grp1], 1, sd)
-    s2 <- apply(data[, grp2], 1, sd)
-    df <- ( (s1^2/n1 + s2^2/n2)^2 )/( (s1^2/n1)^2/(n1-1) + (s2^2/n2)^2/(n2-1) )
-    return(pt(abs(t), df = df, lower.tail = FALSE) * 2)
+  if(bayesEst){
+    if(paired){
+      
+      # Order pairs for the mt.teststat function
+      if(n1 != n2) stop("Cannot pair uneven groups.")
+      i.1 <- which(grp1)
+      i.2 <- which(grp2)
+      paired.order <- unlist(lapply(1:length(i.1), function(i) c(i.1[i], i.2[i])))
+      
+      t <- multtest::mt.teststat(data[, paired.order], as.numeric(grp1)[paired.order],
+                                 test = "pairt", nonpara = "n")
+      df <- length(i.1) - 1
+      sp <- apply(data[, grp1] - data[, grp2], 1, sd)
+      return(list(t = t, sp = sp))
+      
+    } else{
+      
+      t <- multtest::mt.teststat(data, as.numeric(grp1), test = "t", nonpara = "n")
+      s1 <- apply(data[, grp1], 1, sd)
+      s2 <- apply(data[, grp2], 1, sd)
+      df <- ( (s1^2/n1 + s2^2/n2)^2 )/( (s1^2/n1)^2/(n1-1) + (s2^2/n2)^2/(n2-1) )
+      return(list(t = t, s1 = s1, s2 = s2))
+    }
+  } else{
+    if(paired){
+      
+      # Order pairs for the mt.teststat function
+      if(n1 != n2) stop("Cannot pair uneven groups.")
+      i.1 <- which(grp1)
+      i.2 <- which(grp2)
+      paired.order <- unlist(lapply(1:length(i.1), function(i) c(i.1[i], i.2[i])))
+      
+      t <- multtest::mt.teststat(data[, paired.order], as.numeric(grp1)[paired.order],
+                                 test = "pairt", nonpara = "n")
+      df <- length(i.1) - 1
+      return(pt(abs(t), df = df, lower.tail = FALSE) * 2)
+      
+    } else{
+      
+      t <- multtest::mt.teststat(data, as.numeric(grp1), test = "t", nonpara = "n")
+      s1 <- apply(data[, grp1], 1, sd)
+      s2 <- apply(data[, grp2], 1, sd)
+      df <- ( (s1^2/n1 + s2^2/n2)^2 )/( (s1^2/n1)^2/(n1-1) + (s2^2/n2)^2/(n2-1) )
+      return(pt(abs(t), df = df, lower.tail = FALSE) * 2)
+    }
   }
+  
 }
 
 # wilcox.fast function replaces wilcox.test
