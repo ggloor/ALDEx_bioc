@@ -86,8 +86,9 @@ aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
 #' @return A ggplot2 object
 #' @importFrom tidyr %>%
 #' @importFrom stringr str_detect
+#' @importFrom gghighlight gghighlight
 #' @export
-plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL){
+plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL, bayesEst = TRUE){
   if(thresh < 0 | thresh > 1){
     stop("Please return a valid value for threshold")
   }
@@ -99,7 +100,11 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
   if(test == "t"){
     for(i in 1:length(sen_results)){
       B[i,] <- sen_results[[i]]$effect
-      pvals[i,] <- sen_results[[i]]$we.eBH
+      if(bayesEst){
+        pvals[i,] <- sen_results[[i]]$p.val
+      } else{
+        pvals[i,] <- sen_results[[i]]$we.eBH
+      }
     }
   } else if(test == "glm"){
     if(is.null(glmVar)){

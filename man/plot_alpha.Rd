@@ -9,7 +9,8 @@ plot_alpha(
   test = "t",
   thresh = 0.05,
   taxa_to_label = 10,
-  glmVar = NULL
+  glmVar = NULL,
+  bayesEst = TRUE
 )
 }
 \arguments{

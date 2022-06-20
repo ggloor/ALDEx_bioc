@@ -124,9 +124,9 @@ We begin by running `aldex` without scale simulation as a baseline. We use the C
 
 countdata <- t(rdat[,-1,drop=F])
 colnames(countdata) <- paste0("n", 1:ncol(countdata))
-aldex.fit <- aldex(countdata, as.character(rdat$Condition), denom="all")
+aldex.fit <- aldex(countdata, as.character(rdat$Condition), denom="all", bayesEst = TRUE)
  
-sig.aldex = aldex.fit %>% filter(wi.eBH <= 0.05)
+sig.aldex = aldex.fit %>% filter(p.val <= 0.05)
 head(sig.aldex)
 dim(sig.aldex)
 ```
@@ -144,13 +144,10 @@ First, we run ALDEx2 with scale simulation using a relaxed model. Specifically, 
 For this simulation, we set $\mu_j = 0$, $c=1$, and $\alpha = 0.5$. First, we simulate the samples from the scale model. This must be a matrix with the number of rows equaling the number of samples in the experiment and the number of columns equaling the number of Monte Carlo samples in `ALDEx2`. We then pass this matrix to the `aldex` function. Three out of 21 taxa were found to be significant.
 
 ```{r ALDEX2ScaleSim}
-##Simulate samples from a scale model
-scale.samps = matrix(rlnorm(2000*100, 1, sdlog = .5), nrow = 100)
-
-##Pass to ALDEx2
-aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), gamma = scale.samps, mc.samples = 2000)
+##Run ALDEx2 with Scale Sim
+aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 0.5, mc.samples = 2000, bayesEst = TRUE)
  
-sig.aldexScaleSim = aldexScaleSim.fit %>% filter(wi.eBH <= 0.05)
+sig.aldexScaleSim = aldexScaleSim.fit %>% filter(p.val <= 0.05)
 sig.aldexScaleSim
 ```
 
@@ -163,15 +160,15 @@ To recapture the behavior of ALDEx2 using scale simulation, we also drew samples
 We pass these scale samples to `aldex` as before. As expected, the CLR model returns all 21 taxa as significant whereas the CoDA model returns none as significant.
 
 ```{r ALDEX2ScaleSimOtherMods}
-aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), gamma = 1e-3, mc.samples = 2000)
+aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), gamma = 1e-3, mc.samples = 2000, bayesEst = TRUE)
  
-sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(wi.eBH <= 0.05)
+sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(p.val <= 0.05)
 head(sig.aldexScaleSimCLR)
 dim(sig.aldexScaleSimCLR)
 
-aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), gamma = 10, mc.samples = 2000)
+aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), gamma = 10, mc.samples = 2000, bayesEst = TRUE)
  
-sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(wi.eBH <= 0.05)
+sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(p.val <= 0.05)
 head(sig.aldexScaleSimCoDA)
 ```
 
@@ -247,8 +244,8 @@ summary_aldex2 <- function(fit, pval = 0.05){
   fit %>% 
     as.data.frame() %>% 
     rownames_to_column("category") %>% 
-    dplyr::select(category, effect, wi.eBH) %>% 
-    mutate(padj=wi.eBH) %>% 
+    dplyr::select(category, effect, p.val) %>% 
+    mutate(padj=p.val) %>% 
     mutate(mean=effect) %>% 
     mutate(low=NA, high=NA) %>%
     mutate(sig = ifelse(padj <= pval, TRUE, FALSE))
