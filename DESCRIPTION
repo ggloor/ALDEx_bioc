@@ -46,7 +46,8 @@ Suggests:
   ggpattern,
   ggplot2,
   cowplot,
-  tidyverse
+  tidyverse,
+  magick
 Remotes:
   coolbutuseless/ggpattern
 
