@@ -23,6 +23,8 @@ plot_alpha(
 \item{taxa_to_label}{A positive integer. How many taxa should be labeled in the plot?}
 
 \item{glmVar}{If `test = "glm"`, what variable do you want plotted?}
+
+\item{bayesEst}{A boolean. Do you want to use the Bayesian hypothesis testing method?}
 }
 \value{
 A plot object

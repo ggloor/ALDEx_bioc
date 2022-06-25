@@ -12,6 +12,7 @@ aldex.senAnalysis(
   include.sample.summary = FALSE,
   verbose = FALSE,
   iterate = FALSE,
+  bayesEst = FALSE,
   ...
 )
 }
@@ -38,6 +39,8 @@ running. Useful for debugging errors on large datasets. Applies to
 \item{iterate}{A boolean. Toggles whether to iteratively perform a test. For example,
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
+
+\item{bayesEst}{A boolean. Do you want to use the Bayesian hypothesis testing method?}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }
