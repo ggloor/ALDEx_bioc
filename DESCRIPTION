@@ -36,12 +36,7 @@ Imports:
   S4Vectors,
   SummarizedExperiment,
   multtest,
-  tidyr,
-  dplyr,
-  plyr,
-  stringr,
-  ggplot2,
-  gghighlight
+  stringr
 Suggests:
   testthat,
   BiocStyle,
@@ -49,6 +44,7 @@ Suggests:
   rmarkdown,
   purrr,
   ggpattern,
+  ggplot2,
   cowplot,
   tidyverse
 Remotes:

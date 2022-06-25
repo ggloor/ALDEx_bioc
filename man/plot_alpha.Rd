@@ -25,7 +25,7 @@ plot_alpha(
 \item{glmVar}{If `test = "glm"`, what variable do you want plotted?}
 }
 \value{
-A ggplot2 object
+A plot object
 }
 \description{
 Create alpha diagram for scale simulation sensitivity result

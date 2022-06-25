@@ -83,10 +83,7 @@ aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
 #' @param thresh A numeric between 0 and 1. What threshold should be used for significance?
 #' @param taxa_to_label A positive integer. How many taxa should be labeled in the plot?
 #' @param glmVar If `test = "glm"`, what variable do you want plotted?
-#' @return A ggplot2 object
-#' @importFrom tidyr %>%
-#' @importFrom stringr str_detect
-#' @importFrom gghighlight gghighlight
+#' @return A plot object
 #' @export
 plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL, bayesEst = TRUE){
   if(thresh < 0 | thresh > 1){
@@ -125,40 +122,51 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
     taxa_to_label <- dim(sen_results[[1]])
   }
   
-  P = pvals %>% as.data.frame %>%
-    as.data.frame() %>%
-    dplyr::mutate("gamma" = gamma) %>%
-    dplyr::select(gamma, everything()) %>%
-    tidyr::pivot_longer(cols = !gamma, names_to = "Sequence", values_to = "pval")
+  P = as.data.frame(pvals)
+  P$gamma = gamma
+  P = P[,c(ncol(P), 1:(ncol(P)-1))]
+  P = reshape(P, direction = "long", idvar = "gamma", varying = list(2:ncol(P)), times = names(P)[2:ncol(P)], v.names = "pval", timevar = "Sequence")
+
+  P.toLabel = P[P$pval < thresh, ]
+  P.toLabel = P.toLabel[order(P.toLabel$gamma, decreasing = TRUE),]
+  P.toLabel = unique(P.toLabel$Sequence)
+  P.toLabel = as.numeric(sub("V","",P.toLabel))
   
-  P.toLabel = P %>% dplyr::filter(pval < 0.1) %>%
-    dplyr::arrange(desc(gamma)) %>%
-    dplyr::select(Sequence) %>%
-    unique() %>%
-    dplyr::mutate(Sequence = as.numeric(sub("V","",Sequence)))
+  taxa_to_label = P.toLabel[1:taxa_to_label]
   
-  taxa_to_label = P.toLabel$Sequence[1:taxa_to_label]
+  B_graph <- as.data.frame(B)
+  B_graph$gamma <- gamma
+  B_graph <- B_graph[,c(ncol(B_graph), 1:(ncol(B_graph)-1))]
+  B_graph <- reshape(B_graph, direction = "long", idvar = "gamma", varying = list(2:ncol(B_graph)), times = names(B_graph)[2:ncol(B_graph)], v.names = "Effect", timevar = "Sequence")
+  B_graph <- merge(B_graph, P, by = c("gamma", "Sequence"))
+  B_graph$Sequence <- sub("V", "", B_graph$Sequence)
+  B_graph$labl <- B_graph$Sequence
+  B_graph$labl <- ifelse(B_graph$labl %in% taxa_to_label, B_graph$labl, NA)
   
-  B %>% 
-    as.data.frame() %>%
-    dplyr::mutate("gamma" = gamma) %>%
-    dplyr::select(gamma, dplyr::everything()) %>%
-    tidyr::pivot_longer(cols = !gamma, names_to = "Sequence", values_to = "Effect") %>%
-    plyr::join(P, by = c("gamma", "Sequence")) %>%
-    dplyr::mutate("Sequence" = sub("V", "", Sequence)) %>%
-    dplyr::mutate("labl" = sub("V", "", Sequence)) %>%
-    dplyr::mutate("labl" = ifelse(labl %in% taxa_to_label, labl, NA)) %>%
-    ggplot(aes(x=gamma, y = Effect, group=Sequence)) +
-    geom_line() +
-    gghighlight((pval <= thresh), use_direct_label  = FALSE) +
-    gghighlight(!is.na(labl), unhighlighted_params = list(colour = NULL)) +
-    geom_hline(yintercept=0, color="red", linetype = "dashed") +
-    theme_bw() +
-    ylab("Effect Size") +
-    scale_y_reverse() +
-    xlab("Gamma") +
-    theme(text = element_text(size=18))+
-    theme(legend.position = "none") 
+  ##Switching the graph around
+  B_graph$Effect = -B_graph$Effect
+  tmp <- B_graph[B_graph$Sequence == 1, ]
+  plot(tmp$gamma, tmp$Effect, type = "l", col = "grey", ylim = c(min(B_graph$Effect), max(B_graph$Effect)), xlim = c(0, max(gamma) + .1), xlab = "Gamma", ylab = "Effect Size")
+  tmp2 <- tmp[tmp$pval <= thresh,]
+  points(tmp2$gamma, tmp2$Effect, type = "l", col = "black")
+  if(1 %in% taxa_to_label){
+    text(x = max(gamma) + 0.05, y = tmp$Effect[length(tmp$Effect)], labels = c("1"))
+  }
+  
+  for(i in 2:max(as.numeric(B_graph$Sequence))){
+    tmp <- B_graph[B_graph$Sequence == i, ]
+    points(tmp$gamma, tmp$Effect, type = "l", col = "grey", ylim = c(min(B_graph$Effect), max(B_graph$Effect)), xlab = "Gamma", ylab = "Effect Size")
+    tmp2 <- tmp[tmp$pval <= thresh,]
+    points(tmp2$gamma, tmp2$Effect, type = "l", col = "black")
+    
+    if(i %in% taxa_to_label){
+      text(x = max(gamma) + .05, y = tmp$Effect[length(tmp$Effect)], labels = i)
+      
+    }
+  }
+  abline(h=0, col = "red", lty = "dashed")
+  
+
 }
 
 gm <- function(x, na.rm = TRUE){
