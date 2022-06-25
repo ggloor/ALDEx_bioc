@@ -15,7 +15,7 @@
 }
 \usage{
     aldex.clr(reads, conds, mc.samples = 128, denom="all", 
-          verbose=FALSE, useMC=FALSE, scale.samples = NULL)
+          verbose=FALSE, useMC=FALSE, gamma = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

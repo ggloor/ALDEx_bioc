@@ -5,12 +5,13 @@
 #' 
 #' @param aldex_clr An `aldex.clr` object
 #' @param gamma A vector of positive numeric components. Used as the standard deviation of the scale simulation model.
+#' @param bayesEst A boolean. Do you want to use the Bayesian hypothesis testing method?
 #' @inheritParams aldex
 #' @return A list of results. Each element corresponds to a single result for a given value of gamma
 #' @export
 aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
                               include.sample.summary=FALSE, verbose=FALSE,
-                              iterate=FALSE, ...){
+                              iterate=FALSE, bayesEst = FALSE, ...){
   gamma <- sort(gamma)
   sen_results <- list()
   p <- getDirichletInstances(aldex_clr)
@@ -39,7 +40,7 @@ aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
     if(test == "t") {
       
       message("aldex.ttest: doing t-test")
-      x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose)
+      x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose, bayesEst = bayesEst)
       
     }else if(test == "kw"){
       
@@ -49,7 +50,7 @@ aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
     }else if(test == "glm"){
       
       message("aldex.glm: doing glm test based on a model matrix")
-      x.tt <- aldex.glm(x, ...)
+      x.tt <- aldex.glm(x, bayesEst = bayesEst, ...)
       
     }else if(test == "cor" | test == "corr"){
       
@@ -83,6 +84,7 @@ aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
 #' @param thresh A numeric between 0 and 1. What threshold should be used for significance?
 #' @param taxa_to_label A positive integer. How many taxa should be labeled in the plot?
 #' @param glmVar If `test = "glm"`, what variable do you want plotted?
+#' @param bayesEst A boolean. Do you want to use the Bayesian hypothesis testing method?
 #' @return A plot object
 #' @export
 plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL, bayesEst = TRUE){

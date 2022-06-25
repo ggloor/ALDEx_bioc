@@ -1,21 +1,18 @@
 library(ALDEx2)
-library(tidyverse)
-set.seed(1)
+set.seed(100)
 
 ##Function to create the true abundances via Poisson resampling
 create_true_abundances <- function(d, n){
   dd <- length(d)/2
-  dat <- d %>%
-    sapply(function(x) rpois(n, lambda=x)) %>% 
-    t() %>%
-    as.data.frame() %>%
-    split(rep(1:2, each=dd)) %>%
-    purrr::map(~`rownames<-`(.x, paste0("Taxa", 1:dd))) %>%
-    purrr::map(t) %>%
-    do.call(rbind, .) %>%
-    as.data.frame() %>%
-    cbind(Condition=factor(rep(c("Pre", "Post"), each=n), levels = c("Pre", "Post")), .) %>%
-    `rownames<-`(., NULL)
+  dat <- as.data.frame(t(sapply(d, function(x) rpois(n, lambda=x))))
+  dat <- split(dat, rep(1:2, each=dd))
+  dat <- lapply(dat, function(x, dd){`rownames<-`(x, paste0("Taxa", 1:dd))}, dd = dd)
+  dat <- lapply(dat, function(x){t(x)})
+  dat <- do.call(rbind, dat)
+  dat <- as.data.frame(dat)
+  dat$Condition <- factor(rep(c("Pre", "Post"), each=n), levels = c("Pre", "Post"))
+  dat <- dat[,c(ncol(dat),1:(ncol(dat)-1))]
+  rownames(dat) <- NULL
   return(dat)
 }
 
@@ -38,34 +35,25 @@ dat <- create_true_abundances(d, n=50)
 ##Create resampled data
 rdat <- resample_data(dat, seq.depth=5000)
 
-scale.sampsWrongDim = matrix(rlnorm(128*10, 1, sdlog = 0.75), nrow = 10)
-scale.sampsRightDim = matrix(rlnorm(128*100, 1, sdlog = 0.75), nrow = 100)
-
 countdata <- t(rdat[,-1,drop=F])
 colnames(countdata) <- paste0("n", 1:ncol(countdata))
 
-test_that("scale simulation errors when wrong dimensions are passed", {
-  expect_error(aldex(countdata, as.character(rdat$Condition), gamma = scale.sampsWrongDim, mc.samples = 128), "Scale samples are of incorrect size!")
-})
 
 test_that("aldex2 works without scale samples passed", {
-  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), gamma = NULL, mc.samples = 128))) # expect no error
+  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), gamma = NULL, mc.samples = 128, bayesEst = FALSE))) # expect no error
 })
 
 test_that("aldex2 works with scale samples passed", {
-  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), gamma = scale.sampsRightDim, mc.samples = 128))) # expect no error
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = scale.sampsRightDim, mc.samples = 128) %>%
-    filter(wi.eBH <= 0.05)
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 1, mc.samples = 128, bayesEst = FALSE)
+  
+  aldex.fit <- aldex.fit[aldex.fit$wi.eBH <= 0.05, ]
   truth <- row.names(aldex.fit)
-  expect_true("Taxa4" %in% truth)
-  expect_true("Taxa15" %in% truth)
   expect_true("Taxa21" %in% truth)
 })
 
 test_that("aldex2 works with coda scale samples passed", {
-  scale.sampsCoDA = matrix(rlnorm(128*100, 1, sdlog = 10), nrow = 100)
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = scale.sampsCoDA, mc.samples = 128) %>%
-    filter(wi.eBH <= 0.05)
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 100, mc.samples = 128, bayesEst = FALSE)
+  aldex.fit <- aldex.fit[aldex.fit$wi.eBH <= 0.05, ]
   truth <- row.names(aldex.fit)
   expect_true(length(truth) == 0)
 })

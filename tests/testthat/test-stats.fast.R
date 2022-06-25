@@ -22,13 +22,13 @@ test_that("t.fast gives same result as t.test", {
   expect_equivalent(
     as.vector(apply(t.input, 1, function(i){
       t.test(x=i[setA],y=i[setB], paired = FALSE)$p.value})),
-    ALDEx2:::t.fast(t.input, group, paired = FALSE)
+    ALDEx2:::t.fast(t.input, group, paired = FALSE, bayesEst = FALSE)
   )
   
   expect_equivalent(
     as.vector(apply(t.input, 1, function(i){
       t.test(x=i[setA],y=i[setB], paired = TRUE)$p.value})),
-    ALDEx2:::t.fast(t.input, group, paired = TRUE)
+    ALDEx2:::t.fast(t.input, group, paired = TRUE, bayesEst = FALSE)
   )
 })
 
@@ -75,13 +75,13 @@ test_that("t.fast gives same result as t.test", {
   expect_equivalent(
     as.vector(apply(t.input, 1, function(i){
       t.test(x=i[setA],y=i[setB], paired = FALSE)$p.value})),
-    ALDEx2:::t.fast(t.input, group, paired = FALSE)
+    ALDEx2:::t.fast(t.input, group, paired = FALSE, bayesEst = FALSE)
   )
   
   expect_equivalent(
     as.vector(apply(t.input, 1, function(i){
       t.test(x=i[setA],y=i[setB], paired = TRUE)$p.value})),
-    ALDEx2:::t.fast(t.input, group, paired = TRUE)
+    ALDEx2:::t.fast(t.input, group, paired = TRUE, bayesEst = FALSE)
   )
 })
 
@@ -123,13 +123,13 @@ test_that("t.fast gives same result as t.test", {
   expect_equivalent(
     as.vector(apply(t.input, 1, function(i){
       t.test(x=i[setA],y=i[setB], paired = FALSE)$p.value})),
-    ALDEx2:::t.fast(t.input, group, paired = FALSE)
+    ALDEx2:::t.fast(t.input, group, paired = FALSE, bayesEst = FALSE)
   )
   
   expect_equivalent(
     as.vector(apply(t.input, 1, function(i){
       t.test(x=i[setA],y=i[setB], paired = TRUE)$p.value})),
-    ALDEx2:::t.fast(t.input, group, paired = TRUE)
+    ALDEx2:::t.fast(t.input, group, paired = TRUE, bayesEst = FALSE)
   )
 })
 
@@ -165,3 +165,4 @@ test_that("wilcox.fast gives same result as wilcox.test (given ties)", {
     ALDEx2:::wilcox.fast(t.input, group, paired = TRUE)
   )
 })
+
