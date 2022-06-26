@@ -18,7 +18,7 @@ running. Useful for debugging errors on large datasets. Applies to
 \value{
 Returns a data.frame of the average
  coefficients and their p-values for each feature,
- with FDR appended as a \code{BH} column.
+ with FDR appended as a \code{holm} column.
 }
 \description{
 \code{aldex.glm} calculates the expected values for each coefficient of a
@@ -32,7 +32,7 @@ selex <- selex[1201:1600,]
 covariates <- data.frame("A" = sample(0:1, 14, replace = TRUE),
                          "B" = c(rep(0, 7), rep(1, 7)))
 mm <- model.matrix(~ A + B, covariates)
-x <- aldex.clr(selex, mm, mc.samples=1, denom="all")
+x <- aldex.clr(selex, mm, mc.samples=4, denom="all")
 glm.test <- aldex.glm(x)
 }
 \references{

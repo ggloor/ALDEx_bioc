@@ -1,7 +1,9 @@
-#' Calculate the Kruskal-Wallis test and glm ANOVA statistics
+#' Calculate the Kruskal-Wallis test and glm statistics
 #' 
 #' \code{aldex.kw} calculates the expected values of the Kruskal-Wallis
-#'  test and a glm ANOVA on the data returned by \code{aldex.clr}.
+#'  test and a glm on the data returned by \code{aldex.clr}.
+#' 
+#' use the aldex.glm function unless you really need the nonparametric KW test
 #' 
 #' @param clr An \code{ALDEx2} object. The output of \code{aldex.clr}.
 #' @inheritParams aldex
@@ -15,7 +17,8 @@
 #' \item{glm.ep}{ a vector containing the expected p-value of the glm ANOVA
 #'  for each feature }
 #' \item{glm.eBH}{ a vector containing the corresponding expected value of the
-#'  Benjamini-Hochberg corrected p-value for each feature }
+#'  Benjamini-Hochberg corrected p-value for each feature. Note, you should use
+#'  the aldex.glm function for better post-hoc test statistics. }
 #' 
 #' @author Arianne Albert
 #' 
