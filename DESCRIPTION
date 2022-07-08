@@ -28,6 +28,8 @@ Depends:
   methods,
   stats,
   zCompositions,
+  lattice,
+  latticeExtra
 Imports:
   Rfast,
   BiocParallel,
@@ -36,7 +38,8 @@ Imports:
   S4Vectors,
   SummarizedExperiment,
   multtest,
-  stringr
+  stringr,
+  directlabels
 Suggests:
   testthat,
   BiocStyle,

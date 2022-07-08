@@ -82,12 +82,11 @@ aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
 #' @param sen_results A list return by aldex.senAnalysis()
 #' @param test A character string. What test was used to calculate the results
 #' @param thresh A numeric between 0 and 1. What threshold should be used for significance?
-#' @param taxa_to_label A positive integer. How many taxa should be labeled in the plot?
 #' @param glmVar If `test = "glm"`, what variable do you want plotted?
 #' @param bayesEst A boolean. Do you want to use the Bayesian hypothesis testing method?
 #' @return A plot object
 #' @export
-plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL, bayesEst = TRUE){
+plot_alpha <- function(sen_results, test = "t", thresh = 0.05, glmVar = NULL, bayesEst = FALSE){
   if(thresh < 0 | thresh > 1){
     stop("Please return a valid value for threshold")
   }
@@ -119,10 +118,6 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
     stop("Test not supported by plot_alpha!")
   }
   
-  if(taxa_to_label > dim(sen_results[[1]])[1]){
-    message("Cannot label more taxa than exist. Reverting to all taxa in the data set.")
-    taxa_to_label <- dim(sen_results[[1]])
-  }
   
   P = as.data.frame(pvals)
   P$gamma = gamma
@@ -134,39 +129,24 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
   P.toLabel = unique(P.toLabel$Sequence)
   P.toLabel = as.numeric(sub("V","",P.toLabel))
   
-  taxa_to_label = P.toLabel[1:taxa_to_label]
-  
+
   B_graph <- as.data.frame(B)
   B_graph$gamma <- gamma
   B_graph <- B_graph[,c(ncol(B_graph), 1:(ncol(B_graph)-1))]
   B_graph <- reshape(B_graph, direction = "long", idvar = "gamma", varying = list(2:ncol(B_graph)), times = names(B_graph)[2:ncol(B_graph)], v.names = "Effect", timevar = "Sequence")
   B_graph <- merge(B_graph, P, by = c("gamma", "Sequence"))
   B_graph$Sequence <- sub("V", "", B_graph$Sequence)
-  B_graph$labl <- B_graph$Sequence
-  B_graph$labl <- ifelse(B_graph$labl %in% taxa_to_label, B_graph$labl, NA)
   
   ##Switching the graph around
   B_graph$Effect = -B_graph$Effect
-  tmp <- B_graph[B_graph$Sequence == 1, ]
-  plot(tmp$gamma, tmp$Effect, type = "l", col = "grey", ylim = c(min(B_graph$Effect), max(B_graph$Effect)), xlim = c(0, max(gamma) + .1), xlab = "Gamma", ylab = "Effect Size")
-  tmp2 <- tmp[tmp$pval <= thresh,]
-  points(tmp2$gamma, tmp2$Effect, type = "l", col = "black")
-  if(1 %in% taxa_to_label){
-    text(x = max(gamma) + 0.05, y = tmp$Effect[length(tmp$Effect)], labels = c("1"))
-  }
+  B_graph$Sequence = as.numeric(B_graph$Sequence)
+  B_graph = B_graph[order(B_graph$Sequence, B_graph$gamma),]
+  p <- xyplot(Effect~gamma, data = B_graph, groups = Sequence, col = "grey", type = "l", xlab = "Gamma", ylab = "Effect")
   
-  for(i in 2:max(as.numeric(B_graph$Sequence))){
-    tmp <- B_graph[B_graph$Sequence == i, ]
-    points(tmp$gamma, tmp$Effect, type = "l", col = "grey", ylim = c(min(B_graph$Effect), max(B_graph$Effect)), xlab = "Gamma", ylab = "Effect Size")
-    tmp2 <- tmp[tmp$pval <= thresh,]
-    points(tmp2$gamma, tmp2$Effect, type = "l", col = "black")
-    
-    if(i %in% taxa_to_label){
-      text(x = max(gamma) + .05, y = tmp$Effect[length(tmp$Effect)], labels = i)
-      
-    }
-  }
-  abline(h=0, col = "red", lty = "dashed")
+  B_thresh <- B_graph[B_graph$pval <= thresh,]
+  p2 <- direct.label(xyplot(Effect~gamma, data = B_thresh, groups = Sequence, type = "l", xlab = "Gamma", col= "black", ylab = "Effect"), "last.points")
+  p3 <- xyplot(rep(0, length(unique(B_graph$gamma)))~unique(B_graph$gamma),  col = "red", type = "l", lty = "dashed", xlab = "Gamma", ylab = "Effect")
+  p + as.layer(p2) + as.layer(p3)
   
 
 }
