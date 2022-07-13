@@ -30,4 +30,6 @@ setGeneric("getMonteCarloSample", function(.object, i=-1) standardGeneric("getMo
 
 setGeneric("getDenom", function(.object) standardGeneric("getDenom"))
 
-setGeneric("aldex.clr", function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) standardGeneric("aldex.clr"), signature=c("reads"))
+setGeneric("getZero", function(.object) standardGeneric("getZero"))
+
+setGeneric("aldex.clr", function(reads, conds, mc.samples=128, denom="all", replace.zero="prior", verbose=FALSE, useMC=FALSE) standardGeneric("aldex.clr"), signature=c("reads"))

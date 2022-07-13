@@ -14,7 +14,7 @@
     This is the input for all further analyses.
 }
 \usage{
-    aldex.clr(reads, conds, mc.samples = 128, denom="all", verbose=FALSE, useMC=FALSE)
+    aldex.clr(reads, conds, mc.samples = 128, denom="all", replace.zero="prior", verbose=FALSE, useMC=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -53,6 +53,11 @@
           with caution because the offsets may be different in the original data
           and in the data used by the function because features that are 0 in all
           samples are removed by \code{aldex.clr}.
+      }
+     \item{replace.zero}{
+          An \code{any} variable (prior, GBM) indicating the zero replacement
+          method. The default adds 0.5 to all values, GBM uses the zCompositions
+          R package cmultRepl function and may be substantially slower.
       }
      \item{verbose}{
         Print diagnostic information while running. Useful only for debugging

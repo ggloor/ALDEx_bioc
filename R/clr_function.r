@@ -4,7 +4,7 @@
 #  this function generates the centre log-ratio transform of Monte-Carlo instances
 #  drawn from the Dirichlet distribution.
 
-aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL ) {
+aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", replace.zero="prior", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL ) {
 
 # INPUT
 # The 'reads' data.frame MUST have row
@@ -118,18 +118,29 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     if ( length(colnames(reads)) != length(unique(colnames(reads))) ) stop ("col names are not unique")
     if ( mc.samples < 128 ) warning("values are unreliable when estimated with so few MC smps")
 
-    # add a prior expection to all remaining reads that are 0
-    # this should be by a Count Zero Multiplicative approach, but in practice
-    # this is not necessary because of the large number of features
-    prior <- 0.5
-
     # This extracts the set of features to be used in the geometric mean computation
     # returns a list of features
     feature.subset <- aldex.set.mode(reads, conds, denom)
-
     if ( length(feature.subset[[1]]) == 0 ) stop("No low variance, high abundance features in common between conditions\nPlease choose another denomiator.")
 
-    reads <- reads + prior
+    
+    if(replace.zero=="prior"){
+    # add a prior expection to all remaining reads that are 0
+    # this should be by a Count Zero Multiplicative approach, but in practice
+    # this is not necessary because of the large number of features
+      prior <- 0.5
+      reads <- reads + prior
+    } else if(replace.zero=="GBM"){
+      # something stupid here where cmultRepl() returns a matrix that gets turned into a list by t()
+      # as.data.frame() fixes this
+      reads <- as.data.frame(t(zCompositions::cmultRepl(t(reads), method="GBM", output="p-counts", 
+        z.warning=0.99, suppress.print=TRUE)))
+      reads[reads <0.2] <- 0.2
+    } else {
+      message('incorrect 0 replacement method: using a prior of 0.5')
+      prior <- 0.5
+      reads <- reads + prior
+    }
 
 if (verbose == TRUE) message("data format is OK")
 
@@ -232,7 +243,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
     }
 if (verbose == TRUE) message("transformation complete")
 
-    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,dirichletData=p,analysisData=l2p))
+    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,replace.zero=replace.zero,verbose=verbose,useMC=useMC,dirichletData=p,analysisData=l2p))
 }
 
 
@@ -268,8 +279,10 @@ setMethod("getMonteCarloSample", signature(.object="aldex.clr",i="numeric"), fun
 
 setMethod("getDenom", signature(.object="aldex.clr"), function(.object) .object@denom)
 
-setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE))
+setMethod("getZero", signature(.object="aldex.clr"), function(.object) .object@zero)
 
-setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE))
+setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", replace.zero="prior", verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, conds, mc.samples, denom, replace.zero, verbose, useMC, summarizedExperiment=FALSE))
 
-setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE))
+setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", replace.zero="prior", verbose=FALSE, useMC=FALSE) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, replace.zero, verbose, useMC, summarizedExperiment=FALSE))
+
+setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", replace.zero="prior", verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, conds, mc.samples, denom, replace.zero, verbose, useMC, summarizedExperiment=TRUE))
