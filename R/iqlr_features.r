@@ -80,7 +80,7 @@ iqlr.features <- function(reads, conds)
     neg.indicies <- vector("list", length(unique(conds)))
 
     ##### Adjust all reads with prior of 0.5
-    reads <- reads + 0.5
+    if(min(reads == 0) reads <- reads + 0.5
 
     nr <- nrow( reads )
     rn <- rownames( reads )
@@ -128,8 +128,12 @@ house.features <- function(reads, conds)
   invariant.set.list <- vector("list",
   length(unique(conds)))
 
-  reads.n0 <- cmultRepl(t(reads), label=0, method="CZM",
+  if(min(reads == 0) {
+    reads.n0 <- cmultRepl(t(reads), label=0, method="CZM",
      suppress.print=TRUE)
+  } else {
+    reads.n0 = reads
+  }
 
   # clr transform
   reads.clr <- t(apply(reads.n0, 1,
