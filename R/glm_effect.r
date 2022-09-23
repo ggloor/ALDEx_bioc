@@ -21,7 +21,7 @@ aldex.glm.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, us
         next
       }
 
-      effect.out[[name]] <- aldex.effect(clr, glm.conds=conds)
+      effect.out[[name]] <- aldex.effect(clr, glm.conds=conds, verbose=verbose, include.sample.summary=include.sample.summary, useMC=useMC, CI=CI)
     }
     return(effect.out)
   } else {
