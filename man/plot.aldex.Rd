@@ -7,7 +7,7 @@
     Create `MW'- or `MA'-type plots from the given \code{aldex} object.
 }
 \usage{
-    \method{aldex}{plot}(  x, ..., type=c("MW","MA"),
+    \method{aldex}{plot}(  x, ..., type=c("MW","MA","volcano","volcano.var"),
     xlab=NULL, ylab=NULL, xlim=NULL, ylim=NULL,
     all.col=rgb(0,0,0,0.2), all.pch=19, all.cex=0.4,
     called.col=red, called.pch=20, called.cex=0.6,
@@ -25,7 +25,9 @@
     \item{type}{
         which type of plot is to be produced. MA is a Bland-Altman style plot; MW is a
         difference between to a variance within plot as described in:
-        http://dx.doi.org/10.1080/10618600.2015.1131161
+        http://dx.doi.org/10.1080/10618600.2015.1131161; volcano is a volcano plot
+        of either the difference or variance type: http://dx.doi.org/10.1186/gb-2003-4-4-210
+         
     }
     \item{test}{
         the method of calculating significance, one of:

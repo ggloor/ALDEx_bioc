@@ -1,4 +1,4 @@
-aldex.plot<-function (x, ..., type = c("MW", "MA"), xlab = NULL, ylab = NULL,
+aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xlab = NULL, ylab = NULL,
     xlim = NULL, ylim = NULL, all.col = rgb(0, 0, 0, 0.2), all.pch = 19,
     all.cex = 0.4, called.col = "red", called.pch = 20, called.cex = 0.6,
     thres.line.col = "darkgrey", thres.lwd = 1.5, test = "welch",
@@ -12,21 +12,25 @@ aldex.plot<-function (x, ..., type = c("MW", "MA"), xlab = NULL, ylab = NULL,
         if (length(x$we.eBH) == 0)
             stop("Welch's t test results not in dataset")
         called <- x$we.eBH <= cutoff.pval
+        all.p <- x$we.eBH
     }
     else if (test == "wilcox") {
         if (length(x$wi.eBH) == 0)
             stop("Wilcoxon test results not in dataset")
         called <- x$wi.eBH <= cutoff.pval
+        all.p <- x$wi.eBH
     }
     else if (test == "glm") {
         if (length(x$glm.eBH) == 0)
             stop("glm test results not in dataset")
         called <- x$glm.eBH <= cutoff.pval
+        all.p <- x$glm.eBH
     }
     else if (test == "kruskal") {
         if (length(x$kw.eBH) == 0)
             stop("Kruskall-Wallace test results not in dataset")
         called <- x$kw.eBH <= cutoff.pval
+        all.p <- x$kw.eBH
     }
     else if (test == "effect") {
         if (cutoff.effect <= 0.49)
@@ -73,5 +77,33 @@ aldex.plot<-function (x, ..., type = c("MW", "MA"), xlab = NULL, ylab = NULL,
             col = "grey", cex = 0.8)
         mtext(colnames(x)[cols[2]], 2, line = 2, at = max(x$diff.btw),
             col = "grey", cex = 0.8)
+    }
+  if (type == "volcano") {
+        if (is.null(ylab))
+            ylab <- expression("-1 * Median Log"[10]~" q value")
+        if (is.null(xlab))
+            xlab <- expression("Median Log"[2]~" Difference")
+        plot(x$diff.btw, -1*log10(all.p), xlab = xlab, ylab = ylab,
+            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, xlim=xlim)
+        points(x$diff.btw[called], -1*log10(all.p)[called], col = called.col,
+            pch = called.pch, cex = called.cex)
+        cols <- grep("rab.win", colnames(x))
+        mtext(colnames(x)[cols[1]], 1, line = 2, at = min(x$diff.btw),
+            col = "grey", cex = 0.8)
+        mtext(colnames(x)[cols[2]], 1, line = 2, at = max(x$diff.btw),
+            col = "grey", cex = 0.8)
+
+    }
+  if (type == "volcano.var") {
+        if (is.null(ylab))
+            ylab <- expression("-1 * Median Log"[10]~" q value")
+        if (is.null(xlab))
+            xlab <- expression("Median Log"[2]~" Dispersion")
+        plot(x$diff.win, -1*log10(all.p), xlab = xlab, ylab = ylab,
+            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, xlim=xlim)
+        points(x$diff.win[called], -1*log10(all.p)[called], col = called.col,
+            pch = called.pch, cex = called.cex)
+        cols <- grep("rab.win", colnames(x))
+
     }
 }
