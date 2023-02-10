@@ -35,7 +35,7 @@ aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
       l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
     }
     names(l2p) <- names(aldex_clr@dirichletData)
-    x <-  new("aldex.clr",reads=clr@reads,mc.samples=clr@mc.samples,conds=clr@conds,
+    x <-  new("aldex.clr",reads=aldex_clr@reads,mc.samples=aldex_clr@mc.samples,conds=aldex_clr@conds,
               denom=getDenom(aldex_clr),verbose=verbose,useMC=FALSE,dirichletData=getDirichletInstances(aldex_clr),analysisData=l2p, scaleSamps = gamma[j])
     if(test == "t") {
       
