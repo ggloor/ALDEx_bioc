@@ -200,6 +200,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
           noise_mean <- rowMeans(noise)
 
           scale_samples[i,] <- geo_means + noise_mean
+          scale_samples <- log2(exp(scale_samples))
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
         }
       } else if(length(gamma) >1 & is.null(dim(gamma))){ ##Vector case/scale sim + senstitivity

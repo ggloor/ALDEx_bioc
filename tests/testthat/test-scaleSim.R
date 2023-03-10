@@ -44,7 +44,7 @@ test_that("aldex2 works without scale samples passed", {
 })
 
 test_that("aldex2 works with scale samples passed", {
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 1, mc.samples = 128, bayesEst = FALSE)
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = .5, mc.samples = 128, bayesEst = FALSE)
   
   aldex.fit <- aldex.fit[aldex.fit$wi.eBH <= 0.05, ]
   truth <- row.names(aldex.fit)
@@ -52,8 +52,52 @@ test_that("aldex2 works with scale samples passed", {
 })
 
 test_that("aldex2 works with coda scale samples passed", {
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 100, mc.samples = 128, bayesEst = FALSE)
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 10, mc.samples = 128, bayesEst = FALSE)
   aldex.fit <- aldex.fit[aldex.fit$wi.eBH <= 0.05, ]
   truth <- row.names(aldex.fit)
   expect_true(length(truth) == 0)
+})
+
+## this code was used to set the tolerances
+#out.data <- matrix(data=NA, ncol=9, nrow=100)
+#
+#for(i in 1:100){
+#       x <- aldex.clr(selex, conds, verbose=F)
+#       x.e <- aldex.effect(x,verbose=F)
+#       out.data[i,1:7] <- as.numeric(x.e['P:E:T:E',])
+#       out.data[i,8] <- median(x.e$diff.By the way,)
+#       out.data[i,9] <- median(x.e$diff.win)
+#       print(i)
+#}
+
+
+#########
+# unit test
+#########
+
+library(ALDEx2)
+data(selex)
+
+conds <- c(rep("NS", 7), rep("S", 7))
+x <- aldex.clr(selex,conds)
+x.e <- aldex.effect(x)
+
+xs <- aldex.clr(selex, conds, gamma=1e-3)
+xs.e <- aldex.effect(xs)
+
+xS <- aldex.clr(selex, conds, gamma=0.5)
+xS.e <- aldex.effect(xS)
+
+
+test_that("scale sim minimally pertubs diff.btw output", {
+  
+  expect_equal(median(x.e$diff.btw), median(xs.e$diff.btw),
+               tolerance=0.1)
+  
+  expect_equal(median(x.e$diff.win), median(xs.e$diff.win),
+               tolerance=0.1)
+  
+  expect_error(expect_equal(median(x.e$diff.win),
+                            median(xS.e$diff.win), tolerance=0.1))
+  
 })
