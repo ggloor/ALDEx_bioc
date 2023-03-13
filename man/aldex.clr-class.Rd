@@ -14,8 +14,7 @@
   is a positive integer.
   There are N samples, D features, and M Monte-Carlo instances.
   \describe{
-    \item{}{
-      \code{getMonteCarloInstances(x)}:
+    \item{\code{getMonteCarloInstances(x)}}{
       Returns the clr transformed Monte Carlo Dirichlet instances as a list where
       each list entry is a single sample containing a D x M matrix.
     }
