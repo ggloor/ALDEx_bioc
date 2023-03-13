@@ -3,6 +3,7 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/michellepistner/ALDEx_bioc/workflows/R-CMD-check/badge.svg)](https://github.com/michellepistner/ALDEx_bioc/actions)
+[![R-CMD-check](https://github.com/michellepistner/ALDEx_bioc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/michellepistner/ALDEx_bioc/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Introduction
@@ -53,6 +54,8 @@ library(ALDEx2)
 #> 
 #>     cor
 #> Loading required package: truncnorm
+#> Loading required package: lattice
+#> Loading required package: latticeExtra
 data(selex)
 group <- c(rep("A", 7), rep("B", 7))
 res <- aldex(selex, group, denom = "iqlr")
