@@ -2,7 +2,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/michellepistner/ALDEx_bioc/workflows/R-CMD-check/badge.svg)](https://github.com/michellepistner/ALDEx_bioc/actions)
 [![R-CMD-check](https://github.com/michellepistner/ALDEx_bioc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/michellepistner/ALDEx_bioc/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
