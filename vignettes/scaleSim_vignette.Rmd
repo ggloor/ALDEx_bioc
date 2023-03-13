@@ -244,7 +244,7 @@ summary_aldex2 <- function(fit, pval = 0.05){
   fit %>% 
     as.data.frame() %>% 
     rownames_to_column("category") %>% 
-    dplyr::select(category, effect, p.val) %>% 
+    select(category, effect, p.val) %>% 
     mutate(padj=p.val) %>% 
     mutate(mean=effect) %>% 
     mutate(low=NA, high=NA) %>%
@@ -255,7 +255,7 @@ summary_aldex2 <- function(fit, pval = 0.05){
 plot_sig2 <- function(rrs, truth, ...){
   names(rrs) <- model.names[names(rrs)]
   bind_rows(rrs, .id="Model") %>% 
-    dplyr::select(Model, category, sig) %>% 
+    select(Model, category, sig) %>% 
     mutate(Taxa = category) %>% 
     mutate(Taxa=as.numeric(sub("Taxa", "", Taxa))) %>%  
     mutate(sigcode = sig_code(sig, Taxa, truth)) %>% 
