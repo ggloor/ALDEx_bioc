@@ -8,8 +8,8 @@
     determines the effect size, which is the median of the ratio of the between group difference and the larger of the variance within groups
 }
 \usage{
-aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE,
-            useMC=FALSE, CI=FALSE, glm.conds=NULL)
+aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE, useMC=FALSE, 
+  CI=FALSE, glm.conds=NULL, paired.test=FALSE)
 }
 \arguments{
     \item{clr}{
@@ -29,6 +29,9 @@ aldex.effect(clr, verbose = TRUE, include.sample.summary = FALSE,
     }
     \item{glm.conds}{
         give effect for glm contrasts, note: saved as list
+    }
+    \item{paired.test}{
+        calculate effect size for paired samples, defaults to FALSE
     }
 }
 \details{

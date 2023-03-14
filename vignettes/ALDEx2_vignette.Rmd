@@ -79,7 +79,7 @@ selex.sub <- selex[1:400,]
 
 conds <- c(rep("NS", 7), rep("S", 7))
 x.all <- aldex(selex.sub, conds, mc.samples=16, test="t", effect=TRUE,
-     include.sample.summary=FALSE, denom="all", verbose=FALSE, bayesEst = FALSE)
+     include.sample.summary=FALSE, denom="all", verbose=FALSE, paired.test=FALSE, bayesEst = FALSE)
 
 par(mfrow=c(1,2))
 aldex.plot(x.all, type="MA", test="welch", xlab="Log-ratio abundance",
@@ -111,18 +111,20 @@ This operation is reasonably fast.
 x.tt <- aldex.ttest(x, paired.test=FALSE, verbose=FALSE, bayesEst = FALSE)
 ```
 
-## The `aldex.kw` module
+## The `aldex.kw` and the `aldex.glm` modules
 Alternatively to the t-test, the user can perform the glm and Kruskal Wallace tests for one-way ANOVA of two or more conditions. Here there are only two inputs: the aldex object from aldex.clr, and the vector of conditions. Note that this is slow! and is not evaluated for this documentation.
+
+The `aldex.glm` module is the preferred method for testing of more than two conditons or for complex study designs. See the `Complex study designs' section below.
 
 ```{r,echo=TRUE, eval=FALSE, results="hide"}
 x.kw <- aldex.kw(x)
 ```
 
 ## The `aldex.effect` module
-Finally, we estimate effect size and the within and between condition values in the case of two conditions. This step is required for plotting, in our lab we base our conclusions primarily on the output of this function^[@macklaim:2013;@mcmurrough:2014;@bian:2017].. There is one input: the aldex object from aldex.clr,  ; and several parameters: a flag as to whether to include values for all samples or not are used as the denominator, and the level of verbosity. It is also possible to include the 95% confidence interval information for the effect size estimate with the flag `CI=TRUE`. This can be helpful when deciding whether to include or exclude specific features from consideration. We find that a large effect but that is an outlier for the extremes of the effect distribution can be false positives.
+Finally, we estimate effect size and the within and between condition values in the case of two conditions. This step is required for plotting, in our lab we base our conclusions primarily on the output of this function^[@macklaim:2013;@mcmurrough:2014;@bian:2017]. There is one input: the aldex object from aldex.clr; and several useful parameters. It is  possible to include the 95% confidence interval information for the effect size estimate with the boolean flag `CI=TRUE`. This can be helpful when deciding whether to include or exclude specific features from consideration. We find that a large effect but that is an outlier for the extremes of the effect distribution can be false positives. New is the option to calculate effect sizes for paired t-tests or repeated samples with the boolean `paired.test=TRUE` option. In this case the difference between and difference within values are calculated as the median paired difference and the median absolute deviation of that difference. The standardized effect size is their ratio and is usually slightly larger than the unpaired effect size. The supplied selex dataset is actually a paired dataset and can be used to explore this option.
 
 ```{r,echo=T, eval=TRUE, message=F, error=F, warning=F, results="hide"}
-x.effect <- aldex.effect(x, CI=T, verbose=FALSE)
+x.effect <- aldex.effect(x, CI=T, verbose=FALSE, paired.test=FALSE)
 ```
 
 ## The `aldex.plot` module
@@ -168,7 +170,7 @@ abline(0,-2, lty=2, col="grey")
 
 ## Complex study designs and the aldex.glm module
 
-The aldex.glm module has been included so that the probabilistic compositional approach can be used for complex study designs. This module is substantially slower than the two-comparison tests above, but we think it is worth it if you have complex study designs.
+The aldex.glm module is included so that the probabilistic compositional approach can be used for complex study designs. This module is substantially slower than the two-comparison tests above, but we think it is worth it if you have complex study designs.
 
 Essentially, the approach is the modular approach above but using a model matrix and covariates supplied to the glm function in R. The values returned are the expected values of the glm function given the inputs. In the example below, we are measuring the predictive value of variables A and B independently. See the documentation for the R formula function, or http://faculty.chicagobooth.edu/richard.hahn/teaching/formulanotation.pdf for more information.
 
@@ -234,7 +236,6 @@ A:D:A:D | 1.12261 | 1.72910 | 0.471043 | 0.267260701
 A:D:A:E | 2.73090 | 2.38134 | 1.034873 | 0.135857781
 A:E:A:D | 9.64287 | 2.85008 | 3.429068 | 0.000156632
 
-
 In the list below, the `aldex.ttest` function returns the values highlighted with $\ast$, the `aldex.kw` function returns the values highlighted with $\circ$, and the `aldex.effect` function returns the values highlighted with $\diamondsuit$.
 
 1. $\ast$ we.ep - Expected P value of Welch's t test
@@ -254,6 +255,20 @@ In the list below, the `aldex.ttest` function returns the values highlighted wit
 15. $\diamondsuit$ effect - median effect size:  diff.btw / max(diff.win) for all instances
 16. $\diamondsuit$ overlap - proportion of effect size that overlaps 0 (i.e. no effect)
 
+The output from the `aldex.glm` function is somewhat different, although it still returns the expected values of the test statistics.
+
+For example, using the `selex` dataset and the model matrix from the `aldex.glm` help information:
+
+`conds <- data.frame("A" = sample(0:1, 14, replace = TRUE), "B" = c(rep(0, 7), rep(1, 7)))`
+
+which we turn into a model matrix: `mm <- model.matrix(~ A + B, conds)`
+
+Note that we have generated a random model  ``A'' and that model ``B'' is simply the correct comparison. We anticipate that model A will give no statistically significant outputs, and that B will give similar results to a t-test, and indeed this is the case. 
+
+The outputs are expected values of the intercept and its coefficients, and the estimates for each model and their coefficients. Also calculated is the Family Wide Error Rate (FWER) for each P value (reported in the `model.x Pr(>|t|).holm` output. This is a Holm-Bonferroni FWER correction that is more powerful than the Bonferroni correction, and is a step-down correction that is more stringent than a false discovery rate correction such as Benjamini-Hochberg. Note that for a generalized linear model, Tukey's HSD is not applicable to control the FWER. This is because Tukey's HSD depends on an ANOVA in the background in R and packages that calculate Tukey's HSD essentially all do an `aov`, thus the FWER is calculated on a different test statistic than is calculated by the glm.  
+ 
+The expected value of the Holm-Bonferroni test can be used as the post-hoc standin for Tukey's HSD. Note, that this is true only when there are a relatively small number of contrasts (up to 10) in the model^[@kim2015RWER]. 
+ 
 ## A word about effect size and overlap
 
 The effect size metric used by `r Biocpkg("ALDEx2")` is a standardized distributional effect size metric developed specifically for this package. The measure is somewhat robust, allowing up to 20% of the samples to be outliers before the value is affected, returns an effect size that is 71% the size of Cohen's d on a Normal distribution, and requires at worst twice the number of samples as fully parametric methods (which are not robust) would to estimate values with the same precision. The metric is equally valid for  Normal, random uniform and Cauchy distributions^(@Gloor submitted).

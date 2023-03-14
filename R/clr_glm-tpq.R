@@ -10,7 +10,7 @@
 #'
 #' @return Returns a data.frame of the average
 #'  coefficients and their p-values for each feature,
-#'  with FDR appended as a \code{BH} column.
+#'  with FDR appended as a \code{holm} column.
 #'
 #' @author Thom Quinn
 #'
@@ -34,7 +34,7 @@
 #' covariates <- data.frame("A" = sample(0:1, 14, replace = TRUE),
 #'                          "B" = c(rep(0, 7), rep(1, 7)))
 #' mm <- model.matrix(~ A + B, covariates)
-#' x <- aldex.clr(selex, mm, mc.samples=1, denom="all")
+#' x <- aldex.clr(selex, mm, mc.samples=4, denom="all")
 #' glm.test <- aldex.glm(x)
 aldex.glm <- function(clr, verbose=FALSE, ...){
 
@@ -59,16 +59,6 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
     glms <- apply(lr, 2, function(x){
       glm(x ~ model., ...)
     })
-
-    # Extract coefficients and p-values
-    extract <- function(model){
-      x <- coef(summary(model))
-      coefs <- lapply(1:nrow(x), function(i){
-        y <- x[i,,drop=FALSE]
-        colnames(y) <- paste(rownames(y), colnames(y))
-        y})
-      do.call("cbind", coefs)
-    }
 
     # Combine to make data.frame
     extracts <- lapply(glms, extract)
@@ -95,9 +85,9 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
     # Create new data.frame for FDR
     pvals <- colnames(df)[grepl("Pr\\(>", colnames(df))]
     df.bh <- df[,pvals]
-    colnames(df.bh) <- paste0(colnames(df.bh), ".BH")
+    colnames(df.bh) <- paste0(colnames(df.bh), ".holm")
     for(j in 1:ncol(df.bh)){
-      df.bh[,j] <- p.adjust(df.bh[,j])
+      df.bh[,j] <- p.adjust(df.bh[,j], method='holm')
     }
 
     # Merge results with FDR
@@ -116,6 +106,26 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
     mci_lr <- t(sapply(mc, function(x) x[, i]))
     r <- r + lr2glm(mci_lr, conditions, ...)
   }
+  # simplify names for plotting
+  colnames(r) <- gsub("\\(Intercept)", 'Intercept:', colnames(r))
+  colnames(r) <- gsub('model.', '', colnames(r))
+  colnames(r) <- gsub(' Estimate', ':Est', colnames(r))
+  colnames(r) <- gsub(' t value', ':t.val', colnames(r))
+  colnames(r) <- gsub(' Std. Error', ':SE', colnames(r))
+  colnames(r) <- gsub(" Pr\\(.+\\)", ':pval', colnames(r))
+
 
   r / k # return expected
 }
+
+# declaring this once provides a 40% speedup
+# Extract coefficients and p-values
+extract <- function(model){
+  x <- coef(summary(model))
+  coefs <- lapply(1:nrow(x), function(i){
+	y <- x[i,,drop=FALSE]
+	colnames(y) <- paste(rownames(y), colnames(y))
+	y})
+  do.call("cbind", coefs)
+}
+

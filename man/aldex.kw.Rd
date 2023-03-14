@@ -2,7 +2,7 @@
 % Please edit documentation in R/clr_glm.r
 \name{aldex.kw}
 \alias{aldex.kw}
-\title{Calculate the Kruskal-Wallis test and glm ANOVA statistics}
+\title{Calculate the Kruskal-Wallis test and glm statistics}
 \usage{
 aldex.kw(clr, useMC = FALSE, verbose = FALSE)
 }
@@ -24,11 +24,15 @@ Returns a \code{data.frame} with the following information:
 \item{glm.ep}{ a vector containing the expected p-value of the glm ANOVA
  for each feature }
 \item{glm.eBH}{ a vector containing the corresponding expected value of the
- Benjamini-Hochberg corrected p-value for each feature }
+ Benjamini-Hochberg corrected p-value for each feature. Note, you should use
+ the aldex.glm function for better post-hoc test statistics. }
 }
 \description{
 \code{aldex.kw} calculates the expected values of the Kruskal-Wallis
- test and a glm ANOVA on the data returned by \code{aldex.clr}.
+ test and a glm on the data returned by \code{aldex.clr}.
+}
+\details{
+use the aldex.glm function unless you really need the nonparametric KW test
 }
 \examples{
 data(selex)

@@ -20,10 +20,10 @@ aitchison.mean <- function( n, log=FALSE ) {
     return(p)
 }
 
-# From the R-Help mailing list
+# modified from the R-Help mailing list
 # https://stat.ethz.ch/pipermail/r-help/2000-December/009561.html
 # modified to test for rational inputs first by gg Oct 09, 2018
-# this should be clean of any GPL license and we can start again
+# this should be clean of any GPL license
 
 rdirichlet<-function(n,a)
   ## pick n random deviates from the Dirichlet function with shape parameters a
@@ -33,7 +33,6 @@ rdirichlet<-function(n,a)
     n <- floor(n)
     l<-length(a);
     x<-matrix(rgamma(l*n,a),ncol=l,byrow=TRUE);
-    # sm<-x%*%rep(1,l);
     return(x/rowSums(x) );
 }
 

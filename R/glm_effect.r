@@ -7,20 +7,21 @@ aldex.glm.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, us
   if (is.vector(clr@conds)) {
     stop("only a single condition vector detected\n  use aldex.effect instead")
   } else if (is.matrix(clr@conds)) {
-    effect.out <- list()
-    names <- colnames(clr@conds[,2:ncol(clr@conds)])
-    for(i in 1:length(names)){
-      conds=clr@conds[,i+1]
+	effect.out <- list()
+    names <- colnames(clr@conds)
+    names <- names[-1]
+    for(name in names){
+      conds=clr@conds[,name]      
       conditions <- as.factor( conds )
       levels     <- levels( factor( conds) )
 
       if ( length( conds ) !=  numConditions(clr) ) stop("mismatch btw 'length(conditions)' and 'ncol(reads)'")
       if ( length( levels ) != 2 ) {
-        warning("only two condition levels are currently supported\neffect not calculated for ",names[i])
+        warning("only two condition levels are currently supported\neffect not calculated for ",name)
         next
       }
 
-      effect.out[[names[i]]] <- aldex.effect(clr, glm.conds=conds)
+      effect.out[[name]] <- aldex.effect(clr, glm.conds=conds, verbose=verbose, include.sample.summary=include.sample.summary, useMC=useMC, CI=CI)
     }
     return(effect.out)
   } else {

@@ -50,14 +50,17 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 # force the use of either all for the denominator
 # or
 # the use of a user-supplied denominator
-  if(is(conds, "matrix")){
-    message("checking for condition length disabled!")
-    if(is.vector(denom, mode="integer")){
+  if(is(conds, "vector")){
+      message("conditions vector supplied")
+  }    
+  else if(is(conds, "matrix")  & all(round(conds) == conds)){
+    message("integer matrix provided")
+    if(is.vector(denom, mode="numeric")){
       message("user-defined denominator used")
     } else if (denom == "all"){
       message("using all features for denominator")
     } else {
-      stop("please supply a vector of indices for the denominator")
+      stop("please supply the desired vector of indices for the denominator")
     }
 #     if(conds.col == 0){
 #       message("conditions provided as matrix: selecting first column for aldex.clr")
