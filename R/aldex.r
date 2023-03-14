@@ -91,7 +91,7 @@
 #' x <- aldex(selex, conds, mc.samples=2, denom="all",
 #'            test="t", effect=TRUE, paired.test=FALSE)
 aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
-                  include.sample.summary=FALSE, verbose=FALSE,
+                  include.sample.summary=FALSE, verbose=FALSE, paired.test=FALSE,
                   denom="all", iterate=FALSE, gamma = NULL, bayesEst = TRUE, ...){
 
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")

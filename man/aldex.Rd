@@ -12,6 +12,7 @@ aldex(
   effect = TRUE,
   include.sample.summary = FALSE,
   verbose = FALSE,
+  paired.test = FALSE,
   denom = "all",
   iterate = FALSE,
   gamma = NULL,
@@ -48,6 +49,9 @@ values for each sample. Applies to \code{effect = TRUE}.}
 running. Useful for debugging errors on large datasets. Applies to
 \code{effect = TRUE}.}
 
+\item{paired.test}{A boolean. Toggles whether to do paired-sample tests.
+Applies to \code{effect = TRUE} and \code{test = "t"}.}
+
 \item{denom}{A character string. Indicates which features to retain as the
 denominator for the Geometric Mean calculation. Using "iqlr" accounts for data
 with systematic variation and centers the features on the set features that have
@@ -65,9 +69,6 @@ this will use the results from an initial "t" routine to seed the reference
 \item{bayesEst}{A boolean. Do we use the Bayes estimate for testing?}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
-
-\item{paired.test}{A boolean. Toggles whether to do paired-sample tests.
-Applies to \code{effect = TRUE} and \code{test = "t"}.}
 }
 \value{
 Returns a number of values that depends on the set of options.
