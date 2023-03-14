@@ -13,7 +13,6 @@ aldex(
   include.sample.summary = FALSE,
   verbose = FALSE,
   denom = "all",
-  paired.test = FALSE,
   iterate = FALSE,
   gamma = NULL,
   bayesEst = TRUE,
@@ -57,9 +56,6 @@ is a more extreme case where there are many non-zero features in one condition b
 many zeros in another. In this case the geometric mean of each group is calculated
 using the set of per-group non-zero features.}
 
-\item{paired.test}{A boolean. Toggles whether to do paired-sample tests.
-Applies to \code{effect = TRUE} and \code{test = "t"}.}
-
 \item{iterate}{A boolean. Toggles whether to iteratively perform a test. For example,
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
@@ -69,6 +65,9 @@ this will use the results from an initial "t" routine to seed the reference
 \item{bayesEst}{A boolean. Do we use the Bayes estimate for testing?}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
+
+\item{paired.test}{A boolean. Toggles whether to do paired-sample tests.
+Applies to \code{effect = TRUE} and \code{test = "t"}.}
 }
 \value{
 Returns a number of values that depends on the set of options.
