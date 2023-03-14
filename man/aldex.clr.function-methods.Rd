@@ -15,7 +15,7 @@
 }
 \usage{
     aldex.clr(reads, conds, mc.samples = 128, denom="all", 
-          verbose=FALSE, useMC=FALSE, scale.lambda = NULL, scale.mu = NULL)
+          verbose=FALSE, useMC=FALSE, gamma = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -65,17 +65,12 @@
         not possible. In practice serial and multicore are nearly the same speed
         because of overhead in setting up the parallel processes.
     }
-    \item{scale.lambda}{
-        Use scale simulation for variance if not `NULL`. If a numeric is
+    \item{gamma}{
+        Use scale simulation if not `NULL`. If a matrix is supplied, scale simulation
+        will be used assuming that matrix denotes the scale samples. If a numeric is
         supplied, scale simulation will be applied by relaxing the geometric mean 
         assumption with the numeric representing the standard deviation of the
         scale distribution.
-    }
-    \item{scale.mu}{
-        Use scale adjustment for denominator if not `NULL`. If a numeric is
-        supplied, scale simulation will be applied by subtracting scale.mu from
-        the geometric mean. Use this only if strong prior information that the
-        geometric mean of the conditions should be dramatically different.
     }
 }
 \details{
@@ -92,7 +87,7 @@
 \references{
     Please use the citation given by \code{citation(package="ALDEx")}.}
 \author{
-    Greg Gloor, Thom Quinn, Ruth Grace Wong, Andrew Fernandes, Matt Links, Jia Rong Wu, Michelle Pistner and Justin Silverman contributed to this code.
+    Greg Gloor, Thom Quinn, Ruth Grace Wong, Andrew Fernandes, Matt Links and Jia Rong Wu contributed to this code.
 }
 
 \seealso{

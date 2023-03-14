@@ -34,25 +34,25 @@
 
 ##### Determines the mode to be used in ALDEx2
 ##### Default is all features
-aldex.set.mode <- function(reads, conds, denom="all", verbose=FALSE)
+aldex.set.mode <- function(reads, conds, denom="all")
 {
 
     if (is.character(denom))
     {
         if (denom == "zero") {
-            if(verbose == TRUE) message("computing zero removal")
+            message("computing zero removal")
             features <- zero.features(reads,conds)
         } else if (denom == "iqlr") {
-            if(verbose == TRUE) message("computing iqlr centering")
+            message("computing iqlr centering")
             features <- iqlr.features(reads,conds)
         } else if (denom == "all" | denom == "" | denom == "median") {
-            if(verbose == TRUE) message("computing center with all features")
+            message("computing center with all features")
             features <- all.features(reads,conds)
         } else if (denom == "lvha" ) {
-            if(verbose == TRUE) message("computing center with housekeeping features")
+            message("computing center with housekeeping features")
             features <- house.features(reads,conds)
         } else {
-            if(verbose == TRUE) message(paste("denom: '", denom, "' unrecognized. Using all features.", sep=""))
+            message(paste("denom: '", denom, "' unrecognized. Using all features.", sep=""))
             features <- all.features(reads,conds)
         }
         return(features)

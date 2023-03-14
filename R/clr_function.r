@@ -4,7 +4,7 @@
 #  this function generates the centre log-ratio transform of Monte-Carlo instances
 #  drawn from the Dirichlet distribution.
 
-aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, scale.lambda = NULL, scale.mu=NULL) {
+aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, gamma = NULL) {
 
 # INPUT
 # The 'reads' data.frame MUST have row
@@ -39,8 +39,8 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
   # make sure the conditions vector or matrix is reasonable
   if(missing(conds)){
 
-    if(verbose == TRUE) message("no conditions provided: forcing denom = 'all'")
-    if(verbose == TRUE) message("no conditions provided: forcing conds = 'NA'")
+    message("no conditions provided: forcing denom = 'all'")
+    message("no conditions provided: forcing conds = 'NA'")
     denom <- "all"
     conds <- rep("NA", ncol(reads))
 
@@ -51,11 +51,11 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 # or
 # the use of a user-supplied denominator
   if(is(conds, "matrix")){
-    if(verbose == TRUE) message("checking for condition length disabled!")
+    message("checking for condition length disabled!")
     if(is.vector(denom, mode="integer")){
-      if(verbose == TRUE) message("user-defined denominator used")
+      message("user-defined denominator used")
     } else if (denom == "all"){
-      if(verbose == TRUE) message("using all features for denominator")
+      message("using all features for denominator")
     } else {
       stop("please supply a vector of indices for the denominator")
     }
@@ -82,12 +82,12 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     # make sure that the multicore package is in scope and return if available
     has.BiocParallel <- FALSE
     if ("BiocParallel" %in% rownames(installed.packages()) & useMC){
-        if(verbose == TRUE) message("multicore environment is is OK -- using the BiocParallel package")
+        message("multicore environment is is OK -- using the BiocParallel package")
         #require(BiocParallel)
         has.BiocParallel <- TRUE
     }
     else {
-        if(verbose == TRUE) message("operating in serial mode")
+        message("operating in serial mode")
     }
 
     # make sure that mc.samples is an integer, despite it being a numeric type value
@@ -118,9 +118,6 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
     if ( length(colnames(reads)) != length(unique(colnames(reads))) ) stop ("col names are not unique")
     if ( mc.samples < 128 ) warning("values are unreliable when estimated with so few MC smps")
 
-    if(!is.null(dim(scale.lambda))) stop("scale.lambda must be NULL or a single number or vector of numbers")
-    if(!is.null(dim(scale.mu))) stop("scale.mu must be NULL or a single number or vector of numbers")
-      
     # add a prior expection to all remaining reads that are 0
     # this should be by a Count Zero Multiplicative approach, but in practice
     # this is not necessary because of the large number of features
@@ -128,9 +125,8 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 
     # This extracts the set of features to be used in the geometric mean computation
     # returns a list of features
-    # TO DO integrate scale into feature.subset
-    if(is.null(scale.lambda)){
-      feature.subset <- aldex.set.mode(reads, conds, denom, verbose)
+    if(is.null(gamma)){
+      feature.subset <- aldex.set.mode(reads, conds, denom)
       if ( length(feature.subset[[1]]) == 0 ) stop("No low variance, high abundance features in common between conditions\nPlease choose another denomiator.")
     } else{
       feature.subset <- vector()
@@ -179,45 +175,76 @@ if (verbose == TRUE) message("dirichlet samples complete")
     # Add scale samples (if desired)
     # Checking the size of the scale samples
     
-    if(!is.null(scale.lambda) | !is.null(scale.mu)){
-      if(verbose == TRUE) message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
-		# set up the vectors for lambda and mu for gm, and rlnorm
-		if(is.null(scale.lambda)) { s.lambda <- rep(0, length(conds))  # no variance
-		} else if(length(scale.lambda) == 1){ s.lambda <- rep(scale.lambda, length(conds)) 
-		} else if(length(scale.lambda) == length(conds)) { s.lambda <- scale.lambda 
-		} else { stop("something went wrong, check your scale.lambda input")
-        }
+    if(!is.null(gamma)){
+      message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
+      l2p <- list()
+      if(length(gamma) == 1){ ##Add uncertainty around the scale samples
+        # lambda <- scale.samples
+        # scale.samples <-matrix(ncol = mc.samples)
+        # for(i in 1:length(p)){
+        #   gm_sample <- log(apply(p[[i]],2,gm))
+        #   scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
+        #   l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
+        #   scale.samples = rbind(scale.samples, scale_for_sample)
+        # }
+        # scale.samples <- scale.samples[-1,]
+        conds_mat <- matrix(conds, nrow = length(p))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) as.numeric(as.factor(vec)))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) vec - mean(vec))##Centering
+        col_var <- gamma^2/apply(conds_mat, 2, var)
+        scale_samples <- matrix(NA, length(p), mc.samples)
+        
+        for(i in 1:length(p)){
+          geo_means <- log(apply(p[[i]],2,gm))
+          noise <- sapply(col_var, FUN = function(sd){stats::rnorm(mc.samples, 0, sqrt(sd))})
+          noise_mean <- rowMeans(noise)
 
-		if(is.null(scale.mu)) { s.mu <- rep(0, length(conds))  # no offset
-		} else if(length(scale.mu) == 1){ s.mu <- rep(scale.mu, length(conds)) 
-		} else if(length(scale.mu) == length(conds)) { s.mu <- scale.mu 
-		} else { stop("something went wrong, check your scale.mu input")
+          scale_samples[i,] <- geo_means + noise_mean
+          scale_samples <- log2(exp(scale_samples))
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
+        }
+      } else if(length(gamma) >1 & is.null(dim(gamma))){ ##Vector case/scale sim + senstitivity
+        warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
+        warning("Using only the first item in vector for scale simulation.")
+        gamma <- gamma[1]
+        geo_means = c()
+        conds_mat <- matrix(conds, nrow = length(p))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) as.numeric(as.factor(vec)))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) vec - mean(vec))##Centering
+        col_var <- gamma^2/apply(conds_mat, 2, var)
+        scale_samples <- matrix(NA, length(p), mc.samples)
+        
+        for(i in 1:length(p)){
+          geo_means <- log(apply(p[[i]],2,gm))
+          noise <- sapply(col_var, FUN = function(sd){stats::rnorm(mc.samples, 0, sqrt(sd))})
+          noise_mean <- rowMeans(noise)
+          
+          scale_samples[i,] <- geo_means + noise_mean
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
         }
         
-		l2p <- list()
-
-		scale.samples <- matrix(ncol = mc.samples, nrow=length(p))
-
-		for(i in 1:length(p)){
-		  gm_sample <- log(apply(p[[i]],2,gm))  - s.mu[i] 
-		  scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, s.lambda[i])})
-		  l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
-          #scale.samples = rbind(scale.samples, scale_for_sample) # archive these for output in clr object.
-          scale.samples[i,] <- scale_for_sample
-		}
-      # scale.samples <- scale.samples[-1,]   
-
+      } else{ ##User input of scale samples
+        Q <- nrow(gamma)
+        N <- ncol(gamma)
+        if(Q != ncol(reads) | N != mc.samples){
+          stop("Scale samples are of incorrect size!")
+        }
+        for(i in 1:length(p)){
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(gamma[i,]), "+")
+        }
+        scale_samples <- gamma
+        
+      }
       names(l2p) <- names(p)
     }
-		
     
     # ---------------------------------------------------------------------
     # Take the log2 of the frequency and subtract the geometric mean log2 frequency per sample
     # i.e., do a centered logratio transformation as per Aitchison
     
     # apply the function over elements in a list, that contains an array
-    if(is.null(scale.lambda) & is.null(scale.mu)){
-      scale.samples=NULL
+    if(is.null(gamma)){
+      scale_samples <- NULL
       # DEFAULT
       if (is.list(feature.subset)) {
         # ZERO only
@@ -267,7 +294,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
           }
         }
       }  else {
-        warning("the denominator is not recognized, use a different denominator")
+        message("the denominator is not recognized, use a different denominator")
       }
       
       # sanity check on data
@@ -277,7 +304,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
       if (verbose == TRUE) message("transformation complete")
     }
     
-    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,dirichletData=p,analysisData=l2p, scaleSamps = scale.samples))
+    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,dirichletData=p,analysisData=l2p, scaleSamps = scale_samples))
 }
 
 
@@ -313,10 +340,12 @@ setMethod("getMonteCarloSample", signature(.object="aldex.clr",i="numeric"), fun
 
 setMethod("getDenom", signature(.object="aldex.clr"), function(.object) .object@denom)
 
+setMethod("getConditions", signature(.object="aldex.clr"), function(.object) .object@conds)
+
 setMethod("getScaleSamples", signature(.object="aldex.clr"), function(.object) .object@scaleSamps)
 
-setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, scale.lambda, scale.mu) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, scale.lambda, scale.mu))
+setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma))
 
-setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, scale.lambda, scale.mu) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, scale.lambda, scale.mu))
+setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma))
 
-setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, scale.lambda, scale.mu) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE, scale.lambda, scale.mu))
+setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE, gamma))

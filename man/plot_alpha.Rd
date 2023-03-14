@@ -8,8 +8,8 @@ plot_alpha(
   sen_results,
   test = "t",
   thresh = 0.05,
-  taxa_to_label = 10,
-  glmVar = NULL
+  glmVar = NULL,
+  bayesEst = FALSE
 )
 }
 \arguments{
@@ -19,12 +19,12 @@ plot_alpha(
 
 \item{thresh}{A numeric between 0 and 1. What threshold should be used for significance?}
 
-\item{taxa_to_label}{A positive integer. How many taxa should be labeled in the plot?}
-
 \item{glmVar}{If `test = "glm"`, what variable do you want plotted?}
+
+\item{bayesEst}{A boolean. Do you want to use the Bayesian hypothesis testing method?}
 }
 \value{
-A ggplot2 object
+A plot object
 }
 \description{
 Create alpha diagram for scale simulation sensitivity result

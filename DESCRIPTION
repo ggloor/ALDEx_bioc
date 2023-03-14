@@ -1,10 +1,10 @@
 Package: ALDEx2
 Type: Package
 Title: Analysis Of Differential Abundance Taking Sample Variation Into Account
-Version: 1.27.1.3
-Date: 2022-04-01
+Version: 1.25.2
+Date: 2020-10-01
 Author: Greg Gloor, Andrew Fernandes, Jean Macklaim, Arianne Albert, Matt Links,
-    Thomas Quinn, Jia Rong Wu, Ruth Grace Wong, Brandon Lieng, Michelle Pistner, Justin Silverman
+    Thomas Quinn, Jia Rong Wu, Ruth Grace Wong, Brandon Lieng
 Maintainer: Greg Gloor <ggloor@uwo.ca>
 biocViews: DifferentialExpression, RNASeq, Transcriptomics, GeneExpression, DNASeq,
     ChIPSeq, Bayesian, Sequencing, Software, Microbiome, Metagenomics,
@@ -14,8 +14,7 @@ Description: A differential abundance analysis for the comparison of two or more
     as well as selected and unselected values from in-vitro sequence selections.
     Uses a Dirichlet-multinomial model to infer abundance from counts, optimized for
     three or more experimental replicates. The method infers biological and sampling
-    variation and can estimate the impact of scale uncertainty. These estimates are used
-    to calculate the expected false discovery rate, given the variation, based
+    variation to calculate the expected false discovery rate, given the variation, based
     on a Wilcoxon Rank Sum test and Welch's t-test (via aldex.ttest), a Kruskal-Wallis test
     (via aldex.kw), a generalized linear model (via aldex.glm), or a correlation test
     (via aldex.corr). All tests report p-values and Benjamini-Hochberg
@@ -29,6 +28,8 @@ Depends:
   methods,
   stats,
   zCompositions,
+  lattice,
+  latticeExtra
 Imports:
   Rfast,
   BiocParallel,
@@ -36,7 +37,9 @@ Imports:
   IRanges,
   S4Vectors,
   SummarizedExperiment,
-  multtest
+  multtest,
+  stringr,
+  directlabels
 Suggests:
   testthat,
   BiocStyle,
@@ -44,8 +47,10 @@ Suggests:
   rmarkdown,
   purrr,
   ggpattern,
+  ggplot2,
   cowplot,
-  tidyverse
+  tidyverse,
+  magick
 Remotes:
   coolbutuseless/ggpattern
 

@@ -1,33 +1,46 @@
 #' Sensitivity analysis using scale simulation
 #' 
-#' Performs scale simulation over a range of values for lambda.
+#' Performs scale simulation over a range of values for gamma
 #' Dirichlet samples are reused for computational convenience.
 #' 
 #' @param aldex_clr An `aldex.clr` object
-#' @param lambda A vector of positive numeric components. Used as the standard deviation of the scale simulation model.
+#' @param gamma A vector of positive numeric components. Used as the standard deviation of the scale simulation model.
+#' @param bayesEst A boolean. Do you want to use the Bayesian hypothesis testing method?
 #' @inheritParams aldex
-#' @return A list of results. Each element corresponds to a single result for a given value of lambda
+#' @return A list of results. Each element corresponds to a single result for a given value of gamma
 #' @export
-aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
+aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
                               include.sample.summary=FALSE, verbose=FALSE,
-                              iterate=FALSE, ...){
-  lambda <- sort(lambda)
+                              iterate=FALSE, bayesEst = FALSE, ...){
+  gamma <- sort(gamma)
   sen_results <- list()
-  for(j in 1:length(lambda)){
+  p <- getDirichletInstances(aldex_clr)
+  mc.samples <- ncol(p[[1]])
+  conds <- getConditions(aldex_clr)
+  for(j in 1:length(gamma)){
     p <- getDirichletInstances(aldex_clr)
     l2p <- list()
+    conds_mat <- matrix(conds, nrow = length(p))
+    conds_mat <- apply(conds_mat, 2, FUN = function(vec) as.numeric(as.factor(vec)))
+    conds_mat <- apply(conds_mat, 2, FUN = function(vec) vec - mean(vec))##Centering
+    col_var <- gamma^2/apply(conds_mat, 2, var)
+    scale_samples <- matrix(NA, length(p), mc.samples)
+    
     for(i in 1:length(p)){
-      gm_sample <- log(apply(p[[i]],2,gm))
-      scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda[j])})
-      l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
+      geo_means <- log(apply(p[[i]],2,gm))
+      noise <- sapply(col_var, FUN = function(sd){stats::rnorm(mc.samples, 0, sqrt(sd))})
+      noise_mean <- rowMeans(noise)
+      
+      scale_samples[i,] <- geo_means + noise_mean
+      l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
     }
     names(l2p) <- names(aldex_clr@dirichletData)
-    x <-  new("aldex.clr",reads=x@reads,mc.samples=x@mc.samples,conds=x@conds,
-              denom=getDenom(aldex_clr),verbose=verbose,useMC=FALSE,dirichletData=getDirichletInstances(aldex_clr),analysisData=l2p, scaleSamps = lambda[j])
+    x <-  new("aldex.clr",reads=aldex_clr@reads,mc.samples=aldex_clr@mc.samples,conds=aldex_clr@conds,
+              denom=getDenom(aldex_clr),verbose=verbose,useMC=FALSE,dirichletData=getDirichletInstances(aldex_clr),analysisData=l2p, scaleSamps = gamma[j])
     if(test == "t") {
       
       message("aldex.ttest: doing t-test")
-      x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose)
+      x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose, bayesEst = bayesEst)
       
     }else if(test == "kw"){
       
@@ -37,7 +50,7 @@ aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
     }else if(test == "glm"){
       
       message("aldex.glm: doing glm test based on a model matrix")
-      x.tt <- aldex.glm(x, ...)
+      x.tt <- aldex.glm(x, bayesEst = bayesEst, ...)
       
     }else if(test == "cor" | test == "corr"){
       
@@ -60,7 +73,7 @@ aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
     }
     sen_results[[j]] <- z
   }
-  names(sen_results) = paste0("lambda_", lambda)
+  names(sen_results) = paste0("gamma_", gamma)
   return(sen_results)
 }
 
@@ -69,32 +82,34 @@ aldex.senAnalysis <- function(aldex_clr, lambda, test="t", effect=TRUE,
 #' @param sen_results A list return by aldex.senAnalysis()
 #' @param test A character string. What test was used to calculate the results
 #' @param thresh A numeric between 0 and 1. What threshold should be used for significance?
-#' @param taxa_to_label A positive integer. How many taxa should be labeled in the plot?
 #' @param glmVar If `test = "glm"`, what variable do you want plotted?
-#' @return A ggplot2 object
-#' @importFrom tidyr %>%
-#' @importFrom stringr str_detect
+#' @param bayesEst A boolean. Do you want to use the Bayesian hypothesis testing method?
+#' @return A plot object
 #' @export
-plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL){
+plot_alpha <- function(sen_results, test = "t", thresh = 0.05, glmVar = NULL, bayesEst = FALSE){
   if(thresh < 0 | thresh > 1){
-    stop("Please return a valid value for threshold between zero and 1.")
+    stop("Please return a valid value for threshold")
   }
   
-  lambda <- as.numeric(sub("lambda_", "", names(sen_results)))
+  gamma <- as.numeric(sub("gamma_", "", names(sen_results)))
   B <- matrix(NA, nrow = length(sen_results), ncol = dim(sen_results[[1]])[1])
   pvals <- matrix(NA, nrow = length(sen_results), ncol = dim(sen_results[[1]])[1])
   
   if(test == "t"){
     for(i in 1:length(sen_results)){
       B[i,] <- sen_results[[i]]$effect
-      pvals[i,] <- sen_results[[i]]$we.eBH
+      if(bayesEst){
+        pvals[i,] <- sen_results[[i]]$p.val
+      } else{
+        pvals[i,] <- sen_results[[i]]$we.eBH
+      }
     }
   } else if(test == "glm"){
     if(is.null(glmVar)){
       stop("Please supply what variable you want to plot!")
     }
-    nameEffect = names(sen_results[[1]])[base::grepl(paste0(glmVar, ".Estimate"), names(sen_results[[1]]))]
-    namePval = names(sen_results[[1]])[base::grepl(paste0(glmVar, ".Pr...t...BH"), names(sen_results[[1]]))]
+    nameEffect = names(sen_results[[1]])[stringr::str_detect(names(sen_results[[1]]), paste0(glmVar, ".Estimate"))]
+    namePval = names(sen_results[[1]])[stringr::str_detect(names(sen_results[[1]]), paste0(glmVar, ".Pr...t...BH"))]
     for(i in 1:length(sen_results)){
       B[i,] <- sen_results[[i]][,nameEffect]
       pvals[i,] <- sen_results[[i]][,namePval]
@@ -103,57 +118,37 @@ plot_alpha <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
     stop("Test not supported by plot_alpha!")
   }
   
-  if(taxa_to_label > dim(sen_results[[1]])[1]){
-    message("Cannot label more taxa than exist. Reverting to all taxa in the data set.")
-    taxa_to_label <- dim(sen_results[[1]])
-  }
   
-  P <- as.data.frame(pvals) 
-  P$lambda <- lambda
-  P <- P[,c(ncol(P), 1:(ncol(P)-1))]
-  P <- reshape(P, idvar = "lambda",
-               varying = list(2:ncol(P)),
-               timevar = "Sequence",
-               v.names = "pval", direction = "long")
-  P$Sequence = paste0("V", P$Sequence)
+  P = as.data.frame(pvals)
+  P$gamma = gamma
+  P = P[,c(ncol(P), 1:(ncol(P)-1))]
+  P = reshape(P, direction = "long", idvar = "gamma", varying = list(2:ncol(P)), times = names(P)[2:ncol(P)], v.names = "pval", timevar = "Sequence")
+
+  P.toLabel = P[P$pval < thresh, ]
+  P.toLabel = P.toLabel[order(P.toLabel$gamma, decreasing = TRUE),]
+  P.toLabel = unique(P.toLabel$Sequence)
+  P.toLabel = as.numeric(sub("V","",P.toLabel))
   
-  P.toLabel <- P[(P$pval < 0.1),]
-  P.toLabel <- P.toLabel[order(-P.toLabel$lambda),]
-  seq_to_label <- as.numeric(sub("V", "", unique(P.toLabel$Sequence)))
+
+  B_graph <- as.data.frame(B)
+  B_graph$gamma <- gamma
+  B_graph <- B_graph[,c(ncol(B_graph), 1:(ncol(B_graph)-1))]
+  B_graph <- reshape(B_graph, direction = "long", idvar = "gamma", varying = list(2:ncol(B_graph)), times = names(B_graph)[2:ncol(B_graph)], v.names = "Effect", timevar = "Sequence")
+  B_graph <- merge(B_graph, P, by = c("gamma", "Sequence"))
+  B_graph$Sequence <- sub("V", "", B_graph$Sequence)
   
-  taxa_to_label = as.vector(na.omit(seq_to_label[1:taxa_to_label]))
+  ##Switching the graph around
+  B_graph$Effect = -B_graph$Effect
+  B_graph$Sequence = as.numeric(B_graph$Sequence)
+  B_graph = B_graph[order(B_graph$Sequence, B_graph$gamma),]
+  p <- xyplot(Effect~gamma, data = B_graph, groups = Sequence, col = "grey", type = "l", xlab = "Gamma", ylab = "Effect")
   
-  B.graph <- as.data.frame(B)
-  B.graph$lambda <- lambda
-  B.graph <- B.graph[,c(ncol(B.graph), 1:(ncol(B.graph)-1))]
-  B.graph <- reshape(B.graph, idvar = "lambda",
-               varying = list(2:ncol(B.graph)),
-               timevar = "Sequence",
-               v.names = "Effect", direction = "long")
-  B.graph$Sequence <- paste0("V", B.graph$Sequence)
-  B.graph <- base::merge(B.graph, P, by = c("lambda", "Sequence"))
-  B.graph$Sequence <- sub("V", "", B.graph$Sequence)
-  B.graph$labl = ifelse(B.graph$Sequence %in% taxa_to_label, B.graph$Sequence, NA)
+  B_thresh <- B_graph[B_graph$pval <= thresh,]
+  p2 <- direct.label(xyplot(Effect~gamma, data = B_thresh, groups = Sequence, type = "l", xlab = "Gamma", col= "black", ylab = "Effect"), "last.points")
+  p3 <- xyplot(rep(0, length(unique(B_graph$gamma)))~unique(B_graph$gamma),  col = "red", type = "l", lty = "dashed", xlab = "Gamma", ylab = "Effect")
+  p + as.layer(p2) + as.layer(p3)
   
-  ##Looping graph
-  seq_max = unique(B.graph$Sequence)
-  top = max(B.graph$Effect) + .5
-  bottom = min(B.graph$Effect) - .5
-  plot(1, type="n", xlab="Lambda", ylab="Effect Size", xlim=c(min(lambda), max(lambda)), ylim=c(bottom, top), panel.first = grid())
-  for(i in seq_max){
-    B.tmp = B.graph[B.graph$Sequence == i,]
-    points(B.tmp$lambda, B.tmp$Effect, type = "l", col = "grey")
-    B.tmp = B.tmp[B.tmp$pval <= thresh, ]
-    points(B.tmp$lambda, B.tmp$Effect, type = "l", col = "black")
-    
-    B.tmp = B.tmp[nrow(B.tmp),]
-    if(nrow(B.tmp) > 0){
-      if(!is.na(B.tmp$labl)){
-        text(x = B.tmp$lambda + runif(1,-.05,.05) , y = B.tmp$Effect + runif(1,-.25,.25), label = B.tmp$labl)
-      }
-    }
-  }
-  abline(h = 0, type = "l", col = "red", lty = "dashed")
+
 }
 
 gm <- function(x, na.rm = TRUE){

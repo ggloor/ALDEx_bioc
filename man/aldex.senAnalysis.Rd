@@ -6,19 +6,20 @@
 \usage{
 aldex.senAnalysis(
   aldex_clr,
-  lambda,
+  gamma,
   test = "t",
   effect = TRUE,
   include.sample.summary = FALSE,
   verbose = FALSE,
   iterate = FALSE,
+  bayesEst = FALSE,
   ...
 )
 }
 \arguments{
 \item{aldex_clr}{An `aldex.clr` object}
 
-\item{lambda}{A vector of positive numeric components. Used as the standard deviation of the scale simulation model.}
+\item{gamma}{A vector of positive numeric components. Used as the standard deviation of the scale simulation model.}
 
 \item{test}{A character string. Indicates which tests to perform. "t" runs
 Welch's t and Wilcoxon tests. "kw" runs Kruskal-Wallace and glm tests.
@@ -39,12 +40,14 @@ running. Useful for debugging errors on large datasets. Applies to
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
 
+\item{bayesEst}{A boolean. Do you want to use the Bayesian hypothesis testing method?}
+
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }
 \value{
-A list of results. Each element corresponds to a single result for a given value of lambda
+A list of results. Each element corresponds to a single result for a given value of gamma
 }
 \description{
-Performs scale simulation over a range of values for lambda.
+Performs scale simulation over a range of values for gamma
 Dirichlet samples are reused for computational convenience.
 }

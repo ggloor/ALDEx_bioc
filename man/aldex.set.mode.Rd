@@ -7,7 +7,7 @@
   calculate the features that are to be used as the denominator for
   the Geometric Mean calculation in clr_function.R}
 \usage{
-  aldex.set.mode(reads, conds, denom="all",verbose=FALSE)
+  aldex.set.mode(reads, conds, denom="all")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -29,9 +29,6 @@
     users who can pre-determine the invariant set of features within
     their data. Check that the same number of features are in the
     input and output datasets.
-}
-    \item{verbose}{
-    Logical argument controlling messages, default=FALSE 
 }
 }
 \details{

@@ -106,7 +106,7 @@ gm <- function(x, na.rm = TRUE){
 ##Last 21 values: post-conditions
 ##Note only taxa 3, 4, 15, and 21 change
 d <- c(4000, 4000, 4000, 4000, 4000, 400,400,400,400,4000,400,500,500,500,400,400,400,400,400,100,400, # Pre
-       4000, 4000, 3000, 256, 4000, 400,400,400,400,4000,400,500,500,500,200,400,400,400,400,100,100) # Post
+       4000, 4000, 3000, 2000, 4000, 400,400,400,400,4000,400,500,500,500,200,400,400,400,400,100,100) # Post
 
 ##Create scale abundances
 dat <- create_true_abundances(d, n=50)
@@ -124,9 +124,9 @@ We begin by running `aldex` without scale simulation as a baseline. We use the C
 
 countdata <- t(rdat[,-1,drop=F])
 colnames(countdata) <- paste0("n", 1:ncol(countdata))
-aldex.fit <- aldex(countdata, as.character(rdat$Condition), denom="all")
+aldex.fit <- aldex(countdata, as.character(rdat$Condition), denom="all", bayesEst = TRUE)
  
-sig.aldex = aldex.fit %>% filter(wi.eBH <= 0.05)
+sig.aldex = aldex.fit %>% filter(p.val <= 0.05)
 head(sig.aldex)
 dim(sig.aldex)
 ```
@@ -144,14 +144,10 @@ First, we run ALDEx2 with scale simulation using a relaxed model. Specifically, 
 For this simulation, we set $\mu_j = 0$, $c=1$, and $\alpha = 0.5$. First, we simulate the samples from the scale model. This must be a matrix with the number of rows equaling the number of samples in the experiment and the number of columns equaling the number of Monte Carlo samples in `ALDEx2`. We then pass this matrix to the `aldex` function. Three out of 21 taxa were found to be significant.
 
 ```{r ALDEX2ScaleSim}
-##Simulate samples from a scale model
-scale.lambda=0.5
-scale.mu = 1
-
-##Pass to ALDEx2
-aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), scale.lambda=0.5, scale.mu =1, mc.samples = 256)
+##Run ALDEx2 with Scale Sim
+aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 0.5, mc.samples = 2000, bayesEst = TRUE)
  
-sig.aldexScaleSim = aldexScaleSim.fit %>% filter(wi.eBH <= 0.05)
+sig.aldexScaleSim = aldexScaleSim.fit %>% filter(p.val <= 0.05)
 sig.aldexScaleSim
 ```
 
@@ -164,15 +160,15 @@ To recapture the behavior of ALDEx2 using scale simulation, we also drew samples
 We pass these scale samples to `aldex` as before. As expected, the CLR model returns all 21 taxa as significant whereas the CoDA model returns none as significant.
 
 ```{r ALDEX2ScaleSimOtherMods}
-aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 1e-3, mc.samples = 256)
+aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), gamma = 1e-3, mc.samples = 2000, bayesEst = TRUE)
  
-sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(wi.eBH <= 0.05)
+sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(p.val <= 0.05)
 head(sig.aldexScaleSimCLR)
 dim(sig.aldexScaleSimCLR)
 
-aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), scale.lambda = 10, mc.samples = 256)
+aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), gamma = 10, mc.samples = 2000, bayesEst = TRUE)
  
-sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(wi.eBH <= 0.05)
+sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(p.val <= 0.05)
 head(sig.aldexScaleSimCoDA)
 ```
 
@@ -182,7 +178,7 @@ head(sig.aldexScaleSimCoDA)
 We also added functionality to return the scale samples from an `aldex.clr` object similar to other functions in ALDEx2. Scale samples can be returned using the function `getScaleSamples()`.
 
 ```{r getScaleSamps}
-x <- aldex.clr(countdata, as.character(rdat$Condition), scale.lambda = 10, mc.samples = 256)
+x <- aldex.clr(countdata, as.character(rdat$Condition), gamma = 10, mc.samples = 2000)
 
 getScaleSamples(x)[1:5,1:5]
 ```
@@ -196,11 +192,11 @@ We also added sensitivity analysis functionality (should be considered in develo
 * If desired, use `plot_alpha` to plot.
 
 ```{r senAnalysis}
-x <- aldex.clr(countdata, as.character(rdat$Condition), scale.lambda = 1e-3, mc.samples = 256)
+x <- aldex.clr(countdata, as.character(rdat$Condition), gamma = 1e-3, mc.samples = 2000)
 
-senAnalysis = aldex.senAnalysis(x, lambda = c(1e-3, .1, .25, .5, 1, 2, 3))
+senAnalysis = aldex.senAnalysis(x, gamma = c(1e-3, .1, .25, .5, 1, 2, 3), bayesEst  = FALSE)
 
-plot_alpha(senAnalysis, taxa_to_label = 4)
+plot_alpha(senAnalysis, bayesEst = FALSE)
 ```
 
 
@@ -248,8 +244,8 @@ summary_aldex2 <- function(fit, pval = 0.05){
   fit %>% 
     as.data.frame() %>% 
     rownames_to_column("category") %>% 
-    dplyr::select(category, effect, wi.eBH) %>% 
-    mutate(padj=wi.eBH) %>% 
+    select(category, effect, p.val) %>% 
+    mutate(padj=p.val) %>% 
     mutate(mean=effect) %>% 
     mutate(low=NA, high=NA) %>%
     mutate(sig = ifelse(padj <= pval, TRUE, FALSE))
@@ -259,7 +255,7 @@ summary_aldex2 <- function(fit, pval = 0.05){
 plot_sig2 <- function(rrs, truth, ...){
   names(rrs) <- model.names[names(rrs)]
   bind_rows(rrs, .id="Model") %>% 
-    dplyr::select(Model, category, sig) %>% 
+    select(Model, category, sig) %>% 
     mutate(Taxa = category) %>% 
     mutate(Taxa=as.numeric(sub("Taxa", "", Taxa))) %>%  
     mutate(sigcode = sig_code(sig, Taxa, truth)) %>% 
@@ -309,7 +305,7 @@ conds <- c(rep('N', 7), rep('S', 7))
 x <- aldex.clr(selex, conds)
 x.e <- aldex.effect(x)
 
-x.s <- aldex.clr(selex, conds, scale.lambda=1e-3)
+x.s <- aldex.clr(selex, conds, gamma=1e-3)
 x.s.e <- aldex.effect(x.s)
 sig <- which(abs(x.e$effect) > 2)
 sig.s <- which(abs(x.s.e$effect) > 2)
@@ -328,7 +324,7 @@ Next, relaxing the geometric mean assumption:
 
 ```{r selex2}
 
-x.s <- aldex.clr(selex, conds, scale.lambda=1)
+x.s <- aldex.clr(selex, conds, gamma=0.5)
 x.s.e <- aldex.effect(x.s)
 sig <- which(abs(x.e$effect) > 2)
 sig.s <- which(abs(x.s.e$effect) > 2)

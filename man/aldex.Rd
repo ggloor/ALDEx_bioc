@@ -14,8 +14,8 @@ aldex(
   verbose = FALSE,
   denom = "all",
   iterate = FALSE,
-  scale.lambda = NULL,
-  scale.mu = NULL,
+  gamma = NULL,
+  bayesEst = TRUE,
   ...
 )
 }
@@ -60,11 +60,9 @@ using the set of per-group non-zero features.}
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
 
-\item{scale.lambda}{A number or vector that contains scale uncertainty to test.
-If \code{NULL} (default), ALDEx2 is run without scale variance simulation.}
+\item{gamma}{A numeric. The standard deviation on the within sample variation.}
 
-\item{scale.mu}{A number or vector that contains scale offset to test.
-If \code{NULL} (default), ALDEx2 is run without scale offset.}
+\item{bayesEst}{A boolean. Do we use the Bayes estimate for testing?}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }

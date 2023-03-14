@@ -44,10 +44,8 @@
 #' @param verbose A boolean. Toggles whether to print diagnostic information while
 #'  running. Useful for debugging errors on large datasets. Applies to
 #'  \code{effect = TRUE}.
-#' @param scale.lambda A number or vector that contains scale uncertainty to test.
-#'  If \code{NULL} (default), ALDEx2 is run without scale variance simulation.
-#' @param scale.mu A number or vector that contains scale offset to test.
-#'  If \code{NULL} (default), ALDEx2 is run without scale offset.
+#' @param gamma A numeric. The standard deviation on the within sample variation.
+#' @param bayesEst A boolean. Do we use the Bayes estimate for testing?
 #' @param ... Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).
 #'
 #' @return Returns a number of values that depends on the set of options.
@@ -92,21 +90,19 @@
 #'            test="t", effect=FALSE)
 aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
                   include.sample.summary=FALSE, verbose=FALSE,
-                  denom="all", iterate=FALSE, scale.lambda = NULL, 
-                  scale.mu = NULL, ...){
+                  denom="all", iterate=FALSE, gamma = NULL, bayesEst = TRUE, ...){
 
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
 
   # wrapper function for the entire set of
   message("aldex.clr: generating Monte-Carlo instances and clr values")
   x <- aldex.clr(reads=reads, conds=conditions, mc.samples=mc.samples,
-                 denom=denom, verbose=verbose, useMC=FALSE, 
-                 scale.lambda = scale.lambda, scale.mu = scale.mu)
+                 denom=denom, verbose=verbose, useMC=FALSE, gamma = gamma)
 
   if(test == "t") {
 
     message("aldex.ttest: doing t-test")
-    x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose)
+    x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose, bayesEst = bayesEst)
 
   }else if(test == "kw"){
 

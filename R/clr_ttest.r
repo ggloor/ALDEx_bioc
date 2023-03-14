@@ -41,7 +41,7 @@
 #' conds <- c(rep("NS", 7), rep("S", 7))
 #' x <- aldex.clr(selex, conds, mc.samples=2, denom="all")
 #' ttest.test <- aldex.ttest(x)
-aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) {
+aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE, bayesEst = TRUE) {
   
   # Use clr conditions slot instead of input
   conditions <- clr@conds
@@ -71,46 +71,88 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
   setA <- which(conditions == sets[1])
   setB <- which(conditions == sets[2])
   
-  # set up the t-test result containers
-  wi.p.matrix <- as.data.frame(matrix(1, nrow = feature.number, ncol = mc.instances))
-  wi.BH.matrix <- wi.p.matrix # duplicate result container
-  we.p.matrix <- wi.p.matrix # duplicate result container
-  we.BH.matrix <- wi.p.matrix # duplicate result container
-  
-  # mc.i is the i-th Monte-Carlo instance
-  if(verbose) message("running tests for each MC instance:")
-  mc.all <- getMonteCarloInstances(clr)
-  for(mc.i in 1:mc.instances){
+  if(bayesEst == FALSE){
+    # set up the t-test result containers
+    wi.p.matrix <- as.data.frame(matrix(1, nrow = feature.number, ncol = mc.instances))
+    wi.BH.matrix <- wi.p.matrix # duplicate result container
+    we.p.matrix <- wi.p.matrix # duplicate result container
+    we.BH.matrix <- wi.p.matrix # duplicate result container
     
-    if(verbose) numTicks <- progress(mc.i, mc.instances, numTicks)
+    # mc.i is the i-th Monte-Carlo instance
+    if(verbose) message("running tests for each MC instance:")
+    mc.all <- getMonteCarloInstances(clr)
+    for(mc.i in 1:mc.instances){
+      
+      if(verbose) numTicks <- progress(mc.i, mc.instances, numTicks)
+      
+      # generate a matrix of i-th Monte-Carlo instance, columns are samples, rows are features
+      t.input <- sapply(mc.all, function(y){y[, mc.i]})
+      
+      wi.p.matrix[, mc.i] <- wilcox.fast(t.input, setAsBinary, paired.test)
+      wi.BH.matrix[, mc.i] <- p.adjust(wi.p.matrix[, mc.i], method = "BH")
+      
+      we.p.matrix[, mc.i] <- t.fast(t.input, setAsBinary, paired.test, bayesEst)
+      we.BH.matrix[, mc.i] <- p.adjust(we.p.matrix[, mc.i], method = "BH")
+    }
     
-    # generate a matrix of i-th Monte-Carlo instance, columns are samples, rows are features
-    t.input <- sapply(mc.all, function(y){y[, mc.i]})
+    if(hist.plot == TRUE){
+      
+      par(mfrow=c(2,2))
+      hist(we.p.matrix[,1], breaks=99, main="Welch's P values Instance 1")
+      hist(wi.p.matrix[,1], breaks=99, main="Wilcoxon P values Instance 1")
+      hist(we.BH.matrix[,1], breaks=99, main="Welch's BH values Instance 1")
+      hist(wi.BH.matrix[,1], breaks=99, main="Wilcoxon BH values Instance 1")
+      par(mfrow=c(1,1))
+    }
     
-    wi.p.matrix[, mc.i] <- wilcox.fast(t.input, setAsBinary, paired.test)
-    wi.BH.matrix[, mc.i] <- p.adjust(wi.p.matrix[, mc.i], method = "BH")
+    # get the Expected values of p, q and lfdr
+    we.ep <- rowMeans(we.p.matrix) # rowMeans is faster than apply()!!
+    we.eBH <- rowMeans(we.BH.matrix)
+    wi.ep <- rowMeans(wi.p.matrix)
+    wi.eBH <- rowMeans(wi.BH.matrix)
     
-    we.p.matrix[, mc.i] <- t.fast(t.input, setAsBinary, paired.test)
-    we.BH.matrix[, mc.i] <- p.adjust(we.p.matrix[, mc.i], method = "BH")
+    z <- data.frame(we.ep, we.eBH, wi.ep, wi.eBH)
+    rownames(z) <- getFeatureNames(clr)
+    return(z)
+  } else{
+    t.obs.matrix <- as.data.frame(matrix(1, nrow = feature.number, ncol = mc.instances))
+    sp.matrix <- t.obs.matrix # duplicate result container
+    lfc.obs.matrix <- t.obs.matrix # duplicate result container
+    lfc.null.matrix <- t.obs.matrix # duplicate result container
+    
+    # mc.i is the i-th Monte-Carlo instance
+    if(verbose) message("running tests for each MC instance:")
+    mc.all <- getMonteCarloInstances(clr)
+    for(mc.i in 1:mc.instances){
+      
+      if(verbose) numTicks <- progress(mc.i, mc.instances, numTicks)
+      
+      n1 <- length(setA)
+      n2 <- length(setB)
+      
+      # generate a matrix of i-th Monte-Carlo instance, columns are samples, rows are features
+      t.input <- sapply(mc.all, function(y){y[, mc.i]})
+      t.hold <- t.fast(t.input, setAsBinary, paired.test, bayesEst)
+      t.obs.matrix[, mc.i] <- t.hold$t
+      if(paired.test){
+        sp.matrix[, mc.i] <- sqrt(t.hold$sp^2/n1)
+      } else{
+        sp.matrix[, mc.i] <- sqrt((t.hold$s1^2/n1) + (t.hold$s2^2/n2))
+      }
+      lfc.obs.matrix[ ,mc.i] <- t.obs.matrix[, mc.i] * sp.matrix[, mc.i]
+      lfc.null.matrix[, mc.i] <- rt(feature.number, n1+n2-2) * sp.matrix[, mc.i]
+    }
+    
+    ##Calculating |lfc.obs| - |lfc.null|
+    lfc.between <- abs(lfc.obs.matrix) - abs(lfc.null.matrix)
+    #lfc.between <- lfc.obs.matrix - lfc.null.matrix
+    lfc.est <- rowMeans(as.matrix(lfc.between))
+    lfc.obs <- rowMeans(as.matrix(lfc.obs.matrix))
+    p.val <- apply(as.matrix(lfc.between), 1, FUN = function(vec){ecdf(vec)(0)})
+    
+    #p.val <- min(p.val, 1 - p.val)
+    z <- data.frame(lfc.est, lfc.obs, p.val)
+    rownames(z) <- getFeatureNames(clr)
+    return(z)
   }
-  
-  if(hist.plot == TRUE){
-    
-    par(mfrow=c(2,2))
-    hist(we.p.matrix[,1], breaks=99, main="Welch's P values Instance 1")
-    hist(wi.p.matrix[,1], breaks=99, main="Wilcoxon P values Instance 1")
-    hist(we.BH.matrix[,1], breaks=99, main="Welch's BH values Instance 1")
-    hist(wi.BH.matrix[,1], breaks=99, main="Wilcoxon BH values Instance 1")
-    par(mfrow=c(1,1))
-  }
-  
-  # get the Expected values of p, q and lfdr
-  we.ep <- rowMeans(we.p.matrix) # rowMeans is faster than apply()!!
-  we.eBH <- rowMeans(we.BH.matrix)
-  wi.ep <- rowMeans(wi.p.matrix)
-  wi.eBH <- rowMeans(wi.BH.matrix)
-  
-  z <- data.frame(we.ep, we.eBH, wi.ep, wi.eBH)
-  rownames(z) <- getFeatureNames(clr)
-  return(z)
 }
