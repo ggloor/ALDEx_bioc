@@ -72,7 +72,7 @@ test_that("new faster alex.ttest matches old function", {
   
   expect_equal(
     aldex.ttest.old(clr, group),
-    aldex.ttest(clr)
+    aldex.ttest(clr, bayesEst = FALSE)
   )
 })
 
@@ -90,6 +90,6 @@ test_that("new faster alex.ttest matches old function", {
   
   expect_equal(
     aldex.ttest.old(clr, group),
-    aldex.ttest(clr)
+    aldex.ttest(clr, bayesEst = FALSE)
   )
 })

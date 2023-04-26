@@ -14,49 +14,39 @@
   is a positive integer.
   There are N samples, D features, and M Monte-Carlo instances.
   \describe{
-    \item{}{
-      \code{getMonteCarloInstances(x)}:
+    \item{\code{getMonteCarloInstances(x)}}{
       Returns the clr transformed Monte Carlo Dirichlet instances as a list where
       each list entry is a single sample containing a D x M matrix.
     }
-    \item{}{
-      \code{getSampleIDs(x)}:
+    \item{\code{getSampleIDs(x)}}{
       Returns the names of the samples. These can be used to access the
       original reads for a given sample, as in \code{x@reads\$sampleID}
       (if the reads are a data frame).
     }
-    \item{}{
-      \code{getFeatureNames(x)}:
+    \item{\code{getFeatureNames(x)}}{
       Returns the names of the \code{keys}. These can be used to subset the
       data rows.
     }
-    \item{}{
-      \code{getFeatures(x)}:
+    \item{\code{getFeatures(x)}}{
       Returns the clr transformed values for the features in the first sample.
     }
-    \item{}{
-      \code{numFeatures(x)}:
+    \item{\code{numFeatures(x)}}{
       Returns the number of features that were non-0 in at least one sample.
     }
-    \item{}{
-      \code{numMCInstances(x)}:
+    \item{\code{numMCInstances(x)}}{
       Returns the number of Monte-Carlo instances.
     }
-    \item{}{
-      \code{getReads(x)}:
+    \item{\code{getReads(x)}}{
       Returns the input data as used by the method.
     }
-    \item{}{
-      \code{numConditions(x)}:
+    \item{\code{numConditions(x)}}{
       Returns the number of samples in the \code{conditions} analysis.
     }
-    \item{}{
-      \code{getMonteCarloReplicate(x, i)}:
+    \item{\code{getMonteCarloReplicate(x, i)}}{
       Returns the D x M matrix containing the Monte-Carlo instances
       for one sample.
     }
-    \item{}{
-      \code{getMonteCarloSample(x, i)}:
+    \item{\code{getMonteCarloSample(x, i)}}{
       Returns the N x D matrix containing  Monte-Carlo instance \code{i}
       for for all samples.
     }

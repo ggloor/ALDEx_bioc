@@ -29,6 +29,8 @@ Depends:
   methods,
   stats,
   zCompositions,
+  lattice,
+  latticeExtra
 Imports:
   Rfast,
   BiocParallel,
@@ -36,9 +38,19 @@ Imports:
   IRanges,
   S4Vectors,
   SummarizedExperiment,
-  multtest
+  multtest,
+  stringr,
+  directlabels
 Suggests:
   testthat,
   BiocStyle,
   knitr,
-  rmarkdown
+  rmarkdown,
+  purrr,
+  ggpattern,
+  ggplot2,
+  cowplot,
+  tidyverse,
+  magick
+Remotes:
+  coolbutuseless/ggpattern

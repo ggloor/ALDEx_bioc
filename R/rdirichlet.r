@@ -35,3 +35,4 @@ rdirichlet<-function(n,a)
     x<-matrix(rgamma(l*n,a),ncol=l,byrow=TRUE);
     return(x/rowSums(x) );
 }
+

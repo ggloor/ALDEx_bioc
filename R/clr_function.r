@@ -4,7 +4,7 @@
 #  this function generates the centre log-ratio transform of Monte-Carlo instances
 #  drawn from the Dirichlet distribution.
 
-aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL ) {
+aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, gamma = NULL) {
 
 # INPUT
 # The 'reads' data.frame MUST have row
@@ -128,9 +128,12 @@ aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", verbo
 
     # This extracts the set of features to be used in the geometric mean computation
     # returns a list of features
-    feature.subset <- aldex.set.mode(reads, conds, denom)
-
-    if ( length(feature.subset[[1]]) == 0 ) stop("No low variance, high abundance features in common between conditions\nPlease choose another denomiator.")
+    if(is.null(gamma)){
+      feature.subset <- aldex.set.mode(reads, conds, denom)
+      if ( length(feature.subset[[1]]) == 0 ) stop("No low variance, high abundance features in common between conditions\nPlease choose another denomiator.")
+    } else{
+      feature.subset <- vector()
+    }
 
     reads <- reads + prior
 
@@ -172,70 +175,139 @@ if (verbose == TRUE) message("data format is OK")
 if (verbose == TRUE) message("dirichlet samples complete")
 
     # ---------------------------------------------------------------------
+    # Add scale samples (if desired)
+    # Checking the size of the scale samples
+    
+    if(!is.null(gamma)){
+      message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
+      l2p <- list()
+      if(length(gamma) == 1){ ##Add uncertainty around the scale samples
+        # lambda <- scale.samples
+        # scale.samples <-matrix(ncol = mc.samples)
+        # for(i in 1:length(p)){
+        #   gm_sample <- log(apply(p[[i]],2,gm))
+        #   scale_for_sample <- sapply(gm_sample, FUN = function(mu){stats::rlnorm(1, mu, lambda)})
+        #   l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_for_sample), "-")
+        #   scale.samples = rbind(scale.samples, scale_for_sample)
+        # }
+        # scale.samples <- scale.samples[-1,]
+        conds_mat <- matrix(conds, nrow = length(p))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) as.numeric(as.factor(vec)))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) vec - mean(vec))##Centering
+        col_var <- gamma^2/apply(conds_mat, 2, var)
+        scale_samples <- matrix(NA, length(p), mc.samples)
+        
+        for(i in 1:length(p)){
+          geo_means <- log(apply(p[[i]],2,gm))
+          noise <- sapply(col_var, FUN = function(sd){stats::rnorm(mc.samples, 0, sqrt(sd))})
+          noise_mean <- rowMeans(noise)
+
+          scale_samples[i,] <- geo_means + noise_mean
+          scale_samples <- log2(exp(scale_samples))
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
+        }
+      } else if(length(gamma) >1 & is.null(dim(gamma))){ ##Vector case/scale sim + senstitivity
+        warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
+        warning("Using only the first item in vector for scale simulation.")
+        gamma <- gamma[1]
+        geo_means = c()
+        conds_mat <- matrix(conds, nrow = length(p))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) as.numeric(as.factor(vec)))
+        conds_mat <- apply(conds_mat, 2, FUN = function(vec) vec - mean(vec))##Centering
+        col_var <- gamma^2/apply(conds_mat, 2, var)
+        scale_samples <- matrix(NA, length(p), mc.samples)
+        
+        for(i in 1:length(p)){
+          geo_means <- log(apply(p[[i]],2,gm))
+          noise <- sapply(col_var, FUN = function(sd){stats::rnorm(mc.samples, 0, sqrt(sd))})
+          noise_mean <- rowMeans(noise)
+          
+          scale_samples[i,] <- geo_means + noise_mean
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
+        }
+        
+      } else{ ##User input of scale samples
+        Q <- nrow(gamma)
+        N <- ncol(gamma)
+        if(Q != ncol(reads) | N != mc.samples){
+          stop("Scale samples are of incorrect size!")
+        }
+        for(i in 1:length(p)){
+          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(gamma[i,]), "+")
+        }
+        scale_samples <- gamma
+        
+      }
+      names(l2p) <- names(p)
+    }
+    
+    # ---------------------------------------------------------------------
     # Take the log2 of the frequency and subtract the geometric mean log2 frequency per sample
     # i.e., do a centered logratio transformation as per Aitchison
-
+    
     # apply the function over elements in a list, that contains an array
-
-    # DEFAULT
-    if (is.list(feature.subset)) {
+    if(is.null(gamma)){
+      scale_samples <- NULL
+      # DEFAULT
+      if (is.list(feature.subset)) {
         # ZERO only
         feat.result <- vector("list", length(unique(conds))) # Feature Gmeans
         condition.list <- vector("list", length(unique(conds)))    # list to store conditions
-
+        
         for (i in 1:length(unique(conds)))
         {
-            condition.list[[i]] <- which(conds == unique(conds)[i]) # Condition list
-            feat.result[[i]] <- lapply( p[condition.list[[i]]], function(m) {
-                apply(log2(m), 2, function(x){mean(x[feature.subset[[i]]])})
-            })
+          condition.list[[i]] <- which(conds == unique(conds)[i]) # Condition list
+          feat.result[[i]] <- lapply( p[condition.list[[i]]], function(m) {
+            apply(log2(m), 2, function(x){mean(x[feature.subset[[i]]])})
+          })
         }
         set.rev <- unlist(feat.result, recursive=FALSE) # Unlist once to aggregate samples
         p.copy <- p
         for (i in 1:length(set.rev))
         {
-            p.copy[[i]] <- as.data.frame(p.copy[[i]])
-            p[[i]] <- apply(log2(p.copy[[i]]),1, function(x){ x - (set.rev[[i]])})
-            p[[i]] <- t(p[[i]])
+          p.copy[[i]] <- as.data.frame(p.copy[[i]])
+          p[[i]] <- apply(log2(p.copy[[i]]),1, function(x){ x - (set.rev[[i]])})
+          p[[i]] <- t(p[[i]])
         }
         l2p <- p    # Save the set in order to generate the aldex.clr variable
-    } else if (is.vector(feature.subset)){
+      } else if (is.vector(feature.subset)){
         # Default ALDEx2, iqlr, user defined, lvha
         # denom[1] is put in explicitly for the user-defined denominator case
         if (has.BiocParallel){
-            if (denom[1] != "median"){
+          if (denom[1] != "median"){
             l2p <- bplapply( p, function(m) {
-                apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
+              apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
             })
-            } else if (denom[1] == "median"){
+          } else if (denom[1] == "median"){
             l2p <- bplapply( p, function(m) {
-                apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
+              apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
             })
-            }
-            names(l2p) <- names(p)
+          }
+          names(l2p) <- names(p)
         }
         else{
-            if (denom[1] != "median"){
+          if (denom[1] != "median"){
             l2p <- lapply( p, function(m) {
-                apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
+              apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
             })
-            } else if (denom[1] == "median"){
-             l2p <- lapply( p, function(m) {
-                apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
+          } else if (denom[1] == "median"){
+            l2p <- lapply( p, function(m) {
+              apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
             })
-            }
+          }
         }
-    }  else {
+      }  else {
         message("the denominator is not recognized, use a different denominator")
-    }
-
-    # sanity check on data
-    for ( i in 1:length(l2p) ) {
+      }
+      
+      # sanity check on data
+      for ( i in 1:length(l2p) ) {
         if ( any( ! is.finite( l2p[[i]] ) ) ) stop("non-finite log-frequencies were unexpectedly computed")
+      }
+      if (verbose == TRUE) message("transformation complete")
     }
-if (verbose == TRUE) message("transformation complete")
-
-    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,dirichletData=p,analysisData=l2p))
+    
+    return(new("aldex.clr",reads=reads,mc.samples=mc.samples,conds=conds,denom=feature.subset,verbose=verbose,useMC=useMC,dirichletData=p,analysisData=l2p, scaleSamps = scale_samples))
 }
 
 
@@ -271,8 +343,12 @@ setMethod("getMonteCarloSample", signature(.object="aldex.clr",i="numeric"), fun
 
 setMethod("getDenom", signature(.object="aldex.clr"), function(.object) .object@denom)
 
-setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE))
+setMethod("getConditions", signature(.object="aldex.clr"), function(.object) .object@conds)
 
-setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE))
+setMethod("getScaleSamples", signature(.object="aldex.clr"), function(.object) .object@scaleSamps)
 
-setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE))
+setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma))
+
+setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma))
+
+setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE, gamma))

@@ -12,9 +12,11 @@ aldex(
   effect = TRUE,
   include.sample.summary = FALSE,
   verbose = FALSE,
-  denom = "all",
   paired.test = FALSE,
+  denom = "all",
   iterate = FALSE,
+  gamma = NULL,
+  bayesEst = TRUE,
   ...
 )
 }
@@ -47,6 +49,9 @@ values for each sample. Applies to \code{effect = TRUE}.}
 running. Useful for debugging errors on large datasets. Applies to
 \code{effect = TRUE}.}
 
+\item{paired.test}{A boolean. Toggles whether to do paired-sample tests.
+Applies to \code{effect = TRUE} and \code{test = "t"}.}
+
 \item{denom}{A character string. Indicates which features to retain as the
 denominator for the Geometric Mean calculation. Using "iqlr" accounts for data
 with systematic variation and centers the features on the set features that have
@@ -55,12 +60,13 @@ is a more extreme case where there are many non-zero features in one condition b
 many zeros in another. In this case the geometric mean of each group is calculated
 using the set of per-group non-zero features.}
 
-\item{paired.test}{A boolean. Toggles whether to do paired-sample tests.
-Applies to \code{effect = TRUE} and \code{test = "t"}.}
-
 \item{iterate}{A boolean. Toggles whether to iteratively perform a test. For example,
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
+
+\item{gamma}{A numeric. The standard deviation on the within sample variation.}
+
+\item{bayesEst}{A boolean. Do we use the Bayes estimate for testing?}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }
