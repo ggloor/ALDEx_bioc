@@ -1,3 +1,52 @@
+#' Plot an \code{aldex} Object
+#'
+#' @title Plot an \code{aldex} Object
+#'
+#' @description Create \code{MW}- or \code{MA}-type plots from the given \code{aldex} object.
+#'
+#' @param x an object of class \code{aldex} produced by the \code{aldex} function
+#' @param ... optional, unused arguments included for compatibility with the S3 method signature
+#' @param type which type of plot is to be produced. \code{MA} is a Bland-Altman style plot; \code{MW} is a
+#' difference between to a variance within plot as described in:
+#' http://dx.doi.org/10.1080/10618600.2015.1131161; \code{volcano} is a volcano plot
+#' of either the difference or variance type: http://dx.doi.org/10.1186/gb-2003-4-4-210
+#' @param test the method of calculating significance, one of:
+#' \code{ppp} = posterior predictive p value;
+#' \code{welch} = welch's t test;
+#' \code{wilcox} = wilcox rank test;
+#' \code{glm} = glm;
+#' \code{kruskal} = Kruskal-Wallace test;
+#' \code{effect} = effect size
+#' @param cutoff.pval the Benjamini-Hochberg fdr cutoff, default 0.1
+#' @param cutoff.effect the effect size cutoff for plotting, default 1
+#' @param xlab the x-label for the plot, as per the parent \code{plot} function
+#' @param ylab the y-label for the plot, as per the parent \code{plot} function
+#' @param xlim the x-limits for the plot, as per the parent \code{plot} function
+#' @param ylim the y-limits for the plot, as per the parent \code{plot} function
+#' @param all.col the default colour of the plotted points
+#' @param all.pch the default plotting symbol
+#' @param all.cex the default symbol size
+#' @param called.col the colour of points with false discovery rate, q <= 0.1
+#' @param called.pch the symbol of points with false discovery rate, q <= 0.1
+#' @param called.cex the character expansion of points with false discovery rate, q <= 0.1
+#' @param thres.line.col the colour of the threshold line where within and between group variation is equivalent
+#' @param thres.lwd the width of the threshold line where within and between group variation is equivalent
+#' @param rare relative abundance cutoff for rare features, default 0 or the mean abundance
+#' @param rare.col color for rare features, default black
+#' @param rare.pch the default symbol of rare features
+#' @param rare.cex the default symbol size of rare points
+#'
+#' @details This particular specialization of the \code{plot} function is relatively simple and provided for convenience.
+#' For more advanced control of the plot is is best to use the values returned by \code{summary(x)}.
+#'
+#' @return None.
+#'
+#' @references Please use the citation given by \code{citation(package="ALDEx")}.
+#'
+#' @seealso \code{\link{aldex}}, \code{\link{aldex.effect}}, \code{\link{aldex.ttest}}, \code{\link{aldex.glm}}
+#'
+#' @examples # See the examples for 'aldex'
+#' @export
 aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xlab = NULL, ylab = NULL,
     xlim = NULL, ylim = NULL, all.col = rgb(0, 0, 0, 0.2), all.pch = 19,
     all.cex = 0.4, called.col = "red", called.pch = 20, called.cex = 0.6,
@@ -8,11 +57,28 @@ aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xl
     type <- match.arg(type)
     if (length(x$effect) == 0)
         stop("Please run aldex.effect before plotting")
-    if (test == "welch") {
-        if (length(x$we.eBH) == 0)
-            stop("Welch's t test results not in dataset")
-        called <- x$we.eBH <= cutoff.pval
-        all.p <- x$we.eBH
+    if (test == "welch" | test == 'ppp') {
+        if (length(x$we.eBH) == 0 & length(x$p.val) == 0)
+            stop("t test results not in dataset")
+        if ( length(x$we.eBH) > 0 ){ 
+        	warning('using we.eBH') 
+        	called <- x$we.eBH <= cutoff.pval
+       		all.p <- x$we.eBH
+        } else if ( length(x$p.val) > 0 ){ 
+            warning("using ppp value")
+        	if(cutoff.pval > 1e-2) {
+        	  warning("posterior p value cutoff changed to 1e-2")
+        	  # note the called group is set here
+        	  # before the 0 values are modified below
+        	  called <- x$p.val <= 1e-2
+        	  } else { called <- x$p.val <= cutoff.pval
+        	  }
+        	all.p <- x$p.val
+        	# modifying 0 values for the ppp
+        	adj.val <- min(all.p[all.p>0])/2
+  			if(adj.val > 1e-3){adj.val = 1e-3}
+  			all.p[all.p == 0] <- adj.val
+        }
     }
     else if (test == "wilcox") {
         if (length(x$wi.eBH) == 0)
@@ -95,7 +161,7 @@ aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xl
 
     }
   if (type == "volcano.var") {
-        if (is.null(ylab))
+       if (is.null(ylab))
             ylab <- expression("-1 * Median Log"[10]~" q value")
         if (is.null(xlab))
             xlab <- expression("Median Log"[2]~" Dispersion")

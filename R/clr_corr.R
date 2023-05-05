@@ -31,7 +31,7 @@
 #' @examples
 #' data(selex)
 #' #subset for efficiency
-#' selex <- selex[1:100,]
+#' selex <- selex[1:50,]
 #' conds <- c(rep("N", 7), rep("S",7))
 #' cont.var <-  c(rep(1,7), rep(2,7))
 #' x <- aldex.clr(selex, conds)

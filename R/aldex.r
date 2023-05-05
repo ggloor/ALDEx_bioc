@@ -7,7 +7,8 @@
 #'  and statistical testing in a single line of code. Specifically, this function:
 #'  (a) generates Monte Carlo samples of the Dirichlet distribution for each sample,
 #'  (b) converts each instance using a log-ratio transform, then (c) returns test
-#'  results for two sample (Welch's t, Wilcoxon) or multi-sample (glm, Kruskal-Wallace)
+#'  results for two sample (Welch's t, Wilcoxon), a Bayesian posterior predictive
+#'  p-value (PPP) or multi-sample (glm, Kruskal-Wallace)
 #'  tests. This function also estimates effect size for two sample analyses.
 #'
 #' @details
@@ -47,7 +48,11 @@
 #'  running. Useful for debugging errors on large datasets. Applies to
 #'  \code{effect = TRUE}.
 #' @param gamma A numeric. The standard deviation on the within sample variation.
-#' @param bayesEst A boolean. Do we use the Bayes estimate for testing?
+#'  used when estimating the effect of scale on the outcome
+#' @param bayesEst A boolean. Do we use the Bayes estimate for testing to 
+#'  generate a posterior predictive p-value? This is set to FALSE by default 
+#'  for backwards compatibility but the recommendation is to use the PPP and
+#'  change any workflows that depended on the old method.
 #' @param ... Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).
 #'
 #' @return Returns a number of values that depends on the set of options.
@@ -56,7 +61,8 @@
 #'
 #' @author Greg Gloor, Andrew Fernandes, and Matt Links contributed to
 #'  the original package. Thom Quinn added the "glm" test method, the
-#'  "corr" test method, and the "iterate" procedure.
+#'  "corr" test method, and the "iterate" procedure. Michelle Pistner Nixon
+#'  and Justin Silverman contributed the scale and PPP routines
 #'
 #' @seealso
 #'  \code{\link{aldex}},
@@ -92,7 +98,7 @@
 #'            test="t", effect=TRUE, paired.test=FALSE)
 aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
                   include.sample.summary=FALSE, verbose=FALSE, paired.test=FALSE,
-                  denom="all", iterate=FALSE, gamma = NULL, bayesEst = TRUE, ...){
+                  denom="all", iterate=FALSE, gamma = NULL, bayesEst = FALSE, ...){
 
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
 

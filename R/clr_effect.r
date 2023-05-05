@@ -1,10 +1,56 @@
-# returns the median clr abundances per sample, per condition
+#' Calculate effect sizes and differences between conditions
+#'
+#' Determines the median clr abundance of the feature in all samples and in groups.
+#' Determines the median difference between the two groups.
+#' Determines the median variation within each two group.
+#' Determines the effect size, which is the median of the ratio of the between-group difference and the larger of the variance within groups.
+#'
+#' @param clr \code{clr} is the data output of \code{aldex.clr}.
+#' @param verbose Print diagnostic information while running. Useful only for debugging if fails on large datasets.
+#' @param include.sample.summary Include median clr values for each sample, defaults to FALSE.
+#' @param useMC Use multicore by default (FALSE).
+#' @param CI Give effect 95\% confidence intervals, defaults to FALSE.
+#' @param glm.conds Give effect for glm contrasts, note: saved as list.
+#' @param paired.test Calculate effect size for paired samples, defaults to FALSE.
+#' 
+#' @details An explicit example for two conditions is shown in the `Examples` below.
+#' 
+#' @return Returns a dataframe with the following information:
+#'  \item{rab.all}{a vector containing the median clr value for each feature.}
+#'  \item{rab.win.conditionA}{a vector containing the median clr value for each feature in condition A.}
+#'  \item{rab.win.conditionB}{a vector containing the median clr value for each feature in condition B.}
+#'  \item{diff.btw}{a vector containing the per-feature median difference between condition A and B.}
+#'  \item{diff.win}{a vector containing the per-feature maximum median difference between Dirichlet instances within conditions.}
+#'  \item{effect}{a vector containing the per-feature effect size.}
+#'  \item{overlap}{a vector containing the per-feature proportion of effect size that is 0 or less.}
+#' 
+#' @references Please use the citation given by \code{citation(package="ALDEx")}.
+#' 
+#' @author Greg Gloor, Andrew Fernandes, Matt Links
+#' 
+#' @seealso \code{\link{aldex.clr}}, \code{\link{aldex.ttest}}, \code{\link{aldex.glm}}, \code{\link{selex}}
+#' 
+#' @examples
+#' # x is the output of the \code{x <- clr(data, mc.samples)} function
+#' # conditions is a description of the data
+#' # for the selex dataset, conditions <- c(rep("N", 7), rep("S", 7))
+#' data(selex)
+#' # subset for efficiency
+#' selex <- selex[1201:1600,]
+#' conds <- c(rep("NS", 7), rep("S", 7))
+#' x <- aldex.clr(selex, conds, mc.samples=2, denom="all")
+#' effect.test <- aldex.effect(x)
+#' 
+#' @export
+aldex.effect <- function(clr, verbose = TRUE, include.sample.summary = FALSE, useMC = FALSE,
+                         CI = FALSE, glm.conds = NULL, paired.test = FALSE) {
+
+
 # returns the median differences in abundance between 2 conditions
 # returns the median effect size and proportion of effect that overlaps 0
 # data is returned in a data frame
 # requires multicore
 # this uses Rfast
-aldex.effect <- function(clr, verbose=TRUE, include.sample.summary=FALSE, useMC=FALSE, CI=FALSE, glm.conds=NULL, paired.test=FALSE){
 
   # Use clr conditions slot instead of input
      if (is.vector(clr@conds)) {

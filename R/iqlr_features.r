@@ -1,39 +1,40 @@
-# iqlr_features.r
-# Author: Jia Rong Wu, Greg Gloor
-#
-# USAGE: source("iqlr_features.R")
-#
-# DESCRIPTION:
-# Functions for declaring a set of features to be used in clr_function.r
-# The output returned is a list of indicies representing the features to be used
-# in either the center log-ratio or the inter quantile log-ratio transformation.
-#
-# INPUT:
-# The 'reads' data.frame MUST have row
-# and column names that are unique, and
-# looks like the following:
-#
-#              T1a T1b  T2  T3  N1  N2
-#   Gene_00001   0   0   2   0   0   1
-#   Gene_00002  20   8  12   5  19  26
-#   Gene_00003   3   0   2   0   0   0
-#       ... many more rows ...
-#
-# ---------------------------------------------------------------------
-# The 'conds' input can be a simple vector
-# i.e.
-# conds <- c(rep("A", 10), rep("B", 10))
-#
-# The 'input' input can be "zero", "iqlr", "all", "lvha", "" or numeric for advanced
-# users.
-#
-# 'input' defaults to "all" if either no parameters or incorrect parameters
-# given
-# a numeric 'input' variable is only for users who understand the set of
-# invariant features in their dataset
 
-##### Determines the mode to be used in ALDEx2
-##### Default is all features
+#' Identify set of denominator features for log-ratio calculation
+#'
+#' @name aldex.set.mode
+#' @title identify set of denominator features for log-ratio calculation
+#' @description calculate the features that are to be used as the denominator for the Geometric Mean calculation in clr_function.R
+#'
+#' @usage aldex.set.mode(reads, conds, denom="all")
+#' @param reads A data frame containing the samples and features per sample.
+#' @param conds A vector describing which samples belong to what condition.
+#' @param denom Character argument specifying which indicies to return.
+#' 'all' returns all features in both conditons.
+#' 'zero' returns the nonzero count features per condition.
+#' 'iqlr' returns the features whose variance falls within the
+#' inter-quantile range of the CLR-transformed data.
+#' In cases of malformed or null queries, input defaults to 'all'.
+#' Additionally, the input can be a numeric vector, which contains
+#' a set of row indicies to center the data against. Only for advanced
+#' users who can pre-determine the invariant set of features within
+#' their data. Check that the same number of features are in the
+#' input and output datasets.
+#' @return Outputs a vector containing indices per condition, or a single vector in some cases.
+#' @details An explicit example for two conditions is shown in the `Examples' below.
+#' @references Please use the citation given by \code{citation(package="ALDEx")}.
+#' @author Jia Rong Wu
+#' @seealso \code{\link{aldex.clr}}, \code{\link{aldex.ttest}}, \code{\link{aldex.effect}}, \code{\link{selex}}
+#' @examples
+#' # x is the output of the \code{x <- clr(data, mc.samples)} function
+#' # conditions is a description of the data
+#' # for the selex dataset, conditions <- c(rep("N", 7), rep("S", 7))
+#' # input can be "all", "iqlr", "zero" or numeric for advanced users
+#' data(selex)
+#' #subset for efficiency
+#' selex <- selex[1201:1600,]
+#' conds <- c(rep("NS", 7), rep("S", 7))
+#' x <- aldex.clr(selex, conds, mc.samples=2, denom="all")
+#' @export
 aldex.set.mode <- function(reads, conds, denom="all")
 {
 

@@ -4,20 +4,29 @@
 #'  test and Welch's t-test on the data returned by \code{aldex.clr}.
 #'
 #' @param clr An \code{ALDEx2} object. The output of \code{aldex.clr}.
-#' @inheritParams aldex
 #' @param paired.test Toggles whether to calculate paired tests.
 #' @param hist.plot Toggles whether to plot a histogram of p-values for the
 #' first Dirichlet Monte Carlo instance.
+#' @param verbose A boolean. Toggles whether to print diagnostic information
+#'   while running. Useful for debugging errors on large datasets. Applies
+#'   to \code{effect = TRUE}.
+#' @param bayesEst A boolean. Do we use the Bayes estimate for testing to
+#'   generate a posterior predictive p-value? This is set to \code{FALSE} by
+#'   default for backwards compatibility but the recommendation is to use the
+#'   PPP and change any workflows that depended on the old method.
 #'
 #' @return Returns a \code{data.frame} with the following information:
-#' \item{we.ep}{ a vector containing the expected p-value of Welch's t-test
+#' \item{we.ep}{if bayesEst=T, a vector containing the expected p-value of Welch's t-test
 #'  for each feature }
-#' \item{we.eBH}{ a vector containing the corresponding expected value of the
+#' \item{we.eBH}{if bayesEst=T, a vector containing the corresponding expected value of the
 #'  Benjamini-Hochberg corrected p-value for each feature }
-#' \item{wi.ep}{ a vector containing the expected p-value of the Wilcoxon Rank Sum test
+#' \item{wi.ep}{if bayesEst=T, a vector containing the expected p-value of the Wilcoxon Rank Sum test
 #'  for each feature }
-#' \item{wi.eBH}{ a vector containing the corresponding expected value of the
+#' \item{wi.eBH}{if bayesEst=T, a vector containing the corresponding expected value of the
 #'  Benjamini-Hochberg corrected p-value for each feature }
+#' \item{lfc.est}{if bayesEst=T, a vector containing the expected log fold change}
+#' \item{lfc.obs}{if bayesEst=T, a vector containing the observed log fold change}
+#' \item{lfc.est}{if bayesEst=T, a vector containing the posterior predicted p-value}
 #'
 #' @author Greg Gloor
 #'
@@ -41,7 +50,7 @@
 #' conds <- c(rep("NS", 7), rep("S", 7))
 #' x <- aldex.clr(selex, conds, mc.samples=2, denom="all")
 #' ttest.test <- aldex.ttest(x)
-aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE, bayesEst = TRUE) {
+aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE, bayesEst = FALSE) {
   
   # Use clr conditions slot instead of input
   conditions <- clr@conds

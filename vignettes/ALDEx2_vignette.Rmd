@@ -186,7 +186,7 @@ selex.sub <- selex[1:500, ]
      "B" = c(rep(0, 7), rep(1, 7)),
      "Z" = sample(c(1,2,3), 14, replace=TRUE))
  mm <- model.matrix(~ A + Z + B, covariates)
- x <- aldex.clr(selex.sub, mm, mc.samples=4, denom="all", verbose=F)
+ x <- aldex.clr(selex.sub, mm, mc.samples=4, denom="all", verbose=T)
  glm.test <- aldex.glm(x, mm, bayesEst = FALSE)
  glm.effect <- aldex.glm.effect(x)
 

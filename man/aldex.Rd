@@ -16,7 +16,7 @@ aldex(
   denom = "all",
   iterate = FALSE,
   gamma = NULL,
-  bayesEst = TRUE,
+  bayesEst = FALSE,
   ...
 )
 }
@@ -64,9 +64,13 @@ using the set of per-group non-zero features.}
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
 
-\item{gamma}{A numeric. The standard deviation on the within sample variation.}
+\item{gamma}{A numeric. The standard deviation on the within sample variation.
+used when estimating the effect of scale on the outcome}
 
-\item{bayesEst}{A boolean. Do we use the Bayes estimate for testing?}
+\item{bayesEst}{A boolean. Do we use the Bayes estimate for testing to 
+generate a posterior predictive p-value? This is set to FALSE by default 
+for backwards compatibility but the recommendation is to use the PPP and
+change any workflows that depended on the old method.}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }
@@ -82,7 +86,8 @@ The \code{aldex} function is a wrapper that performs log-ratio transformation
  and statistical testing in a single line of code. Specifically, this function:
  (a) generates Monte Carlo samples of the Dirichlet distribution for each sample,
  (b) converts each instance using a log-ratio transform, then (c) returns test
- results for two sample (Welch's t, Wilcoxon) or multi-sample (glm, Kruskal-Wallace)
+ results for two sample (Welch's t, Wilcoxon), a Bayesian posterior predictive
+ p-value (PPP) or multi-sample (glm, Kruskal-Wallace)
  tests. This function also estimates effect size for two sample analyses.
 }
 \details{
@@ -125,5 +130,6 @@ Please use the citation given by
 \author{
 Greg Gloor, Andrew Fernandes, and Matt Links contributed to
  the original package. Thom Quinn added the "glm" test method, the
- "corr" test method, and the "iterate" procedure.
+ "corr" test method, and the "iterate" procedure. Michelle Pistner Nixon
+ and Justin Silverman contributed the scale and PPP routines
 }
