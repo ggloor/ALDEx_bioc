@@ -12,7 +12,6 @@ aldex.senAnalysis(
   include.sample.summary = FALSE,
   verbose = FALSE,
   iterate = FALSE,
-  bayesEst = FALSE,
   ...
 )
 }
@@ -40,14 +39,12 @@ running. Useful for debugging errors on large datasets. Applies to
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
 
-\item{bayesEst}{A boolean. Do you want to use the Bayesian hypothesis testing method?}
-
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }
 \value{
 A list of results. Each element corresponds to a single result for a given value of gamma
 }
 \description{
-Performs scale simulation over a range of values for gamma
+Performs scale simulation over a range of values for gamma.
 Dirichlet samples are reused for computational convenience.
 }

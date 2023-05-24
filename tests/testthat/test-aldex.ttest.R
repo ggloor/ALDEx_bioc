@@ -41,7 +41,7 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
     wi.BH.matrix[,mc.i] <- as.numeric(p.adjust(wi.p.matrix[,mc.i], method="BH"))
     
     # do the welch's test on each feature
-    we.p.matrix[,mc.i] <- t(apply(t.input, 1, function(t.input){as.numeric(t.test(x=t.input[setA],y=t.input[setB], paired=paired.test)[3])}))
+    we.p.matrix[,mc.i] <- t(apply(t.input, 1, function(t.input){as.numeric(t.test(x=t.input[setA],y=t.input[setB], paired=paired.test, alternative = "greater")[3])}))
     we.BH.matrix[,mc.i] <- as.numeric(p.adjust(we.p.matrix[,mc.i], method="BH"))
     
   }
@@ -55,9 +55,11 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
   }
   #get the Expected values of p, q and lfdr
   we.ep <- apply(we.p.matrix, 1, mean)
-  we.eBH <- apply(we.BH.matrix,1,mean)
+  we.ep <- 2*sapply(we.ep, FUN = function(x) min(x, 1-x))
+  we.eBH <- p.adjust(we.ep, "BH")
   wi.ep <- apply(wi.p.matrix, 1, mean)
-  wi.eBH <- apply(wi.BH.matrix,1,mean)
+  wi.ep <- 2*sapply(wi.ep, FUN = function(x) min(x, 1-x))
+  wi.eBH <- p.adjust(wi.ep, "BH")
   
   z <- data.frame(we.ep, we.eBH, wi.ep, wi.eBH)
   rownames(z) <- getFeatureNames(clr)
@@ -72,7 +74,7 @@ test_that("new faster alex.ttest matches old function", {
   
   expect_equal(
     aldex.ttest.old(clr, group),
-    aldex.ttest(clr, bayesEst = FALSE)
+    aldex.ttest(clr)
   )
 })
 
@@ -90,6 +92,6 @@ test_that("new faster alex.ttest matches old function", {
   
   expect_equal(
     aldex.ttest.old(clr, group),
-    aldex.ttest(clr, bayesEst = FALSE)
+    aldex.ttest(clr)
   )
 })

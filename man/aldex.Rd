@@ -16,7 +16,6 @@ aldex(
   denom = "all",
   iterate = FALSE,
   gamma = NULL,
-  bayesEst = TRUE,
   ...
 )
 }
@@ -65,8 +64,6 @@ this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
 
 \item{gamma}{A numeric. The standard deviation on the within sample variation.}
-
-\item{bayesEst}{A boolean. Do we use the Bayes estimate for testing?}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }

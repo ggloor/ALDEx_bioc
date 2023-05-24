@@ -41,7 +41,7 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
   # Use clr conditions slot instead of input
   conditions <- clr@conds
 
-  lr2glm <- function(lr, conditions, bayesEst = TRUE, ...){
+  lr2glm <- function(lr, conditions, ...){
 
     if( !is(conditions, "matrix") &
        !("assign" %in% names(attributes(conditions)))){
@@ -66,22 +66,6 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
     rownames(df) <- colnames(lr)
     df <- as.data.frame(df)
     
-    if(bayesEst){
-      estNames <- colnames(df)[grepl("Estimate", colnames(df))]
-      est_df <- df[,estNames]
-      
-      sdNames <-colnames(df)[grepl("Std. Error", colnames(df))]
-      sd_df <- df[,sdNames]
-      
-      rand.t <- matrix(rt(nrow(est_df)*ncol(est_df), nrow(conditions) - ncol(conditions)), ncol = ncol(est_df))
-      beta.null <- rand.t*sd_df
-      diff <- abs(est_df) - abs(beta.null)
-      p_mat <- ifelse(diff < 0, 1, 0)
-      
-      pvals <- colnames(df)[grepl("Pr\\(>", colnames(df))]
-      df[, pvals] <- p_mat
-    }
-
     # Create new data.frame for FDR
     pvals <- colnames(df)[grepl("Pr\\(>", colnames(df))]
     df.bh <- df[,pvals]

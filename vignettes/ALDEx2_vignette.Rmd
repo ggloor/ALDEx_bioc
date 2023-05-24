@@ -79,7 +79,7 @@ selex.sub <- selex[1:400,]
 
 conds <- c(rep("NS", 7), rep("S", 7))
 x.all <- aldex(selex.sub, conds, mc.samples=16, test="t", effect=TRUE,
-     include.sample.summary=FALSE, denom="all", verbose=FALSE, paired.test=FALSE, bayesEst = FALSE)
+     include.sample.summary=FALSE, denom="all", verbose=FALSE, paired.test=FALSE)
 
 par(mfrow=c(1,2))
 aldex.plot(x.all, type="MA", test="welch", xlab="Log-ratio abundance",
@@ -108,7 +108,7 @@ The next operation performs the Welch's t and Wilcoxon rank test for the situati
 This operation is reasonably fast.
 
 ```{r,echo=TRUE, eval=TRUE, results="hide"}
-x.tt <- aldex.ttest(x, paired.test=FALSE, verbose=FALSE, bayesEst = FALSE)
+x.tt <- aldex.ttest(x, paired.test=FALSE, verbose=FALSE)
 ```
 
 ## The `aldex.kw` and the `aldex.glm` modules
@@ -187,7 +187,7 @@ selex.sub <- selex[1:500, ]
      "Z" = sample(c(1,2,3), 14, replace=TRUE))
  mm <- model.matrix(~ A + Z + B, covariates)
  x <- aldex.clr(selex.sub, mm, mc.samples=4, denom="all", verbose=F)
- glm.test <- aldex.glm(x, mm, bayesEst = FALSE)
+ glm.test <- aldex.glm(x, mm)
  glm.effect <- aldex.glm.effect(x)
 
 ```

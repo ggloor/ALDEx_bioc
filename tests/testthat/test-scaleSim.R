@@ -40,11 +40,11 @@ colnames(countdata) <- paste0("n", 1:ncol(countdata))
 
 
 test_that("aldex2 works without scale samples passed", {
-  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), gamma = NULL, mc.samples = 128, bayesEst = FALSE))) # expect no error
+  expect_error(expect_error(aldex(countdata, as.character(rdat$Condition), gamma = NULL, mc.samples = 128))) # expect no error
 })
 
 test_that("aldex2 works with scale samples passed", {
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = .5, mc.samples = 128, bayesEst = FALSE)
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = .5, mc.samples = 128)
   
   aldex.fit <- aldex.fit[aldex.fit$wi.eBH <= 0.05, ]
   truth <- row.names(aldex.fit)
@@ -52,7 +52,7 @@ test_that("aldex2 works with scale samples passed", {
 })
 
 test_that("aldex2 works with coda scale samples passed", {
-  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 10, mc.samples = 128, bayesEst = FALSE)
+  aldex.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 10, mc.samples = 128)
   aldex.fit <- aldex.fit[aldex.fit$wi.eBH <= 0.05, ]
   truth <- row.names(aldex.fit)
   expect_true(length(truth) == 0)
@@ -85,7 +85,7 @@ x.e <- aldex.effect(x)
 xs <- aldex.clr(selex, conds, gamma=1e-3)
 xs.e <- aldex.effect(xs)
 
-xS <- aldex.clr(selex, conds, gamma=0.5)
+xS <- aldex.clr(selex, conds, gamma=1)
 xS.e <- aldex.effect(xS)
 
 
@@ -101,3 +101,4 @@ test_that("scale sim minimally pertubs diff.btw output", {
                             median(xS.e$diff.win), tolerance=0.1))
   
 })
+

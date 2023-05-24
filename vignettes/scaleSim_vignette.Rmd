@@ -124,9 +124,9 @@ We begin by running `aldex` without scale simulation as a baseline. We use the C
 
 countdata <- t(rdat[,-1,drop=F])
 colnames(countdata) <- paste0("n", 1:ncol(countdata))
-aldex.fit <- aldex(countdata, as.character(rdat$Condition), denom="all", bayesEst = TRUE)
+aldex.fit <- aldex(countdata, as.character(rdat$Condition), denom="all")
  
-sig.aldex = aldex.fit %>% filter(p.val <= 0.05)
+sig.aldex = aldex.fit %>% filter(we.eBH <= 0.05)
 head(sig.aldex)
 dim(sig.aldex)
 ```
@@ -145,9 +145,9 @@ For this simulation, we set $\mu_j = 0$, $c=1$, and $\alpha = 0.5$. First, we si
 
 ```{r ALDEX2ScaleSim}
 ##Run ALDEx2 with Scale Sim
-aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 0.5, mc.samples = 2000, bayesEst = TRUE)
+aldexScaleSim.fit <- aldex(countdata, as.character(rdat$Condition), gamma = 0.5, mc.samples = 2000)
  
-sig.aldexScaleSim = aldexScaleSim.fit %>% filter(p.val <= 0.05)
+sig.aldexScaleSim = aldexScaleSim.fit %>% filter(we.eBH <= 0.05)
 sig.aldexScaleSim
 ```
 
@@ -160,15 +160,15 @@ To recapture the behavior of ALDEx2 using scale simulation, we also drew samples
 We pass these scale samples to `aldex` as before. As expected, the CLR model returns all 21 taxa as significant whereas the CoDA model returns none as significant.
 
 ```{r ALDEX2ScaleSimOtherMods}
-aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), gamma = 1e-3, mc.samples = 2000, bayesEst = TRUE)
+aldexScaleSim.fitCLR <- aldex(countdata, as.character(rdat$Condition), gamma = 1e-3, mc.samples = 2000)
  
-sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(p.val <= 0.05)
+sig.aldexScaleSimCLR = aldexScaleSim.fitCLR %>% filter(we.eBH <= 0.05)
 head(sig.aldexScaleSimCLR)
 dim(sig.aldexScaleSimCLR)
 
-aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), gamma = 10, mc.samples = 2000, bayesEst = TRUE)
+aldexScaleSim.fitCoDA <- aldex(countdata, as.character(rdat$Condition), gamma = 10, mc.samples = 2000)
  
-sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(p.val <= 0.05)
+sig.aldexScaleSimCoDA = aldexScaleSim.fitCoDA %>% filter(we.eBH <= 0.05)
 head(sig.aldexScaleSimCoDA)
 ```
 
@@ -194,9 +194,9 @@ We also added sensitivity analysis functionality (should be considered in develo
 ```{r senAnalysis}
 x <- aldex.clr(countdata, as.character(rdat$Condition), gamma = 1e-3, mc.samples = 2000)
 
-senAnalysis = aldex.senAnalysis(x, gamma = c(1e-3, .1, .25, .5, 1, 2, 3), bayesEst  = FALSE)
+senAnalysis = aldex.senAnalysis(x, gamma = c(1e-3, .1, .25, .5, 1, 2, 3))
 
-plot_alpha(senAnalysis, bayesEst = FALSE)
+plot_gamma(senAnalysis)
 ```
 
 
@@ -244,8 +244,8 @@ summary_aldex2 <- function(fit, pval = 0.05){
   fit %>% 
     as.data.frame() %>% 
     rownames_to_column("category") %>% 
-    select(category, effect, p.val) %>% 
-    mutate(padj=p.val) %>% 
+    select(category, effect, we.ep, we.eBH) %>% 
+    mutate(padj=we.eBH) %>% 
     mutate(mean=effect) %>% 
     mutate(low=NA, high=NA) %>%
     mutate(sig = ifelse(padj <= pval, TRUE, FALSE))
