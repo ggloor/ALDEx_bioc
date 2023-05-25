@@ -102,3 +102,13 @@ test_that("scale sim minimally pertubs diff.btw output", {
   
 })
 
+##GLM testing
+test_that("scale sim works with glm testing",{
+  data(selex)
+  #subset for efficiency
+  selex <- selex[1201:1250,]
+  covariates <- data.frame("A" = sample(0:1, 14, replace = TRUE),
+                           "B" = c(rep(0, 7), rep(1, 7)))
+  mm <- model.matrix(~ A + B, covariates)
+  expect_error(expect_error(aldex(selex, mm, mc.samples=4, denom="all", test = "glm", gamma = 1)))
+})

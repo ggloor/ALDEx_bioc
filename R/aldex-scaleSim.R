@@ -102,8 +102,8 @@ plot_gamma <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 1
     if(is.null(glmVar)){
       stop("Please supply what variable you want to plot!")
     }
-    nameEffect = names(sen_results[[1]])[base::grepl(paste0(glmVar, ".Estimate"), names(sen_results[[1]]))]
-    namePval = names(sen_results[[1]])[base::grepl(paste0(glmVar, ".Pr...t...BH"), names(sen_results[[1]]))]
+    nameEffect = names(sen_results[[1]])[base::grepl(paste0(glmVar, ".Est"), names(sen_results[[1]]))]
+    namePval = names(sen_results[[1]])[base::grepl(paste0(glmVar, ".pval.holm"), names(sen_results[[1]]))]
     for(i in 1:length(sen_results)){
       B[i,] <- sen_results[[i]][,nameEffect]
       pvals[i,] <- sen_results[[i]][,namePval]
