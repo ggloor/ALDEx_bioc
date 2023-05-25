@@ -59,12 +59,18 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
     glms <- apply(lr, 2, function(x){
       glm(x ~ model., ...)
     })
-
+    dof <- glm(lr[,1]~model.)$df.residual
     # Combine to make data.frame
     extracts <- lapply(glms, extract)
     df <- do.call("rbind", extracts)
     rownames(df) <- colnames(lr)
     df <- as.data.frame(df)
+    
+    # Adjusting to one-sided p-values
+    colsToAdjust <- which(grepl("Pr\\(>",colnames(df)))
+    for(j in colsToAdjust){
+      df[,j] <- pt(df[,(j-1)], df = dof,lower.tail = FALSE)
+    }
     
     # Create new data.frame for FDR
     pvals <- colnames(df)[grepl("Pr\\(>", colnames(df))]
@@ -98,6 +104,13 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
   colnames(r) <- gsub(' Std. Error', ':SE', colnames(r))
   colnames(r) <- gsub(" Pr\\(.+\\)", ':pval', colnames(r))
 
+  for(j in 1:ncol(r)){
+    if(grepl(":pval", colnames(r)[j])){
+      r[,j] <- 2*sapply(r[,j]/k, FUN = function(vec){min(vec, 1-vec)})
+    } else{
+      r[,j] <- r[,j]/k
+    }
+  }
 
   r / k # return expected
 }
