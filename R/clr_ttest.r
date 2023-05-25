@@ -109,9 +109,9 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
   wi.eBH <- rowMeans(wi.BH.matrix)
     
   we.ep <- 2*sapply(we.ep, FUN = function(vec){min(vec, 1-vec)})
-  we.eBH <- p.adjust(we.ep, method = "BH")
+  we.eBH <- 2*sapply(we.eBH, FUN = function(vec){min(vec, 1-vec)}) 
   wi.ep <- 2*sapply(wi.ep, FUN = function(vec){min(vec, 1-vec)})
-  wi.eBH <- p.adjust(wi.ep, method = "BH")
+  wi.eBH <- 2*sapply(wi.eBH, FUN = function(vec){min(vec, 1-vec)})
 
   z <- data.frame(we.ep, we.eBH, wi.ep, wi.eBH)
   rownames(z) <- getFeatureNames(clr)

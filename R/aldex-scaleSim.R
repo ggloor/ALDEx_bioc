@@ -24,7 +24,7 @@ aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
     l2p <- list()
     
     ##adding scale
-    scale_samples <- default_scale_model(gamma[j], conds, p, mc.samples)
+    scale_samples <- default.scale.model(gamma[j], conds, p, mc.samples)
     for(i in 1:length(p)){
       l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
     }
@@ -82,8 +82,9 @@ aldex.senAnalysis <- function(aldex_clr, gamma, test="t", effect=TRUE,
 #' @param blackWhite boolean. If TRUE, returns the plot in black and white.
 #' @param cex Default == 1. Controls the size of the axis and text labels in the plots.
 #' @return A plot object
+#' 
 #' @export
-plot_gamma <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL, blackWhite = FALSE, cex = 1){
+plotGamma <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10, glmVar = NULL, blackWhite = FALSE, cex = 1){
   Sequence <- NULL ##Fixing an R CMD check note
   if(thresh < 0 | thresh > 1){
     stop("Please return a valid value for threshold between zero and 1.")
@@ -236,7 +237,7 @@ gm <- function(x, na.rm = TRUE){
   exp(mean(log(x[x > 0]), na.rm=na.rm))
 }
 
-default_scale_model <- function(gamma, conds, p, mc.samples){
+default.scale.model <- function(gamma, conds, p, mc.samples){
   ##adding a check to remove the intercept
   conds_used <- conds
   if(is.matrix(conds)){

@@ -56,11 +56,13 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
   #get the Expected values of p, q and lfdr
   we.ep <- apply(we.p.matrix, 1, mean)
   we.ep <- 2*sapply(we.ep, FUN = function(x) min(x, 1-x))
-  we.eBH <- p.adjust(we.ep, "BH")
+  we.eBH <- apply(we.BH.matrix, 1, mean)
+  we.eBH <- 2*sapply(we.eBH, FUN = function(x) min(x, 1-x))
   wi.ep <- apply(wi.p.matrix, 1, mean)
   wi.ep <- 2*sapply(wi.ep, FUN = function(x) min(x, 1-x))
-  wi.eBH <- p.adjust(wi.ep, "BH")
-  
+  wi.eBH <- apply(wi.BH.matrix, 1, mean)
+  wi.eBH <- 2*sapply(wi.eBH, FUN = function(x) min(x, 1-x))
+
   z <- data.frame(we.ep, we.eBH, wi.ep, wi.eBH)
   rownames(z) <- getFeatureNames(clr)
   return(z)

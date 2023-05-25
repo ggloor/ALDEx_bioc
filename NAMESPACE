@@ -21,7 +21,7 @@ importFrom("Rfast", "rowMedians", "colMedians")
 #importFrom("BiocParallel", "bplapply")
 
 export( aldex )
-export(plot_gamma)
+export(plotGamma)
 exportPattern( "^aldex[.]*" )
 exportMethods(getMonteCarloInstances,getDirichletInstances,getSampleIDs,getFeatures,
     numFeatures,numMCInstances,getFeatureNames,getReads,numConditions,

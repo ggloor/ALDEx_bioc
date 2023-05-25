@@ -196,7 +196,7 @@ x <- aldex.clr(countdata, as.character(rdat$Condition), gamma = 1e-3, mc.samples
 
 senAnalysis = aldex.senAnalysis(x, gamma = c(1e-3, .1, .25, .5, 1, 2, 3))
 
-plot_gamma(senAnalysis)
+plotGamma(senAnalysis)
 ```
 
 

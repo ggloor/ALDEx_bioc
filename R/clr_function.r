@@ -185,7 +185,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
         
         ## grabbing samples from the default scale model
         if(verbose) message("sampling from the default scale model.")
-        scale_samples <- default_scale_model(gamma, conds, p, mc.samples)
+        scale_samples <- default.scale.model(gamma, conds, p, mc.samples)
         
         for(i in 1:length(p)){
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
