@@ -154,6 +154,8 @@ aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xl
         points(x$diff.btw[called], -1*log10(all.p)[called], col = called.col,
             pch = called.pch, cex = called.cex)
         cols <- grep("rab.win", colnames(x))
+        abline(v=1.5, col='grey', lty=2)
+        abline(h=-1*log10(cutoff.pval), col='grey', lty=2)
         mtext(colnames(x)[cols[1]], 1, line = 2, at = min(x$diff.btw),
             col = "grey", cex = 0.8)
         mtext(colnames(x)[cols[2]], 1, line = 2, at = max(x$diff.btw),
