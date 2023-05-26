@@ -26,8 +26,10 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
   
   # set up the t-test result containers
   we.p.matrix =  matrix(data=NA, nrow = feature.number, ncol = mc.instances)
-  we.BH.matrix =  matrix(data=NA, nrow = feature.number, ncol = mc.instances) #benjamini-hochberg
-  wi.BH.matrix =  matrix(data=NA, nrow = feature.number, ncol = mc.instances)
+  we.BH.matrix.greater =  matrix(data=NA, nrow = feature.number, ncol = mc.instances) #benjamini-hochberg
+  we.BH.matrix.less =  matrix(data=NA, nrow = feature.number, ncol = mc.instances) #benjamini-hochberg
+  wi.BH.matrix.greater =  matrix(data=NA, nrow = feature.number, ncol = mc.instances)
+  wi.BH.matrix.less =  matrix(data=NA, nrow = feature.number, ncol = mc.instances)
   wi.p.matrix =  matrix(data=NA, nrow = feature.number, ncol = mc.instances)
   
   #mc.i is the monte carlo instance
@@ -38,12 +40,13 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
     
     # do the Wilcoxon tests on each feature
     wi.p.matrix[,mc.i] <- t(apply(t.input, 1, function(t.input){as.numeric(wilcox.test(x=t.input[setA],y=t.input[setB])[3])}))
-    wi.BH.matrix[,mc.i] <- as.numeric(p.adjust(wi.p.matrix[,mc.i], method="BH"))
+    wi.BH.matrix.greater[,mc.i] <- as.numeric(p.adjust(wi.p.matrix[,mc.i], method="BH"))
+    wi.BH.matrix.less[,mc.i] <- as.numeric(p.adjust(1-wi.p.matrix[,mc.i], method="BH"))
     
     # do the welch's test on each feature
     we.p.matrix[,mc.i] <- t(apply(t.input, 1, function(t.input){as.numeric(t.test(x=t.input[setA],y=t.input[setB], paired=paired.test, alternative = "greater")[3])}))
-    we.BH.matrix[,mc.i] <- as.numeric(p.adjust(we.p.matrix[,mc.i], method="BH"))
-    
+    we.BH.matrix.greater[,mc.i] <- as.numeric(p.adjust(we.p.matrix[,mc.i], method="BH"))
+    we.BH.matrix.less[,mc.i] <- as.numeric(p.adjust(1-we.p.matrix[,mc.i], method="BH"))
   }
   if (hist.plot == TRUE) {
     par(mfrow=c(2,2))
@@ -56,12 +59,15 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
   #get the Expected values of p, q and lfdr
   we.ep <- apply(we.p.matrix, 1, mean)
   we.ep <- 2*sapply(we.ep, FUN = function(x) min(x, 1-x))
-  we.eBH <- apply(we.BH.matrix, 1, mean)
-  we.eBH <- 2*sapply(we.eBH, FUN = function(x) min(x, 1-x))
+  
+  we.eBH <- cbind(apply(we.BH.matrix.greater, 1, mean), apply(we.BH.matrix.less, 1, mean))
+  we.eBH <- 2*apply(we.eBH, 1, min)
+  
   wi.ep <- apply(wi.p.matrix, 1, mean)
   wi.ep <- 2*sapply(wi.ep, FUN = function(x) min(x, 1-x))
-  wi.eBH <- apply(wi.BH.matrix, 1, mean)
-  wi.eBH <- 2*sapply(wi.eBH, FUN = function(x) min(x, 1-x))
+  
+  wi.eBH <- cbind(apply(wi.BH.matrix.greater, 1, mean), apply(wi.BH.matrix.less, 1, mean))
+  wi.eBH <- 2*apply(wi.eBH, 1, min)
 
   z <- data.frame(we.ep, we.eBH, wi.ep, wi.eBH)
   rownames(z) <- getFeatureNames(clr)
