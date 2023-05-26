@@ -73,9 +73,11 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
   
   # set up the t-test result containers
   wi.p.matrix <- as.data.frame(matrix(1, nrow = feature.number, ncol = mc.instances))
-  wi.BH.matrix <- wi.p.matrix # duplicate result container
+  wi.BH.matrix.greater <- wi.p.matrix # duplicate result container
+  wi.BH.matrix.less <- wi.p.matrix # duplicate result container
   we.p.matrix <- wi.p.matrix # duplicate result container
-  we.BH.matrix <- wi.p.matrix # duplicate result container
+  we.BH.matrix.greater <- wi.p.matrix # duplicate result container
+  we.BH.matrix.less <- wi.p.matrix # duplicate result container
 
     # mc.i is the i-th Monte-Carlo instance
   if(verbose) message("running tests for each MC instance:")
@@ -88,10 +90,14 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
     t.input <- sapply(mc.all, function(y){y[, mc.i]})
       
     wi.p.matrix[, mc.i] <- wilcox.fast(t.input, setAsBinary, paired.test)
-    wi.BH.matrix[, mc.i] <- p.adjust(wi.p.matrix[, mc.i], method = "BH")
+    wi.BH.matrix.greater[, mc.i] <- p.adjust(wi.p.matrix[, mc.i], method = "BH")
+    wi.BH.matrix.less[, mc.i] <- p.adjust(1-wi.p.matrix[, mc.i], method = "BH")
+    
       
     we.p.matrix[, mc.i] <- t.fast(t.input, setAsBinary, paired.test)$p
-    we.BH.matrix[, mc.i] <- p.adjust(we.p.matrix[, mc.i], method = "BH")
+    we.BH.matrix.greater[, mc.i] <- p.adjust(we.p.matrix[, mc.i], method = "BH")
+    we.BH.matrix.less[, mc.i] <- p.adjust(1-we.p.matrix[, mc.i], method = "BH")
+    
   }
     
   if(hist.plot == TRUE){
@@ -104,14 +110,19 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
     
   # get the Expected values of p, q and lfdr
   we.ep <- rowMeans(we.p.matrix) # rowMeans is faster than apply()!!
-  we.eBH <- rowMeans(we.BH.matrix)
+  we.eBH.greater <- rowMeans(we.BH.matrix.greater)
+  we.eBH.less <- rowMeans(we.BH.matrix.less)
   wi.ep <- rowMeans(wi.p.matrix)
-  wi.eBH <- rowMeans(wi.BH.matrix)
+  wi.eBH.greater <- rowMeans(wi.BH.matrix.greater)
+  wi.eBH.less <- rowMeans(wi.BH.matrix.less)
+  
+  we.eBH <- cbind(we.eBH.less, we.eBH.greater)
+  wi.eBH <- cbind(wi.eBH.less, wi.eBH.greater)
     
   we.ep <- 2*sapply(we.ep, FUN = function(vec){min(vec, 1-vec)})
-  we.eBH <- 2*sapply(we.eBH, FUN = function(vec){min(vec, 1-vec)}) 
+  we.eBH <- 2*apply(we.eBH, 1, min)
   wi.ep <- 2*sapply(wi.ep, FUN = function(vec){min(vec, 1-vec)})
-  wi.eBH <- 2*sapply(wi.eBH, FUN = function(vec){min(vec, 1-vec)})
+  wi.eBH <- 2*apply(wi.eBH, 1, min)
 
   z <- data.frame(we.ep, we.eBH, wi.ep, wi.eBH)
   rownames(z) <- getFeatureNames(clr)
