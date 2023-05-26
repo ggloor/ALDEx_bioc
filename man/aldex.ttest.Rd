@@ -4,13 +4,7 @@
 \alias{aldex.ttest}
 \title{Calculate Wilcoxon Rank Sum test and Welch's t-test statistics}
 \usage{
-aldex.ttest(
-  clr,
-  paired.test = FALSE,
-  hist.plot = FALSE,
-  verbose = FALSE,
-  bayesEst = FALSE
-)
+aldex.ttest(clr, paired.test = FALSE, hist.plot = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}
@@ -20,14 +14,9 @@ aldex.ttest(
 \item{hist.plot}{Toggles whether to plot a histogram of p-values for the
 first Dirichlet Monte Carlo instance.}
 
-\item{verbose}{A boolean. Toggles whether to print diagnostic information
-while running. Useful for debugging errors on large datasets. Applies
-to \code{effect = TRUE}.}
-
-\item{bayesEst}{A boolean. Do we use the Bayes estimate for testing to
-generate a posterior predictive p-value? This is set to \code{FALSE} by
-default for backwards compatibility but the recommendation is to use the
-PPP and change any workflows that depended on the old method.}
+\item{verbose}{A boolean. Toggles whether to print diagnostic information while
+running. Useful for debugging errors on large datasets. Applies to
+\code{effect = TRUE}.}
 }
 \value{
 Returns a \code{data.frame} with the following information:

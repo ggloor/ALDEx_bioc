@@ -48,11 +48,6 @@
 #'  running. Useful for debugging errors on large datasets. Applies to
 #'  \code{effect = TRUE}.
 #' @param gamma A numeric. The standard deviation on the within sample variation.
-#'  used when estimating the effect of scale on the outcome
-#' @param bayesEst A boolean. Do we use the Bayes estimate for testing to 
-#'  generate a posterior predictive p-value? This is set to FALSE by default 
-#'  for backwards compatibility but the recommendation is to use the PPP and
-#'  change any workflows that depended on the old method.
 #' @param ... Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).
 #'
 #' @return Returns a number of values that depends on the set of options.
@@ -98,7 +93,7 @@
 #'            test="t", effect=TRUE, paired.test=FALSE)
 aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
                   include.sample.summary=FALSE, verbose=FALSE, paired.test=FALSE,
-                  denom="all", iterate=FALSE, gamma = NULL, bayesEst = FALSE, ...){
+                  denom="all", iterate=FALSE, gamma = NULL,  ...){
 
   if(missing(conditions)) stop("The 'conditions' argument is needed for this analysis.")
 
@@ -110,7 +105,7 @@ aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
   if(test == "t") {
 
     message("aldex.ttest: doing t-test")
-    x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose, bayesEst = bayesEst)
+    x.tt <- aldex.ttest(x, paired.test=FALSE, hist.plot=FALSE, verbose=verbose)
 
   }else if(test == "kw"){
 

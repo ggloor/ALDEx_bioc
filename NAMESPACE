@@ -10,19 +10,18 @@ import(lattice)
 import(directlabels)
 import(latticeExtra)
 importFrom("grDevices", "rgb")
-importFrom("graphics", "abline","hist","par","plot","points","mtext","polygon","boxplot")
+importFrom("graphics", "abline","hist","par","plot","points","mtext","polygon","boxplot",
+    "text", "grid")
 importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
     "p.adjust", "rgamma", "t.test", "wilcox.test", "coef",
-    "pnorm", "psignrank", "pt", "pwilcox", "as.dist", "density", "dist")
+    "pnorm", "psignrank", "pt", "pwilcox", "as.dist", "density", "dist", "ecdf", "rt",
+    "runif", "reshape")
 importFrom("utils", "installed.packages")
 importFrom("Rfast", "rowMedians", "colMedians")
-importFrom("stringr", "str_detect")
-importFrom("graphics", "text")
-importFrom("stats", "ecdf", "reshape", "rt")
 #importFrom("BiocParallel", "bplapply")
 
 export( aldex )
-export(plot_alpha)
+export(plotGamma)
 exportPattern( "^aldex[.]*" )
 exportMethods(getMonteCarloInstances,getDirichletInstances,getSampleIDs,getFeatures,
     numFeatures,numMCInstances,getFeatureNames,getReads,numConditions,

@@ -16,7 +16,6 @@ aldex(
   denom = "all",
   iterate = FALSE,
   gamma = NULL,
-  bayesEst = FALSE,
   ...
 )
 }
@@ -66,11 +65,6 @@ this will use the results from an initial "t" routine to seed the reference
 
 \item{gamma}{A numeric. The standard deviation on the within sample variation.
 used when estimating the effect of scale on the outcome}
-
-\item{bayesEst}{A boolean. Do we use the Bayes estimate for testing to 
-generate a posterior predictive p-value? This is set to FALSE by default 
-for backwards compatibility but the recommendation is to use the PPP and
-change any workflows that depended on the old method.}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }
