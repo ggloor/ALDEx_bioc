@@ -90,13 +90,13 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
     t.input <- sapply(mc.all, function(y){y[, mc.i]})
       
     wi.p.matrix[, mc.i] <- wilcox.fast(t.input, setAsBinary, paired.test)
-    wi.BH.matrix.greater[, mc.i] <- p.adjust(wi.p.matrix[, mc.i], method = "BH")
-    wi.BH.matrix.less[, mc.i] <- p.adjust(1-wi.p.matrix[, mc.i], method = "BH")
+    wi.BH.matrix.greater[, mc.i] <- p.adjust(2*wi.p.matrix[, mc.i], method = "BH")
+    wi.BH.matrix.less[, mc.i] <- p.adjust(2*(1-wi.p.matrix[, mc.i]), method = "BH")
     
       
     we.p.matrix[, mc.i] <- t.fast(t.input, setAsBinary, paired.test)$p
-    we.BH.matrix.greater[, mc.i] <- p.adjust(we.p.matrix[, mc.i], method = "BH")
-    we.BH.matrix.less[, mc.i] <- p.adjust(1-we.p.matrix[, mc.i], method = "BH")
+    we.BH.matrix.greater[, mc.i] <- p.adjust(2*we.p.matrix[, mc.i], method = "BH")
+    we.BH.matrix.less[, mc.i] <- p.adjust(2*(1-we.p.matrix[, mc.i]), method = "BH")
     
   }
     
@@ -120,9 +120,9 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
   wi.eBH <- cbind(wi.eBH.less, wi.eBH.greater)
     
   we.ep <- 2*sapply(we.ep, FUN = function(vec){min(vec, 1-vec)})
-  we.eBH <- 2*apply(we.eBH, 1, min)
+  we.eBH <- apply(we.eBH, 1, min)
   wi.ep <- 2*sapply(wi.ep, FUN = function(vec){min(vec, 1-vec)})
-  wi.eBH <- 2*apply(wi.eBH, 1, min)
+  wi.eBH <- apply(wi.eBH, 1, min)
 
   z <- data.frame(we.ep, we.eBH, wi.ep, wi.eBH)
   rownames(z) <- getFeatureNames(clr)
