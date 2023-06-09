@@ -41,49 +41,6 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
   # Use clr conditions slot instead of input
   conditions <- clr@conds
 
-  lr2glm <- function(lr, conditions, ...){
-
-    if( !is(conditions, "matrix") &
-       !("assign" %in% names(attributes(conditions)))){
-
-      stop("Please define the aldex.clr object for a model.matrix 'conditions'.")
-     }
-
-    if(nrow(lr) != nrow(conditions)){
-
-      stop("Input data and 'model.matrix' should have same number of rows.")
-    }
-
-    # Build the glm models
-    model. <- conditions
-    glms <- apply(lr, 2, function(x){
-      glm(x ~ model., ...)
-    })
-    dof <- glm(lr[,1]~model.)$df.residual
-    # Combine to make data.frame
-    extracts <- lapply(glms, extract)
-    df <- do.call("rbind", extracts)
-    rownames(df) <- colnames(lr)
-    df <- as.data.frame(df)
-    
-    # Adjusting to one-sided p-values
-    colsToAdjust <- which(grepl("Pr\\(>",colnames(df)))
-    for(j in colsToAdjust){
-      df[,j] <- pt(df[,(j-1)], df = dof,lower.tail = FALSE)
-    }
-    
-    # Create new data.frame for FDR
-    pvals <- colnames(df)[grepl("Pr\\(>", colnames(df))]
-    df.bh <- df[,pvals]
-    colnames(df.bh) <- paste0(colnames(df.bh), ".holm")
-    for(j in 1:ncol(df.bh)){
-      df.bh[,j] <- p.adjust(df.bh[,j], method='holm')
-    }
-
-    # Merge results with FDR
-    cbind(df, df.bh)
-  }
-
   # Keep a running sum of lr2glm instances
   # verbose was throwing an error 'the condition has length > 1'
   if(verbose[1] == TRUE) message("running tests for each MC instance:")
@@ -126,3 +83,45 @@ extract <- function(model){
   do.call("cbind", coefs)
 }
 
+lr2glm <- function(lr, conditions, ...){
+  
+  if( !is(conditions, "matrix") &
+      !("assign" %in% names(attributes(conditions)))){
+    
+    stop("Please define the aldex.clr object for a model.matrix 'conditions'.")
+  }
+  
+  if(nrow(lr) != nrow(conditions)){
+    
+    stop("Input data and 'model.matrix' should have same number of rows.")
+  }
+  
+  # Build the glm models
+  model. <- conditions
+  glms <- apply(lr, 2, function(x){
+    glm(x ~ model., ...)
+  })
+  dof <- glm(lr[,1]~model.)$df.residual
+  # Combine to make data.frame
+  extracts <- lapply(glms, extract)
+  df <- do.call("rbind", extracts)
+  rownames(df) <- colnames(lr)
+  df <- as.data.frame(df)
+  
+  # Adjusting to one-sided p-values
+  colsToAdjust <- which(grepl("Pr\\(>",colnames(df)))
+  for(j in colsToAdjust){
+    df[,j] <- pt(df[,(j-1)], df = dof,lower.tail = FALSE)
+  }
+  
+  # Create new data.frame for FDR
+  pvals <- colnames(df)[grepl("Pr\\(>", colnames(df))]
+  df.bh <- df[,pvals]
+  colnames(df.bh) <- paste0(colnames(df.bh), ".holm")
+  for(j in 1:ncol(df.bh)){
+    df.bh[,j] <- p.adjust(df.bh[,j], method='holm')
+  }
+  
+  # Merge results with FDR
+  cbind(df, df.bh)
+}

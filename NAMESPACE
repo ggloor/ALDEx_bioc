@@ -22,6 +22,7 @@ importFrom("Rfast", "rowMedians", "colMedians")
 
 export( aldex )
 export(plotGamma)
+export(interpretGamma)
 exportPattern( "^aldex[.]*" )
 exportMethods(getMonteCarloInstances,getDirichletInstances,getSampleIDs,getFeatures,
     numFeatures,numMCInstances,getFeatureNames,getReads,numConditions,
