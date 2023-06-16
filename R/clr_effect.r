@@ -3,7 +3,8 @@
 #' Determines the median clr abundance of the feature in all samples and in groups.
 #' Determines the median difference between the two groups.
 #' Determines the median variation within each two group.
-#' Determines the effect size, which is the median of the ratio of the between-group difference and the larger of the variance within groups.
+#' Determines the effect size, which is the median of the ratio of the 
+#'  between-group difference and the larger of the variance within groups.
 #'
 #' @param clr \code{clr} is the data output of \code{aldex.clr}.
 #' @param verbose Print diagnostic information while running. Useful only for debugging if fails on large datasets.
@@ -20,7 +21,8 @@
 #'  \item{rab.win.conditionA}{a vector containing the median clr value for each feature in condition A.}
 #'  \item{rab.win.conditionB}{a vector containing the median clr value for each feature in condition B.}
 #'  \item{diff.btw}{a vector containing the per-feature median difference between condition A and B.}
-#'  \item{diff.win}{a vector containing the per-feature maximum median difference between Dirichlet instances within conditions.}
+#'  \item{diff.win}{a vector containing the per-feature maximum median difference between 
+#'    Dirichlet instances within conditions.}
 #'  \item{effect}{a vector containing the per-feature effect size.}
 #'  \item{overlap}{a vector containing the per-feature proportion of effect size that is 0 or less.}
 #' 
@@ -28,7 +30,8 @@
 #' 
 #' @author Greg Gloor, Andrew Fernandes, Matt Links
 #' 
-#' @seealso \code{\link{aldex.clr}}, \code{\link{aldex.ttest}}, \code{\link{aldex.glm}}, \code{\link{selex}}
+#' @seealso \code{\link{aldex.clr}}, \code{\link{aldex.ttest}}, \code{\link{aldex.glm}}, 
+#'   \code{\link{aldex.glm.effect}}, \code{\link{selex}}
 #' 
 #' @examples
 #' # x is the output of the \code{x <- clr(data, mc.samples)} function

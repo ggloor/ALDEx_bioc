@@ -35,7 +35,8 @@ Returns a dataframe with the following information:
  \item{rab.win.conditionA}{a vector containing the median clr value for each feature in condition A.}
  \item{rab.win.conditionB}{a vector containing the median clr value for each feature in condition B.}
  \item{diff.btw}{a vector containing the per-feature median difference between condition A and B.}
- \item{diff.win}{a vector containing the per-feature maximum median difference between Dirichlet instances within conditions.}
+ \item{diff.win}{a vector containing the per-feature maximum median difference between 
+   Dirichlet instances within conditions.}
  \item{effect}{a vector containing the per-feature effect size.}
  \item{overlap}{a vector containing the per-feature proportion of effect size that is 0 or less.}
 }
@@ -43,7 +44,8 @@ Returns a dataframe with the following information:
 Determines the median clr abundance of the feature in all samples and in groups.
 Determines the median difference between the two groups.
 Determines the median variation within each two group.
-Determines the effect size, which is the median of the ratio of the between-group difference and the larger of the variance within groups.
+Determines the effect size, which is the median of the ratio of the 
+ between-group difference and the larger of the variance within groups.
 }
 \details{
 An explicit example for two conditions is shown in the `Examples` below.
@@ -64,7 +66,8 @@ effect.test <- aldex.effect(x)
 Please use the citation given by \code{citation(package="ALDEx")}.
 }
 \seealso{
-\code{\link{aldex.clr}}, \code{\link{aldex.ttest}}, \code{\link{aldex.glm}}, \code{\link{selex}}
+\code{\link{aldex.clr}}, \code{\link{aldex.ttest}}, \code{\link{aldex.glm}}, 
+  \code{\link{aldex.glm.effect}}, \code{\link{selex}}
 }
 \author{
 Greg Gloor, Andrew Fernandes, Matt Links

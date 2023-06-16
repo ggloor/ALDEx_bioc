@@ -20,7 +20,7 @@ Description: A differential abundance analysis for the comparison of two or more
     (via aldex.corr). All tests report p-values and Benjamini-Hochberg
     corrected p-values. ALDEx2 also calculates expected standardized effect sizes for
     paired or unpaired study designs.
-License: GPL (>= 3)
+License: LICENSE
 URL: https://github.com/ggloor/ALDEx_bioc
 BugReports: https://github.com/ggloor/ALDEx_bioc/issues
 RoxygenNote: 7.2.3

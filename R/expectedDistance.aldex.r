@@ -17,10 +17,11 @@
 #' conds <- c(rep("NS", 7), rep("S", 7))
 #' x <- aldex.clr(selex, conds, mc.samples = 128, denom = "all", verbose = FALSE)
 #' x.dist <- aldex.expectedDistance(x)
+#' plot(hclust(x.dist))
 #'
 #' @export
 aldex.expectedDistance <- function(clrData) {
-    if (class(clrData) != "aldex.clr" && class(clrData) != "list") {
+    if (class(clrData)[1] != "aldex.clr") {
         stop("Please supply a valid aldex.clr object.")
     }
 
