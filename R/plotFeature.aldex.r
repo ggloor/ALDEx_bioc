@@ -9,7 +9,8 @@
 #' @param featureName the name of the feature from the input data
 #' @param pooledOnly show only the pooled plots, default FALSE, shows all plots
 #' @param densityOnly show only the density plots, default FALSE includes expected values
-#'
+#' @param hist embed histogram in frequency graph, default FALSE
+#' 
 #' @author Brandon Lieng, Greg Gloor
 #'
 #' @seealso
@@ -29,7 +30,7 @@
 #' aldex.plotFeature(x, "S:D:A:D")
 
 aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
-                              densityOnly=FALSE) {
+                              densityOnly=FALSE, hist=FALSE) {
     mcInstances <- getMonteCarloInstances(clrData)
     mcInstancesByGroup <- split(mcInstances, factor(clrData@conds))
 
@@ -76,6 +77,10 @@ aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
         plot(withinADensity, main="Group Distribution", xlab="clr Values", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
     } else {
         plot(withinBDensity, main="Group Distribution", xlab="clr Values", xlim=as.numeric(quantile(mixtureVector, probs=c(0.025,0.975))))
+    }
+	if(hist==T){
+      hist(withinVectors[[1]], freq=F, breaks=19, border=NULL, add=T, col=rgb(1,0,1,0.2))
+      hist(withinVectors[[2]], freq=F, breaks=19, border=NULL, add=T, col=rgb(0,0,1,0.2))
     }
     polygon(withinADensity, col=rgb(1,0,0,0.3), border="red")
     polygon(withinBDensity, col=rgb(0,0,1,0.3), border="cyan")

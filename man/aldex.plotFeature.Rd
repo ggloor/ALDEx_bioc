@@ -8,7 +8,8 @@ aldex.plotFeature(
   clrData,
   featureName,
   pooledOnly = FALSE,
-  densityOnly = FALSE
+  densityOnly = FALSE,
+  hist = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ aldex.plotFeature(
 \item{pooledOnly}{show only the pooled plots, default FALSE, shows all plots}
 
 \item{densityOnly}{show only the density plots, default FALSE includes expected values}
+
+\item{hist}{embed histogram in frequency graph, default FALSE}
 }
 \description{
 \code{aldex.plotFeature} generates density plots showing the dispersion

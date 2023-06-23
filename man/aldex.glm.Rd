@@ -34,6 +34,9 @@ covariates <- data.frame("A" = sample(0:1, 14, replace = TRUE),
 mm <- model.matrix(~ A + B, covariates)
 x <- aldex.clr(selex, mm, mc.samples=4, denom="all")
 glm.test <- aldex.glm(x)
+glm.eff <- aldex.glm.effect(x)
+aldex.glm.plot(glm.test, eff=glm.eff, contrast='B', type='MW')
+
 }
 \references{
 Please use the citation given by

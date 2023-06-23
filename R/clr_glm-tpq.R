@@ -6,8 +6,8 @@
 #'
 #' @param clr An \code{ALDEx2} object. The output of \code{aldex.clr}.
 #' @inheritParams aldex
+#' @post.hoc post-hoc correction to apply, any in p.adjust (default holm)
 #' @param ... Arguments passed to \code{glm}.
-#'
 #' @return Returns a data.frame of the average
 #'  coefficients and their p-values for each feature,
 #'  with FDR appended as a \code{holm} column.
@@ -36,7 +36,10 @@
 #' mm <- model.matrix(~ A + B, covariates)
 #' x <- aldex.clr(selex, mm, mc.samples=4, denom="all")
 #' glm.test <- aldex.glm(x)
-aldex.glm <- function(clr, verbose=FALSE, ...){
+#' glm.eff <- aldex.glm.effect(x)
+#' aldex.glm.plot(glm.test, eff=glm.eff, contrast='B', type='MW')
+#'
+aldex.glm <- function(clr, verbose=FALSE, post.hoc='holm', ...){
 
   # Use clr conditions slot instead of input
   conditions <- clr@conds
@@ -74,11 +77,10 @@ aldex.glm <- function(clr, verbose=FALSE, ...){
     
     # Create new data.frame for FDR
     pvals <- colnames(df)[grepl("Pr\\(>", colnames(df))]
-    df.bh <- df[,pvals]
-    colnames(df.bh) <- paste0(colnames(df.bh), ".holm")
-    for(j in 1:ncol(df.bh)){
-      df.bh[,j] <- p.adjust(df.bh[,j], method='holm')
-    }
+
+    df.bh <- apply(df[,pvals], 2, function(x) p.adjust(x, method=post.hoc))
+
+	colnames(df.bh) <- paste0(colnames(df.bh), '.', post.hoc, sep="")
 
     # Merge results with FDR
     cbind(df, df.bh)
