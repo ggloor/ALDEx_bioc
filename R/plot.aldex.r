@@ -32,7 +32,7 @@
 #' @param rare.col color for rare features, default black
 #' @param rare.pch the default symbol of rare features
 #' @param rare.cex the default symbol size of rare points
-#'
+#' @param main the main label for the plot
 #' @details This particular specialization of the \code{plot} function is relatively simple and provided for convenience.
 #' For more advanced control of the plot is is best to use the values returned by \code{summary(x)}.
 #'
@@ -49,7 +49,7 @@ aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xl
     all.cex = 0.4, called.col = "red", called.pch = 20, called.cex = 0.6,
     thres.line.col = "darkgrey", thres.lwd = 1.5, test = "welch",
     cutoff.pval = 0.05, cutoff.effect = 1, rare.col = "black", rare = 0, rare.pch = 20,
-    rare.cex = 0.2)
+    rare.cex = 0.2, main=NULL)
 {
     type <- match.arg(type)
     if (length(x$effect) == 0)
@@ -85,7 +85,8 @@ aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xl
         if (is.null(ylab))
             ylab <- expression("Median" ~ ~Log[2] ~ ~"Difference")
         plot(x$diff.win, x$diff.btw, xlab = xlab, ylab = ylab,
-            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, xlim=xlim)
+            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, 
+            xlim=xlim, main=main)
         points(x$diff.win[x$rab.all < rare], x$diff.btw[x$rab.all <
             rare], col = rare.col, pch = rare.pch, cex = rare.cex)
         points(x$diff.win[called], x$diff.btw[called], col = called.col,
@@ -104,7 +105,8 @@ aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xl
         if (is.null(ylab))
             ylab <- expression("Median" ~ ~Log[2] ~ ~"Difference")
         plot(x$rab.all, x$diff.btw, xlab = xlab, ylab = ylab,
-            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, xlim=xlim)
+            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, 
+            xlim=xlim, main=main)
         points(x$rab.all[x$rab.all < rare], x$diff.btw[x$rab.all <
             rare], col = rare.col, pch = rare.pch, cex = rare.cex)
         points(x$rab.all[called], x$diff.btw[called], col = called.col,
@@ -121,7 +123,8 @@ aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xl
         if (is.null(xlab))
             xlab <- expression("Median Log"[2]~" Difference")
         plot(x$diff.btw, -1*log10(all.p), xlab = xlab, ylab = ylab,
-            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, xlim=xlim)
+            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, 
+            xlim=xlim, main=main)
         points(x$diff.btw[called], -1*log10(all.p)[called], col = called.col,
             pch = called.pch, cex = called.cex)
         cols <- grep("rab.win", colnames(x))
@@ -139,7 +142,8 @@ aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xl
         if (is.null(xlab))
             xlab <- expression("Median Log"[2]~" Dispersion")
         plot(x$diff.win, -1*log10(all.p), xlab = xlab, ylab = ylab,
-            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, xlim=xlim)
+            col = all.col, pch = all.pch, cex = all.cex, ylim=ylim, 
+            xlim=xlim, main=main)
         points(x$diff.win[called], -1*log10(all.p)[called], col = called.col,
             pch = called.pch, cex = called.cex)
         cols <- grep("rab.win", colnames(x))

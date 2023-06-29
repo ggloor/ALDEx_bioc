@@ -4,7 +4,7 @@
 \alias{aldex.glm}
 \title{Calculate glm test statistics using a \code{model.matrix}}
 \usage{
-aldex.glm(clr, verbose = FALSE, ...)
+aldex.glm(clr, verbose = FALSE, post.hoc = "holm", ...)
 }
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}
@@ -14,6 +14,8 @@ running. Useful for debugging errors on large datasets. Applies to
 \code{effect = TRUE}.}
 
 \item{...}{Arguments passed to \code{glm}.}
+
+\item{post-hod}{post-hoc correction to apply, any in p.adjust (default holm)}
 }
 \value{
 Returns a data.frame of the average
@@ -35,7 +37,7 @@ mm <- model.matrix(~ A + B, covariates)
 x <- aldex.clr(selex, mm, mc.samples=4, denom="all")
 glm.test <- aldex.glm(x)
 glm.eff <- aldex.glm.effect(x)
-aldex.glm.plot(glm.test, eff=glm.eff, contrast='B', type='MW')
+aldex.glm.plot(glm.test, eff=glm.eff, contrast='B', type='MW', post.hoc='holm')
 
 }
 \references{

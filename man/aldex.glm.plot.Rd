@@ -40,7 +40,8 @@ aldex.glm.plot(
 
 \item{contrast}{the column name of the model matrix contrast to plot}
 
-\item{test}{the method of calculating significance, one of "pval", "holm"}
+\item{test}{the method of calculating significance, one of "pval", "holm",
+or any of the corrections in \code{p.adjust} passed to \code{aldex.glm}}
 
 \item{type}{which type of plot is to be produced. \code{MA} is a 
 Bland-Altman style plot; \code{MW} is an effect plot showing the

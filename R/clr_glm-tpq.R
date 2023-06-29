@@ -5,8 +5,8 @@
 #'  requires the user to define a model with \code{model.matrix}.
 #'
 #' @param clr An \code{ALDEx2} object. The output of \code{aldex.clr}.
+#' @param post-hod post-hoc correction to apply, any in p.adjust (default holm)
 #' @inheritParams aldex
-#' @post.hoc post-hoc correction to apply, any in p.adjust (default holm)
 #' @param ... Arguments passed to \code{glm}.
 #' @return Returns a data.frame of the average
 #'  coefficients and their p-values for each feature,
@@ -37,7 +37,7 @@
 #' x <- aldex.clr(selex, mm, mc.samples=4, denom="all")
 #' glm.test <- aldex.glm(x)
 #' glm.eff <- aldex.glm.effect(x)
-#' aldex.glm.plot(glm.test, eff=glm.eff, contrast='B', type='MW')
+#' aldex.glm.plot(glm.test, eff=glm.eff, contrast='B', type='MW', post.hoc='holm')
 #'
 aldex.glm <- function(clr, verbose=FALSE, post.hoc='holm', ...){
 
