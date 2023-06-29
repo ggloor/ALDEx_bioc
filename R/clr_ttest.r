@@ -107,21 +107,27 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
     hist(wi.p.matrix[,1], breaks=99, main="Wilcoxon P values Instance 1")
     par(mfrow=c(1,1))
   }
-    
-  # get the Expected values of p, q and lfdr
-  we.ep <- rowMeans(we.p.matrix) # rowMeans is faster than apply()!!
-  we.eBH.greater <- rowMeans(we.BH.matrix.greater)
-  we.eBH.less <- rowMeans(we.BH.matrix.less)
-  wi.ep <- rowMeans(wi.p.matrix)
-  wi.eBH.greater <- rowMeans(wi.BH.matrix.greater)
-  wi.eBH.less <- rowMeans(wi.BH.matrix.less)
+  ##Making this into a two sided test
+  we.p.matrix.greater <- 2*we.p.matrix
+  we.p.matrix.less <- 2*(1-we.p.matrix)
+  wi.p.matrix.greater <- 2*wi.p.matrix
+  wi.p.matrix.less <- 2*(1-wi.p.matrix)
   
-  we.eBH <- cbind(we.eBH.less, we.eBH.greater)
-  wi.eBH <- cbind(wi.eBH.less, wi.eBH.greater)
-    
-  we.ep <- 2*sapply(we.ep, FUN = function(vec){min(vec, 1-vec)})
+  ##making sure the max p-value is 1
+  we.p.matrix.greater <- apply(we.p.matrix.greater, c(1,2), FUN = function(x){min(x,1)})
+  we.p.matrix.less <- apply(we.p.matrix.less, c(1,2), FUN = function(x){min(x,1)})
+  wi.p.matrix.greater <- apply(wi.p.matrix.greater, c(1,2), FUN = function(x){min(x,1)})
+  wi.p.matrix.less <- apply(wi.p.matrix.less, c(1,2), FUN = function(x){min(x,1)})
+  
+  # get the Expected values of p, q and lfdr
+  we.ep <- cbind(rowMeans(we.p.matrix.greater), rowMeans(we.p.matrix.less)) # rowMeans is faster than apply()!!
+  wi.ep <- cbind(rowMeans(wi.p.matrix.greater), rowMeans(wi.p.matrix.less)) 
+  we.eBH <- cbind(rowMeans(we.BH.matrix.greater), rowMeans(we.BH.matrix.less))
+  wi.eBH <- cbind(rowMeans(wi.BH.matrix.greater), rowMeans(wi.BH.matrix.less))
+  
+  we.ep <- apply(we.ep, 1, min)
   we.eBH <- apply(we.eBH, 1, min)
-  wi.ep <- 2*sapply(wi.ep, FUN = function(vec){min(vec, 1-vec)})
+  wi.ep <- apply(wi.ep, 1, min)
   wi.eBH <- apply(wi.eBH, 1, min)
 
   z <- data.frame(we.ep, we.eBH, wi.ep, wi.eBH)

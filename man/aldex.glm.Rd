@@ -4,7 +4,7 @@
 \alias{aldex.glm}
 \title{Calculate glm test statistics using a \code{model.matrix}}
 \usage{
-aldex.glm(clr, verbose = FALSE, ...)
+aldex.glm(clr, verbose = FALSE, p.method = "holm", ...)
 }
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}
@@ -12,6 +12,8 @@ aldex.glm(clr, verbose = FALSE, ...)
 \item{verbose}{A boolean. Toggles whether to print diagnostic information while
 running. Useful for debugging errors on large datasets. Applies to
 \code{effect = TRUE}.}
+
+\item{p.method}{A string ("BH" or "holm") denoting which method to use to adjust p-values. Default is "holm"}
 
 \item{...}{Arguments passed to \code{glm}.}
 }

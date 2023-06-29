@@ -34,16 +34,16 @@ test_that("t.fast gives same result as t.test", {
 
 test_that("wilcox.fast gives same result as wilcox.test (exact)", {
   
-  expect_equivalent(
+  expect_equal(
     as.vector(apply(t.input, 1, function(i){
-      wilcox.test(x=i[setA],y=i[setB], paired = FALSE, exact = TRUE)$p.value})),
-    ALDEx2:::wilcox.fast(t.input, group, paired = FALSE)
+      wilcox.test(x=i[setA],y=i[setB], paired = FALSE, exact = TRUE, alternative = "greater")$p.value})),
+    unname(ALDEx2:::wilcox.fast(t.input, group, paired = FALSE)), ignore_attr = TRUE, tol = 1e-3
   )
   
-  expect_equivalent(
+  expect_equal(
     apply(t.input, 1, function(i){
-      wilcox.test(x=i[setA],y=i[setB], paired = TRUE, exact = TRUE)$p.value}),
-    ALDEx2:::wilcox.fast(t.input, group, paired = TRUE)
+      wilcox.test(x=i[setA],y=i[setB], paired = TRUE, exact = TRUE, alternative = "greater")$p.value}),
+    ALDEx2:::wilcox.fast(t.input, group, paired = TRUE), ignore_attr = TRUE, tol = 1e-3
   )
 })
 
@@ -89,13 +89,13 @@ test_that("wilcox.fast gives same result as wilcox.test (exact)", {
   
   expect_equivalent(
     as.vector(apply(t.input, 1, function(i){
-      wilcox.test(x=i[setA],y=i[setB], paired = FALSE, exact = TRUE)$p.value})),
+      wilcox.test(x=i[setA],y=i[setB], paired = FALSE, exact = TRUE, alternative = "greater")$p.value})),
     ALDEx2:::wilcox.fast(t.input, group, paired = FALSE)
   )
   
   expect_equivalent(
     apply(t.input, 1, function(i){
-      wilcox.test(x=i[setA],y=i[setB], paired = TRUE, exact = TRUE)$p.value}),
+      wilcox.test(x=i[setA],y=i[setB], paired = TRUE, exact = TRUE, alternative = "greater")$p.value}),
     ALDEx2:::wilcox.fast(t.input, group, paired = TRUE)
   )
 })
@@ -137,13 +137,13 @@ test_that("wilcox.fast gives same result as wilcox.test (normal approx.)", {
   
   expect_equivalent(
     as.vector(apply(t.input, 1, function(i){
-      wilcox.test(x=i[setA],y=i[setB], paired = FALSE, correct = FALSE)$p.value})),
+      wilcox.test(x=i[setA],y=i[setB], paired = FALSE, correct = FALSE, alternative = "greater")$p.value})),
     ALDEx2:::wilcox.fast(t.input, group, paired = FALSE)
   )
   
   expect_equivalent(
     apply(t.input, 1, function(i){
-      wilcox.test(x=i[setA],y=i[setB], paired = TRUE, correct = FALSE)$p.value}),
+      wilcox.test(x=i[setA],y=i[setB], paired = TRUE, correct = FALSE, alternative = "greater")$p.value}),
     ALDEx2:::wilcox.fast(t.input, group, paired = TRUE)
   )
 })

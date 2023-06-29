@@ -68,13 +68,13 @@ wilcox.fast <- function(data, group, paired){
     data.diff <- data.t[grp1, ] - data.t[grp2, ]
     V <- apply(data.diff, 2, function(x) sum(rank(abs(x))[x > 0]))
     topscore <- (n1 * (n1+1)) / 2
-    V.lower <- ifelse(V > topscore / 2, topscore - V, V)
+    #V.lower <- ifelse(V > topscore / 2, topscore - V, V)
     if(sum(grp1) < 50){ # as per wilcox test, use exact -- ASSUMES NO TIES!!
-      V.p <- psignrank(V.lower, n1) * 2
-      return(ifelse(V.p > 1, 1, V.p)) # psignrank returns non-zero for W = mean
+      V.p <- psignrank(V-1, n1, lower.tail = FALSE)
+      return(V.p) # psignrank returns non-zero for W = mean
     }else{ # Use normal approximation
-      V.std <- (topscore/2 - V.lower) / sqrt(n1*(n1 + 1) * (2*n1 + 1) / 24) # wilcox.test uses denom = 24
-      return(pnorm(V.std, lower.tail = FALSE) * 2)
+      V.std <- (V - topscore/2) / sqrt(n1*(n1 + 1) * (2*n1 + 1) / 24) # wilcox.test uses denom = 24
+      return(pnorm(V.std, lower.tail = FALSE))
     }
     
     
@@ -83,11 +83,11 @@ wilcox.fast <- function(data, group, paired){
     W.std <- multtest::mt.teststat(data, as.numeric(grp1), test = "wilcoxon")
     if(sum(grp1) < 50 && sum(grp2) < 50){ # as per wilcox test, use exact -- ASSUMES NO TIES!!
       W.var <- sqrt((n1*n2) * (n1+n2+1) / 12)
-      W <- abs(W.std) * W.var + (n1*n2) / 2
-      W.p <- pwilcox(W - 1, n1, n2, lower.tail = FALSE) * 2
-      return(ifelse(W.p > 1, 1, W.p)) # pwilcox returns non-zero for W = mean
+      W <- W.std * W.var + (n1*n2) / 2
+      W.p <- pwilcox(W-1, n1, n2, lower.tail = FALSE)
+      return(W.p) # pwilcox returns non-zero for W = mean
     }else{ # Use normal approximation
-      return(pnorm(abs(W.std), lower.tail = FALSE) * 2)
+      return(pnorm(W.std, lower.tail = FALSE))
     }
   }
 }
