@@ -10,6 +10,7 @@ aldex(
   mc.samples = 128,
   test = "t",
   effect = TRUE,
+  CI = FALSE,
   include.sample.summary = FALSE,
   verbose = FALSE,
   paired.test = FALSE,
@@ -38,7 +39,9 @@ Welch's t and Wilcoxon tests. "kw" runs Kruskal-Wallace and glm tests.
 "glm" runs a generalized linear model using a \code{model.matrix}.
 "corr" runs a correlation test using \code{cor.test}.}
 
-\item{effect}{A boolean. Toggles whether to calculate abundances and effect sizes.
+\item{effect}{A boolean. Toggles whether to calculate abundances and effect sizes.}
+
+\item{CI}{A boolean. Toggles whether to calculate effect size confidence intervals
 Applies to \code{test = "t"} and \code{test = "iterative"}.}
 
 \item{include.sample.summary}{A boolean. Toggles whether to include median clr
@@ -122,5 +125,6 @@ Please use the citation given by
 \author{
 Greg Gloor, Andrew Fernandes, and Matt Links contributed to
  the original package. Thom Quinn added the "glm" test method, the
- "corr" test method, and the "iterate" procedure.
+ "corr" test method, and the "iterate" procedure. Michelle Pistner Nixon
+ and Justin Silverman contributed the scale and PPP routines
 }

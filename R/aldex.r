@@ -38,6 +38,7 @@
 #'  this will use the results from an initial "t" routine to seed the reference
 #'  (i.e., denominator of Geometric Mean calculation) for a second "t" routine.
 #' @param effect A boolean. Toggles whether to calculate abundances and effect sizes.
+#' @param CI A boolean. Toggles whether to calculate effect size confidence intervals
 #'  Applies to \code{test = "t"} and \code{test = "iterative"}.
 #' @param include.sample.summary A boolean. Toggles whether to include median clr
 #'  values for each sample. Applies to \code{effect = TRUE}.
@@ -55,7 +56,8 @@
 #'
 #' @author Greg Gloor, Andrew Fernandes, and Matt Links contributed to
 #'  the original package. Thom Quinn added the "glm" test method, the
-#'  "corr" test method, and the "iterate" procedure.
+#'  "corr" test method, and the "iterate" procedure. Michelle Pistner Nixon
+#'  and Justin Silverman contributed the scale and PPP routines
 #'
 #' @seealso
 #'  \code{\link{aldex}},
@@ -89,7 +91,7 @@
 #' conds <- c(rep("NS", 7), rep("S", 7))
 #' x <- aldex(selex, conds, mc.samples=2, denom="all",
 #'            test="t", effect=TRUE, paired.test=FALSE)
-aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
+aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE, CI=FALSE,
                   include.sample.summary=FALSE, verbose=FALSE, paired.test=FALSE,
                   denom="all", iterate=FALSE, gamma = NULL,  ...){
 
@@ -139,7 +141,7 @@ aldex <- function(reads, conditions, mc.samples=128, test="t", effect=TRUE,
   if(test == "t" && effect && !iterate){
 
     message("aldex.effect: calculating effect sizes")
-    x.effect <- aldex.effect(x, include.sample.summary=include.sample.summary, verbose=verbose, paired.test=paired.test)
+    x.effect <- aldex.effect(x, include.sample.summary=include.sample.summary, verbose=verbose, paired.test=paired.test, CI=CI)
     z <- data.frame(x.effect, x.tt, check.names=F)
 
   }else{

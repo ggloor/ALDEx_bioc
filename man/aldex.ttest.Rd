@@ -14,24 +14,25 @@ aldex.ttest(clr, paired.test = FALSE, hist.plot = FALSE, verbose = FALSE)
 \item{hist.plot}{Toggles whether to plot a histogram of p-values for the
 first Dirichlet Monte Carlo instance.}
 
-\item{verbose}{A boolean. Toggles whether to print diagnostic information while
-running. Useful for debugging errors on large datasets. Applies to
-\code{effect = TRUE}.}
+\item{verbose}{A boolean. Toggles whether to print diagnostic information
+while running. Useful for debugging errors on large datasets. Applies
+to \code{effect = TRUE}.}
 }
 \value{
 Returns a \code{data.frame} with the following information:
-\item{we.ep}{ a vector containing the expected p-value of Welch's t-test
- for each feature }
-\item{we.eBH}{ a vector containing the corresponding expected value of the
+\item{we.ep}{a vector containing the the poseterior predictive p-value of 
+ Welch's t-test for each feature }
+\item{we.eBH}{a vector containing the corresponding expected value of the
  Benjamini-Hochberg corrected p-value for each feature }
-\item{wi.ep}{ a vector containing the expected p-value of the Wilcoxon Rank Sum test
+\item{wi.ep}{a vector containing the expected p-value of the Wilcoxon Rank Sum test
  for each feature }
-\item{wi.eBH}{ a vector containing the corresponding expected value of the
+\item{wi.eBH}{a vector containing the corresponding expected value of the
  Benjamini-Hochberg corrected p-value for each feature }
 }
 \description{
 \code{aldex.ttest} calculates the expected values of the Wilcoxon Rank Sum
- test and Welch's t-test on the data returned by \code{aldex.clr}.
+ test and the posterior predictive value of Welch's t-test on the data
+ returned by \code{aldex.clr}.
 }
 \examples{
 data(selex)
@@ -56,5 +57,5 @@ Please use the citation given by
  \code{\link{selex}}
 }
 \author{
-Greg Gloor
+Greg Gloor, Michelle Pistner
 }

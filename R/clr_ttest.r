@@ -1,25 +1,28 @@
 #' Calculate Wilcoxon Rank Sum test and Welch's t-test statistics
 #'
 #' \code{aldex.ttest} calculates the expected values of the Wilcoxon Rank Sum
-#'  test and Welch's t-test on the data returned by \code{aldex.clr}.
+#'  test and the posterior predictive value of Welch's t-test on the data
+#'  returned by \code{aldex.clr}.
 #'
 #' @param clr An \code{ALDEx2} object. The output of \code{aldex.clr}.
-#' @inheritParams aldex
 #' @param paired.test Toggles whether to calculate paired tests.
 #' @param hist.plot Toggles whether to plot a histogram of p-values for the
 #' first Dirichlet Monte Carlo instance.
+#' @param verbose A boolean. Toggles whether to print diagnostic information
+#'   while running. Useful for debugging errors on large datasets. Applies
+#'   to \code{effect = TRUE}.
 #'
 #' @return Returns a \code{data.frame} with the following information:
-#' \item{we.ep}{ a vector containing the expected p-value of Welch's t-test
-#'  for each feature }
-#' \item{we.eBH}{ a vector containing the corresponding expected value of the
+#' \item{we.ep}{a vector containing the the poseterior predictive p-value of 
+#'  Welch's t-test for each feature }
+#' \item{we.eBH}{a vector containing the corresponding expected value of the
 #'  Benjamini-Hochberg corrected p-value for each feature }
-#' \item{wi.ep}{ a vector containing the expected p-value of the Wilcoxon Rank Sum test
+#' \item{wi.ep}{a vector containing the expected p-value of the Wilcoxon Rank Sum test
 #'  for each feature }
-#' \item{wi.eBH}{ a vector containing the corresponding expected value of the
+#' \item{wi.eBH}{a vector containing the corresponding expected value of the
 #'  Benjamini-Hochberg corrected p-value for each feature }
 #'
-#' @author Greg Gloor
+#' @author Greg Gloor, Michelle Pistner
 #'
 #' @seealso
 #'  \code{\link{aldex}},

@@ -6,9 +6,9 @@
 #'
 #' @param clr An \code{ALDEx2} object. The output of \code{aldex.clr}.
 #' @param p.method A string ("BH" or "holm") denoting which method to use to adjust p-values. Default is "holm"
+
 #' @inheritParams aldex
 #' @param ... Arguments passed to \code{glm}.
-#'
 #' @return Returns a data.frame of the average
 #'  coefficients and their p-values for each feature,
 #'  with FDR appended as a \code{holm} column.
@@ -37,6 +37,9 @@
 #' mm <- model.matrix(~ A + B, covariates)
 #' x <- aldex.clr(selex, mm, mc.samples=4, denom="all")
 #' glm.test <- aldex.glm(x)
+#' glm.eff <- aldex.glm.effect(x)
+#' aldex.glm.plot(glm.test, eff=glm.eff, contrast='B', type='MW', post.hoc='holm')
+#'
 aldex.glm <- function(clr, verbose=FALSE, p.method = "holm", ...){
   
   if(!(p.method %in% c("holm", "BH", "fdr"))){
@@ -45,6 +48,49 @@ aldex.glm <- function(clr, verbose=FALSE, p.method = "holm", ...){
 
   # Use clr conditions slot instead of input
   conditions <- clr@conds
+
+
+  lr2glm <- function(lr, conditions, ...){
+
+    if( !is(conditions, "matrix") &
+       !("assign" %in% names(attributes(conditions)))){
+
+      stop("Please define the aldex.clr object for a model.matrix 'conditions'.")
+     }
+
+    if(nrow(lr) != nrow(conditions)){
+
+      stop("Input data and 'model.matrix' should have same number of rows.")
+    }
+
+    # Build the glm models
+    model. <- conditions
+    glms <- apply(lr, 2, function(x){
+      glm(x ~ model., ...)
+    })
+    dof <- glm(lr[,1]~model.)$df.residual
+    # Combine to make data.frame
+    extracts <- lapply(glms, extract)
+    df <- do.call("rbind", extracts)
+    rownames(df) <- colnames(lr)
+    df <- as.data.frame(df)
+    
+    # Adjusting to one-sided p-values
+    colsToAdjust <- which(grepl("Pr\\(>",colnames(df)))
+    for(j in colsToAdjust){
+      df[,j] <- pt(df[,(j-1)], df = dof,lower.tail = FALSE)
+    }
+    
+    # Create new data.frame for FDR
+    pvals <- colnames(df)[grepl("Pr\\(>", colnames(df))]
+
+    df.bh <- apply(df[,pvals], 2, function(x) p.adjust(x, method=post.hoc))
+
+	colnames(df.bh) <- paste0(colnames(df.bh), '.', post.hoc, sep="")
+
+    # Merge results with FDR
+    cbind(df, df.bh)
+  }
 
   # Keep a running sum of lr2glm instances
   # verbose was throwing an error 'the condition has length > 1'

@@ -25,8 +25,7 @@ Welch's t and Wilcoxon tests. "kw" runs Kruskal-Wallace and glm tests.
 "glm" runs a generalized linear model using a \code{model.matrix}.
 "corr" runs a correlation test using \code{cor.test}.}
 
-\item{effect}{A boolean. Toggles whether to calculate abundances and effect sizes.
-Applies to \code{test = "t"} and \code{test = "iterative"}.}
+\item{effect}{A boolean. Toggles whether to calculate abundances and effect sizes.}
 
 \item{include.sample.summary}{A boolean. Toggles whether to include median clr
 values for each sample. Applies to \code{effect = TRUE}.}
