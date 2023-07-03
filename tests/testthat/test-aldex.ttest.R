@@ -31,6 +31,7 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
   wi.BH.matrix.greater =  matrix(data=NA, nrow = feature.number, ncol = mc.instances)
   wi.BH.matrix.less =  matrix(data=NA, nrow = feature.number, ncol = mc.instances)
   wi.p.matrix =  matrix(data=NA, nrow = feature.number, ncol = mc.instances)
+
   
   #mc.i is the monte carlo instance
   for(mc.i in 1:mc.instances){
@@ -39,7 +40,7 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
     t.input <- sapply(getMonteCarloInstances(clr), function(y){y[,mc.i]})
     
     # do the Wilcoxon tests on each feature
-    wi.p.matrix[,mc.i] <- t(apply(t.input, 1, function(t.input){as.numeric(wilcox.test(x=t.input[setA],y=t.input[setB])[3])}))
+    wi.p.matrix[,mc.i] <- t(apply(t.input, 1, function(t.input){as.numeric(wilcox.test(x=t.input[setA],y=t.input[setB], alternative = "greater")[3])}))
     wi.BH.matrix.greater[,mc.i] <- as.numeric(p.adjust(2*wi.p.matrix[,mc.i], method="BH"))
     wi.BH.matrix.less[,mc.i] <- as.numeric(p.adjust(2*(1-wi.p.matrix[,mc.i]), method="BH"))
     
@@ -57,14 +58,26 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
     par(mfrow=c(1,1))
   }
   #get the Expected values of p, q and lfdr
-  we.ep <- apply(we.p.matrix, 1, mean)
-  we.ep <- 2*sapply(we.ep, FUN = function(x) min(x, 1-x))
   
+  we.p.matrix.greater <- 2*we.p.matrix
+  we.p.matrix.less <- 2*(1-we.p.matrix)
+  wi.p.matrix.greater <- 2*wi.p.matrix
+  wi.p.matrix.less <- 2*(1-wi.p.matrix)
+  
+  we.ep.greater <- rowMeans(apply(we.p.matrix.greater, c(1,2), FUN = function(x) min(1,x)))
+  we.ep.less <- rowMeans(apply(we.p.matrix.less, c(1,2), FUN = function(x) min(1,x)))
+
+  we.ep <- cbind(we.ep.greater, we.ep.less)
+  we.ep <- apply(we.ep, 1, min)
+
   we.eBH <- cbind(apply(we.BH.matrix.greater, 1, mean), apply(we.BH.matrix.less, 1, mean))
   we.eBH <- apply(we.eBH, 1, min)
   
-  wi.ep <- apply(wi.p.matrix, 1, mean)
-  wi.ep <- 2*sapply(wi.ep, FUN = function(x) min(x, 1-x))
+  wi.ep.greater <- rowMeans(apply(wi.p.matrix.greater, c(1,2), FUN = function(x) min(1,x)))
+  wi.ep.less <- rowMeans(apply(wi.p.matrix.less, c(1,2), FUN = function(x) min(1,x)))
+  
+  wi.ep <- cbind(wi.ep.greater, wi.ep.less)
+  wi.ep <- apply(wi.ep, 1, min)
   
   wi.eBH <- cbind(apply(wi.BH.matrix.greater, 1, mean), apply(wi.BH.matrix.less, 1, mean))
   wi.eBH <- apply(wi.eBH, 1, min)
@@ -73,6 +86,7 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
   rownames(z) <- getFeatureNames(clr)
   return(z)
 }
+
 
 data(selex)
 group <- c(rep("A", 7), rep("B", 7))
@@ -103,3 +117,4 @@ test_that("new faster alex.ttest matches old function", {
     aldex.ttest(clr)
   )
 })
+

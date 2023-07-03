@@ -239,21 +239,44 @@ gm <- function(x, na.rm = TRUE){
 
 default.scale.model <- function(gamma, conds, p, mc.samples){
   ##adding a check to remove the intercept
+  ##also identifying binary variables
   conds_used <- conds
   if(is.matrix(conds)){
     inds <- unname(which(colSums(conds == 1) == nrow(conds))) ##Find if any columns are the intercept
     if(length(inds) > 0){
       conds_used <- conds[,-inds]
     }
+    binary <- unname(which(apply(conds_used,2, FUN = function(vec) length(unique(vec))) == 2))
+  } else{
+    ## testing if the one condition has more than two levels
+    if(length(unique(conds_used)) == 2){
+      ##Re-code to zero one
+      binary <- TRUE
+      conds_used <- as.numeric(as.factor(conds_used)) - 1
+    } else{
+      binary <- FALSE
+    }
   }
   
   ##centering and scaling the conditions
   conds_mat <- matrix(conds_used, nrow = length(p))
-  conds_mat <- apply(conds_mat, 2, FUN = function(vec) as.numeric(as.factor(vec)))
-  conds_mat <- apply(conds_mat, 2, FUN = function(vec) vec - mean(vec)) ##Centering
+  conds_mat <- apply(conds_mat, 2, FUN = function(vec){
+    if(length(unique(vec)) == 2){
+      return(as.numeric(as.factor(vec)) - 1)
+    } else{
+      return(vec) 
+    }
+  })
+  conds_mat <- apply(conds_mat, 2, FUN = function(vec){
+    if(length(unique(vec)) > 2){
+      return(scale(vec))
+    } else{
+      return(vec)
+    }
+  }) ##Centering
   
-  ## scaling gamma to the scale of the conditionbs
-  col_var <- gamma^2/apply(conds_mat, 2, var)
+  ## scaling gamma to the scale of the conditions
+  col_var <- rep(gamma^2, ncol(conds_mat))
   scale_samples <- matrix(NA, length(p), mc.samples) ## empty container
 
   for(i in 1:length(p)){
@@ -266,4 +289,75 @@ default.scale.model <- function(gamma, conds, p, mc.samples){
   }
   scale_samples <- log2(exp(scale_samples))
   return(scale_samples)
+}
+
+
+#' Interpret the scale model implied by a certain level of gamma
+#' 
+#' @param clr A aldex.clr object
+#' @return A table
+#' 
+#' @export
+interpretGamma <- function(clr){
+  ## Checking the scale samples were actual
+  if(is.null(clr@scaleSamps)){
+    stop("No scale samples passed in aldex.clr object. This function is for interpreting gamma if scale noise is added.")
+  }
+  
+  ## checking conds to see if a t-test or glm type test
+  if(is.vector(clr@conds)){
+    scale.comb <- c(clr@scaleSamps)
+    print("2.5th and 97.5th quantile of the scale samples...")
+    return(data.frame("Lower_Bound" = quantile(scale.comb, c(0.025)), "Upper_Bound" = quantile(scale.comb, c(0.975))))
+  } else{
+    ##glm type
+    ## creating a new clr object without scale
+    p <- length(clr@dirichletData)
+    
+    ## creating a new object to calculate beta^parallel
+    clr.par <- clr
+    
+    ## transforming the dirichlet samples
+    ## adding the clr-transformed dirichlet data as the analysis data
+    for(i in 1:p){
+      clr.par@analysisData[[i]] <- log2(clr@dirichletData[[i]])
+    }
+    
+    ##Fitting with scale
+    conditions <- clr@conds
+    k <- clr@mc.samples
+    scale.r <- list()
+    par.r <- list()
+    perp.r <- list()
+    
+    mc.scale <- clr@analysisData
+    for(i in 1:k){
+      mci_lr <- t(sapply(mc.scale, function(x) x[, i]))
+      scale.r[[i]] <- lr2glm(mci_lr, conditions)
+    }
+    
+    ## 1. Subtract of Beta^\parallel
+    ## 2. This gives Beta^\perp for each sample and variable
+    ## 3. Summarize over entities
+    
+    ##Fitting without scale
+    mc.par <- clr.par@analysisData
+    for(i in 1:k){
+      mci_lr <- t(sapply(mc.par, function(x) x[, i]))
+      par.r[[i]] <- lr2glm(mci_lr, conditions)
+      perp.r[[i]] <- scale.r[[i]] - par.r[[i]] ## For each mc sample, take the difference
+    }
+    
+    ## for each mc sample, find the average beta^perp
+    perp.names <- grepl("Estimate", names(perp.r[[1]]))
+    perp.est <- matrix(nrow=k,ncol=sum(perp.names))
+    for(i in 1:k){
+      perp.est[i,] <- colMeans(perp.r[[i]][,perp.names])
+    }
+    
+    lower.est <- apply(perp.est, 2, FUN = function(vec) quantile(vec, 0.025))
+    upper.est <- apply(perp.est, 2, FUN = function(vec) quantile(vec, 0.975))
+    
+    return(data.frame("Variable" = names(perp.r[[1]][,perp.names]), "Lower_Bound" = lower.est, "Upper_Bound" = upper.est))
+  }  
 }
