@@ -13,8 +13,7 @@
 #' http://dx.doi.org/10.1080/10618600.2015.1131161; \code{volcano} is a volcano plot
 #' http://dx.doi.org/10.1186/gb-2003-4-4-210
 #' @param contrast the column name of the model matrix contrast to plot
-#' @param test the method of calculating significance, one of "pval", "holm",
-#' or any of the corrections in \code{p.adjust} passed to \code{aldex.glm}
+#' @param test the method of calculating significance, one of "pval" or "fdr"
 #' @param cutoff.pval the fdr cutoff, default 0.05
 #' @param cutoff.effect the effect size cutoff for plotting, default 1
 #' @param xlab the x-label for the plot, as per the parent \code{plot} function
@@ -45,7 +44,7 @@
 #'
 #' @examples # See the examples for 'aldex.glm'
 #' @export
-aldex.glm.plot<-function (x, ..., eff = NULL, contrast=NULL, test = 'holm', 
+aldex.glm.plot<-function (x, ..., eff = NULL, contrast=NULL, test = 'fdr', 
 	type = c("MW", "MA", "volcano"), xlab = NULL, ylab = NULL,
     xlim = NULL, ylim = NULL, all.col = rgb(0, 0, 0, 0.2), all.pch = 19,
     all.cex = 0.4, called.col = "red", called.pch = 20, called.cex = 0.6,
@@ -62,9 +61,8 @@ aldex.glm.plot<-function (x, ..., eff = NULL, contrast=NULL, test = 'holm',
     if (!contrast %in% names(eff)){
     	stop("Please enter a valid contrast name")
     }
-    if(test %in% c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY",
-        "fdr")){
-    	column <- paste(contrast,":pval.", test, sep="")
+    if(test == "fdr"){
+    	column <- paste(contrast,":pval.padj", sep="")
     	called <- x[,column] <= cutoff.pval
     	all.p <- x[,column]
     } else if(test == 'pval'){

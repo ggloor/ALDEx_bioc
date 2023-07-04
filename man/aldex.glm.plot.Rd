@@ -9,7 +9,7 @@ aldex.glm.plot(
   ...,
   eff = NULL,
   contrast = NULL,
-  test = "holm",
+  test = "fdr",
   type = c("MW", "MA", "volcano"),
   xlab = NULL,
   ylab = NULL,
@@ -40,8 +40,7 @@ aldex.glm.plot(
 
 \item{contrast}{the column name of the model matrix contrast to plot}
 
-\item{test}{the method of calculating significance, one of "pval", "holm",
-or any of the corrections in \code{p.adjust} passed to \code{aldex.glm}}
+\item{test}{the method of calculating significance, one of "pval" or "fdr"}
 
 \item{type}{which type of plot is to be produced. \code{MA} is a 
 Bland-Altman style plot; \code{MW} is an effect plot showing the
