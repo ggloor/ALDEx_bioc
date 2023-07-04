@@ -1,9 +1,8 @@
 #' Compute an \code{aldex.clr} Object
-#'
 #' Generate Monte Carlo samples of the Dirichlet distribution for each sample.
 #' Convert each instance using a log-ratio transform.
 #' This is the input for all further analyses.
-#'
+#' @aliases aldex.clr aldex.clr,data.frame-method aldex.clr,matrix-method aldex.clr,RangedSummarizedExperiment-method
 #' @param reads A \code{data.frame} or \code{RangedSummarizedExperiment} object containing
 #' non-negative integers only and with unique names for all rows and columns,
 #' where each row is a different gene and each column represents a sequencing
@@ -52,6 +51,22 @@
 #' features, \code{getSampleIDs(x)} returns sample IDs, and \code{getFeatureNames(x)}
 #' returns the feature names.
 #'
+#'    # The 'reads' data.frame or
+#'    # RangedSummarizedExperiment object should
+#'    # have row and column names that are unique,
+#'    # and looks like the following:
+#'    #
+#'    #              T1a T1b  T2  T3  N1  N2  Nx
+#'    #   Gene_00001   0   0   2   0   0   1   0
+#'    #   Gene_00002  20   8  12   5  19  26  14
+#'    #   Gene_00003   3   0   2   0   0   0   1
+#'    #       ... many more rows ...
+#'
+#'    data(selex)
+#'    #subset for efficiency
+#'    selex <- selex[1201:1600,]
+#'    conds <- c(rep("NS", 7), rep("S", 7))
+#'    x <- aldex.clr(selex, conds, mc.samples=4, gamma=NULL, verbose=FALSE)
 #' @export
 aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", 
     verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, gamma = NULL) {

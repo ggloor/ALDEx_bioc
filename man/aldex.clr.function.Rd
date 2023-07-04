@@ -2,7 +2,14 @@
 % Please edit documentation in R/clr_function.r
 \name{aldex.clr.function}
 \alias{aldex.clr.function}
-\title{Compute an \code{aldex.clr} Object}
+\alias{aldex.clr}
+\alias{aldex.clr,data.frame-method}
+\alias{aldex.clr,matrix-method}
+\alias{aldex.clr,RangedSummarizedExperiment-method}
+\title{Compute an \code{aldex.clr} Object
+Generate Monte Carlo samples of the Dirichlet distribution for each sample.
+Convert each instance using a log-ratio transform.
+This is the input for all further analyses.}
 \usage{
 aldex.clr.function(
   reads,
@@ -71,8 +78,26 @@ values for each Monte-Carlo Dirichlet instance, which can be accessed through
 Each list element is named by the sample ID. \code{getFeatures(x)} returns the
 features, \code{getSampleIDs(x)} returns sample IDs, and \code{getFeatureNames(x)}
 returns the feature names.
+
+   # The 'reads' data.frame or
+   # RangedSummarizedExperiment object should
+   # have row and column names that are unique,
+   # and looks like the following:
+   #
+   #              T1a T1b  T2  T3  N1  N2  Nx
+   #   Gene_00001   0   0   2   0   0   1   0
+   #   Gene_00002  20   8  12   5  19  26  14
+   #   Gene_00003   3   0   2   0   0   0   1
+   #       ... many more rows ...
+
+   data(selex)
+   #subset for efficiency
+   selex <- selex[1201:1600,]
+   conds <- c(rep("NS", 7), rep("S", 7))
+   x <- aldex.clr(selex, conds, mc.samples=4, gamma=NULL, verbose=FALSE)
 }
 \description{
+Compute an \code{aldex.clr} Object
 Generate Monte Carlo samples of the Dirichlet distribution for each sample.
 Convert each instance using a log-ratio transform.
 This is the input for all further analyses.
