@@ -2,12 +2,98 @@
 %% http://bibdesk.sourceforge.net/
 
 
-%% Created for Greg Gloor at 2022-05-10 15:58:56 -0400 
+%% Created for Greg Gloor at 2023-07-04 13:09:58 -0400 
 
 
 %% Saved with string encoding Unicode (UTF-8) 
 
 
+
+@article{GloorAJS2023,
+	author = {Gloor, Gregory B},
+	date-added = {2023-07-04 13:06:44 -0400},
+	date-modified = {2023-07-04 13:09:56 -0400},
+	journal = {Austrian Journal of Statistics},
+	number = {4},
+	pages = {180-197},
+	title = {amIcompositional: Simple Tests for Compositional Behaviour of High Throughput Data with Common Transformations},
+	volume = {52},
+	year = {2023}}
+
+@article{meng1994posterior,
+	author = {Meng, Xiao-Li},
+	date-added = {2023-06-29 13:43:49 -0400},
+	date-modified = {2023-06-29 13:43:49 -0400},
+	journal = {The annals of statistics},
+	number = {3},
+	pages = {1142--1160},
+	publisher = {Institute of Mathematical Statistics},
+	title = {Posterior predictive $ p $-values},
+	volume = {22},
+	year = {1994}}
+
+@misc{nixon2023scale,
+	archiveprefix = {arXiv},
+	author = {Michelle Pistner Nixon and Jeffrey Letourneau and Lawrence A. David and Nicole A. Lazar and Sayan Mukherjee and Justin D. Silverman},
+	date-added = {2023-06-27 13:39:44 -0400},
+	date-modified = {2023-06-27 13:39:44 -0400},
+	eprint = {2201.03616},
+	primaryclass = {stat.ME},
+	title = {Scale Reliant Inference},
+	year = {2023}}
+
+@inbook{Wu2021,
+	abstract = {High-throughput sequencing datasets comprise millions of reads of genomic data and can be modelled as count compositions. These data are used for transcription profiles, microbial diversity, or relative cellular abundance in culture. The data are sparse and high dimensional. Moreover, they are often unbalanced, i.e. there is often systematic variation between groups due to presence or absence of features, and this variation is important to the biological interpretation of the data. The imbalance causes samples in the comparison groups to exhibit varying centres contributing to false positive and false negative identifications. Here, we extend the centred log-ratio transformation method used for the comparison of differential relative abundance between two groups in a Bayesian compositional context. We demonstrate the pathology in modelled and real unbalanced experimental designs to show how this causes both false negative and false positive inference. We examined four approaches to identify denominator features, and tested them with different proportions of modelled asymmetry; two were relatively robust, and recommended. We recommend the `LVHA' transformation for asymmetric transcriptome datasets, and the `IQLR' method for all other datasets when using the ALDEx2 tool available on Bioconductor.},
+	address = {Cham},
+	author = {Wu, Jia R. and Macklaim, Jean M. and Genge, Briana L. and Gloor, Gregory B.},
+	booktitle = {Advances in Compositional Data Analysis: Festschrift in Honour of Vera Pawlowsky-Glahn},
+	date-added = {2023-06-27 13:39:21 -0400},
+	date-modified = {2023-06-27 13:39:21 -0400},
+	doi = {10.1007/978-3-030-71175-7_17},
+	editor = {Filzmoser, Peter and Hron, Karel and Mart\`in-Fern\`andez, Josep Antoni and Palarea-Albaladejo, Javier},
+	isbn = {978-3-030-71175-7},
+	pages = {329--346},
+	publisher = {Springer International Publishing},
+	title = {Finding the Centre: Compositional Asymmetry in High-Throughput Sequencing Datasets},
+	url = {https://doi.org/10.1007/978-3-030-71175-7_17},
+	year = {2021},
+	bdsk-url-1 = {https://doi.org/10.1007/978-3-030-71175-7_17}}
+
+@article{McGovern2023.03.10.532120,
+	abstract = {By applying Differential Set Analysis (DSA) to sequence count data, researchers can determine whether groups of microbes or genes are differentially enriched. Yet these data lack information about the scale (i.e., size) of the biological system under study, leading some authors to call these data compositional (i.e., proportional). In this article we show that commonly used DSA methods make strong, implicit assumptions about the unmeasured system scale. We show that even small errors in these assumptions can lead to false positive rates as high as 70\%. To mitigate this problem, we introduce a sensitivity analysis framework to identify when modeling results are robust to such errors and when they are suspect. Unlike standard benchmarking studies, our methods do not require ground-truth knowledge and can therefore be applied to both simulated and real data.Competing Interest StatementThe authors have declared no competing interest.},
+	author = {Kyle C. McGovern and Michelle Pistner Nixon and Justin D. Silverman},
+	date-added = {2023-06-27 13:39:12 -0400},
+	date-modified = {2023-06-27 13:39:12 -0400},
+	doi = {10.1101/2023.03.10.532120},
+	elocation-id = {2023.03.10.532120},
+	eprint = {https://www.biorxiv.org/content/early/2023/03/12/2023.03.10.532120.full.pdf},
+	journal = {bioRxiv},
+	publisher = {Cold Spring Harbor Laboratory},
+	title = {Addressing Erroneous Scale Assumptions in Microbe and Gene Set Enrichment Analysis},
+	url = {https://www.biorxiv.org/content/early/2023/03/12/2023.03.10.532120},
+	year = {2023},
+	bdsk-url-1 = {https://www.biorxiv.org/content/early/2023/03/12/2023.03.10.532120},
+	bdsk-url-2 = {https://doi.org/10.1101/2023.03.10.532120}}
+
+@article{Marioni:2008,
+	abstract = {Ultra-high-throughput sequencing is emerging as an attractive alternative to microarrays for genotyping, analysis of methylation patterns, and identification of transcription factor binding sites. Here, we describe an application of the {Illumina} sequencing (formerly Solexa sequencing) platform to study mRNA expression levels. Our goals were to estimate technical variance associated with {Illumina} sequencing in this context and to compare its ability to identify differentially expressed genes with existing array technologies. To do so, we estimated gene expression differences between liver and kidney {RNA} samples using multiple sequencing replicates, and compared the sequencing data to results obtained from Affymetrix arrays using the same {RNA} samples. We find that the {Illumina} sequencing data are highly replicable, with relatively little technical variation, and thus, for many purposes, it may suffice to sequence each mRNA sample only once (i.e., using one lane). The information in a single lane of {Illumina} sequencing data appears comparable to that in a single array in enabling identification of differentially expressed genes, while allowing for additional analyses such as detection of low-expressed genes, alternative splice variants, and novel transcripts. Based on our observations, we propose an empirical protocol and a statistical framework for the analysis of gene expression using ultra-high-throughput sequencing technology.},
+	author = {Marioni, John C and Mason, Christopher E and Mane, Shrikant M and Stephens, Matthew and Gilad, Yoav},
+	date-added = {2023-06-27 13:39:00 -0400},
+	date-modified = {2023-06-27 13:39:00 -0400},
+	doi = {10.1101/gr.079558.108},
+	journal = {Genome Res},
+	journal-full = {Genome research},
+	mesh = {Gene Expression Profiling; Humans; Likelihood Functions; Male; Models, Biological; Oligonucleotide Array Sequence Analysis; RNA, Messenger; Reproducibility of Results; Sequence Analysis, RNA},
+	month = {Sep},
+	number = {9},
+	pages = {1509-17},
+	pmc = {PMC2527709},
+	pmid = {18550803},
+	pst = {ppublish},
+	title = {{RNA-seq}: an assessment of technical reproducibility and comparison with gene expression arrays},
+	volume = {18},
+	year = {2008},
+	bdsk-url-1 = {http://dx.doi.org/10.1101/gr.079558.108}}
 
 @article{kim2015RWER,
 	author = {Kim, Hae-Young},
@@ -70,7 +156,7 @@ CONCLUSIONS: Our results have significant practical and methodological implicati
 	title = {A comprehensive evaluation of normalization methods for {Illumina} high-throughput {RNA} sequencing data analysis},
 	volume = {14},
 	year = {2013},
-	bdsk-file-1 = {YnBsaXN0MDDSAQIDBFxyZWxhdGl2ZVBhdGhZYWxpYXNEYXRhXxCALi4vLi4vLi4vLi4vRG93bmxvYWRzL3Byb3ByXy1hbi1yLXBhY2thZ2UtZm9yLWlkZW50aWZ5aW5nLXByb3BvcnRpb25hbGx5LWFidW5kYW50LWZlYXR1cmVzLXVzaW5nLWNvbXBvc2l0aW9uYWwtZGF0YS1hbmFseXNpcy5iaWJPEQK6AAAAAAK6AAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAAAAAAAAQkQAAf////8fcHJvcHJfLWFuLXItcGFja2FnI0ZGRkZGRkZGLmJpYgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAAAAAAAAAAAAAAAAEAAIAAAogY3UAAAAAAAAAAAAAAAAACURvd25sb2FkcwAAAgCDLzpVc2VyczpnZ2xvb3I6RG93bmxvYWRzOnByb3ByXy1hbi1yLXBhY2thZ2UtZm9yLWlkZW50aWZ5aW5nLXByb3BvcnRpb25hbGx5LWFidW5kYW50LWZlYXR1cmVzLXVzaW5nLWNvbXBvc2l0aW9uYWwtZGF0YS1hbmFseXNpcy5iaWIAAA4A1gBqAHAAcgBvAHAAcgBfAC0AYQBuAC0AcgAtAHAAYQBjAGsAYQBnAGUALQBmAG8AcgAtAGkAZABlAG4AdABpAGYAeQBpAG4AZwAtAHAAcgBvAHAAbwByAHQAaQBvAG4AYQBsAGwAeQAtAGEAYgB1AG4AZABhAG4AdAAtAGYAZQBhAHQAdQByAGUAcwAtAHUAcwBpAG4AZwAtAGMAbwBtAHAAbwBzAGkAdABpAG8AbgBhAGwALQBkAGEAdABhAC0AYQBuAGEAbAB5AHMAaQBzAC4AYgBpAGIADwAaAAwATQBhAGMAaQBuAHQAbwBzAGgAIABIAEQAEgCBVXNlcnMvZ2dsb29yL0Rvd25sb2Fkcy9wcm9wcl8tYW4tci1wYWNrYWdlLWZvci1pZGVudGlmeWluZy1wcm9wb3J0aW9uYWxseS1hYnVuZGFudC1mZWF0dXJlcy11c2luZy1jb21wb3NpdGlvbmFsLWRhdGEtYW5hbHlzaXMuYmliAAATAAEvAAAVAAIADf//AAAACAANABoAJACnAAAAAAAAAgEAAAAAAAAABQAAAAAAAAAAAAAAAAAAA2U=},
+	bdsk-file-1 = {YnBsaXN0MDDSAQIDBFxyZWxhdGl2ZVBhdGhZYWxpYXNEYXRhXxCALi4vLi4vLi4vLi4vRG93bmxvYWRzL3Byb3ByXy1hbi1yLXBhY2thZ2UtZm9yLWlkZW50aWZ5aW5nLXByb3BvcnRpb25hbGx5LWFidW5kYW50LWZlYXR1cmVzLXVzaW5nLWNvbXBvc2l0aW9uYWwtZGF0YS1hbmFseXNpcy5iaWJPEQK6AAAAAAK6AAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADgsFtdQkQAAf////8fcHJvcHJfLWFuLXItcGFja2FnI0ZGRkZGRkZGLmJpYgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////9URYfAAAAAAAAAAAAAEAAIAAAogY3UAAAAAAAAAAAAAAAAACURvd25sb2FkcwAAAgCDLzpVc2VyczpnZ2xvb3I6RG93bmxvYWRzOnByb3ByXy1hbi1yLXBhY2thZ2UtZm9yLWlkZW50aWZ5aW5nLXByb3BvcnRpb25hbGx5LWFidW5kYW50LWZlYXR1cmVzLXVzaW5nLWNvbXBvc2l0aW9uYWwtZGF0YS1hbmFseXNpcy5iaWIAAA4A1gBqAHAAcgBvAHAAcgBfAC0AYQBuAC0AcgAtAHAAYQBjAGsAYQBnAGUALQBmAG8AcgAtAGkAZABlAG4AdABpAGYAeQBpAG4AZwAtAHAAcgBvAHAAbwByAHQAaQBvAG4AYQBsAGwAeQAtAGEAYgB1AG4AZABhAG4AdAAtAGYAZQBhAHQAdQByAGUAcwAtAHUAcwBpAG4AZwAtAGMAbwBtAHAAbwBzAGkAdABpAG8AbgBhAGwALQBkAGEAdABhAC0AYQBuAGEAbAB5AHMAaQBzAC4AYgBpAGIADwAaAAwATQBhAGMAaQBuAHQAbwBzAGgAIABIAEQAEgCBVXNlcnMvZ2dsb29yL0Rvd25sb2Fkcy9wcm9wcl8tYW4tci1wYWNrYWdlLWZvci1pZGVudGlmeWluZy1wcm9wb3J0aW9uYWxseS1hYnVuZGFudC1mZWF0dXJlcy11c2luZy1jb21wb3NpdGlvbmFsLWRhdGEtYW5hbHlzaXMuYmliAAATAAEvAAAVAAIADf//AAAACAANABoAJACnAAAAAAAAAgEAAAAAAAAABQAAAAAAAAAAAAAAAAAAA2U=},
 	bdsk-url-1 = {http://dx.doi.org/10.1093/bib/bbs046}}
 
 @article{Anders:2013aa,
@@ -469,7 +555,6 @@ CONTACT: g.j.barton@dundee.ac.uk.},
 	abstract = {BACKGROUND: Experimental designs that take advantage of high-throughput sequencing to generate datasets include RNA sequencing (RNA-seq), chromatin immunoprecipitation sequencing (ChIP-seq), sequencing of 16S rRNA gene fragments, metagenomic analysis and selective growth experiments. In each case the underlying data are similar and are composed of counts of sequencing reads mapped to a large number of features in each sample. Despite this underlying similarity, the data analysis methods used for these experimental designs are all different, and do not translate across experiments. Alternative methods have been developed in the physical and geological sciences that treat similar data as compositions. Compositional data analysis methods transform the data to relative abundances with the result that the analyses are more robust and reproducible.
 RESULTS: Data from an in vitro selective growth experiment, an RNA-seq experiment and the Human Microbiome Project 16S rRNA gene abundance dataset were examined by ALDEx2, a compositional data analysis tool that uses Bayesian methods to infer technical and statistical error. The ALDEx2 approach is shown to be suitable for all three types of data: it correctly identifies both the direction and differential abundance of features in the differential growth experiment, it identifies a substantially similar set of differentially expressed genes in the RNA-seq dataset as the leading tools and it identifies as differential the taxa that distinguish the tongue dorsum and buccal mucosa in the Human Microbiome Project dataset. The design of ALDEx2 reduces the number of false positive identifications that result from datasets composed of many features in few samples.
 CONCLUSION: Statistical analysis of high-throughput sequencing datasets composed of per feature counts showed that the ALDEx2 R package is a simple and robust tool, which can be applied to RNA-seq, 16S rRNA gene sequencing and differential growth datasets, and by extension to other techniques that use a similar approach.},
-
 	author = {Fernandes, Andrew D and Reid, Jennifer Ns and Macklaim, Jean M and McMurrough, Thomas A and Edgell, David R and Gloor, Gregory B},
 	date-added = {2018-08-03 15:54:07 +0000},
 	date-modified = {2018-08-03 15:54:07 +0000},
@@ -506,29 +591,16 @@ CONCLUSION: Statistical analysis of high-throughput sequencing datasets composed
 	bdsk-url-1 = {https://dx.doi.org/10.1371/journal.pone.0067019}}
 
 @article{macklaim:2013,
-	Author = {Macklaim, M Jean and Fernandes, D Andrew and Di Bella, M Julia and Hammond, Jo-Anne and Reid ,Gregor and Gloor, Gregory B},
-	Date-Added = {2018-08-03 15:54:07 +0000},
-	Date-Modified = {2018-08-03 15:54:07 +0000},
-	Doi = {doi: 10.1186/2049-2618-1-12},
-	Journal = {Microbiome},
-	Pages = {15},
-	Title = {Comparative meta-{RNA}-seq of the vaginal microbiota and differential expression by \textit{{L}actobacillus iners} in health and dysbiosis},
-	Volume = {1},
-	Year = {2013},
-	Bdsk-Url-1 = {http://dx.doi.org/10.1186/2049-2618-1-12}}
-
-@article{meng1994posterior,
-	author = {Meng, Xiao-Li},
-	date-added = {2023-04-14 16:26:54 -0400},
-	date-modified = {2023-04-14 16:26:54 -0400},
-	journal = {The annals of statistics},
-	number = {3},
-	pages = {1142--1160},
-	publisher = {Institute of Mathematical Statistics},
-	title = {Posterior predictive $ p $-values},
-	volume = {22},
-	year = {1994}}
-
+	author = {Macklaim, M Jean and Fernandes, D Andrew and Di Bella, M Julia and Hammond, Jo-Anne and Reid ,Gregor and Gloor, Gregory B},
+	date-added = {2018-08-03 15:54:07 +0000},
+	date-modified = {2018-08-03 15:54:07 +0000},
+	doi = {doi: 10.1186/2049-2618-1-12},
+	journal = {Microbiome},
+	pages = {15},
+	title = {Comparative meta-{RNA}-seq of the vaginal microbiota and differential expression by \textit{{L}actobacillus iners} in health and dysbiosis},
+	volume = {1},
+	year = {2013},
+	bdsk-url-1 = {http://dx.doi.org/10.1186/2049-2618-1-12}}
 
 @article{Cui:2003aa,
 	abstract = {Extracting biological information from microarray data requires appropriate statistical methods. The simplest statistical method for detecting differential expression is the t test, which can be used to compare two conditions when there is replication of samples. With more than two conditions, analysis of variance (ANOVA) can be used, and the mixed ANOVA model is a general and powerful approach for microarray experiments with multiple factors and/or several sources of variation.},
@@ -548,15 +620,14 @@ CONCLUSION: Statistical analysis of high-throughput sequencing datasets composed
 	volume = {4},
 	year = {2003}}
 
-
 @article{nixon:2022,
-	Author = {Nixon, Michelle P. and Letourneau, Jeffrey and David, Lawrence A. and  Lazar, Nicole A. and and Mukherjee, Sayan and Silverman, Justin D.},
-	Journal = {ArVix Preprint: 2201.03616},
-	Title = {Scale Reliant Inference},
-	Year = {2023}}
+	author = {Nixon, Michelle P. and Letourneau, Jeffrey and David, Lawrence A. and Lazar, Nicole A. and and Mukherjee, Sayan and Silverman, Justin D.},
+	journal = {ArVix Preprint: 2201.03616},
+	title = {Scale Reliant Inference},
+	year = {2023}}
 
 @article{Gloor,
-	Author = {Fernandes, Andrew D. and Vu, Michael T.H.Q. and Edward, Lisa-Monique and Macklaim, Jean M. and Gloor, Gregory B.},
-	Journal = {ArVix Preprint: 1809.02623},
-	Title = {A reproducible effect size is more useful than an irreproducible hypothesis test to analyze high throughput sequencing datasets},
-	Year = {2019}}
+	author = {Fernandes, Andrew D. and Vu, Michael T.H.Q. and Edward, Lisa-Monique and Macklaim, Jean M. and Gloor, Gregory B.},
+	journal = {ArVix Preprint: 1809.02623},
+	title = {A reproducible effect size is more useful than an irreproducible hypothesis test to analyze high throughput sequencing datasets},
+	year = {2019}}
