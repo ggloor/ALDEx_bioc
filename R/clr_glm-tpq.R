@@ -5,7 +5,7 @@
 #'  requires the user to define a model with \code{model.matrix}.
 #'
 #' @param clr An \code{ALDEx2} object. The output of \code{aldex.clr}.
-#' @param p.method A string ("BH" or "holm") denoting which method to use to adjust p-values. Default is "holm"
+#' @param fdr.method A string ("BH" or "holm") denoting which method to use to adjust p-values. Default is "holm"
 
 #' @inheritParams aldex
 #' @param ... Arguments passed to \code{glm}.
@@ -13,7 +13,7 @@
 #'  coefficients and their p-values for each feature,
 #'  with FDR appended as a \code{holm} column.
 #'
-#' @author Thom Quinn
+#' @author Thom Quinn, Michelle Pistner
 #'
 #' @seealso
 #'  \code{\link{aldex}},
@@ -40,57 +40,14 @@
 #' glm.eff <- aldex.glm.effect(x)
 #' aldex.glm.plot(glm.test, eff=glm.eff, contrast='B', type='MW', post.hoc='holm')
 #'
-aldex.glm <- function(clr, verbose=FALSE, p.method = "holm", ...){
+aldex.glm <- function(clr, verbose=FALSE, fdr.method = "holm", ...){
   
-  if(!(p.method %in% c("holm", "BH", "fdr"))){
+  if(!(fdr.method %in% c("holm", "BH", "fdr"))){
     stop("Method to adjust p-values not supported.")
   }
 
   # Use clr conditions slot instead of input
   conditions <- clr@conds
-
-
-  lr2glm <- function(lr, conditions, ...){
-
-    if( !is(conditions, "matrix") &
-       !("assign" %in% names(attributes(conditions)))){
-
-      stop("Please define the aldex.clr object for a model.matrix 'conditions'.")
-     }
-
-    if(nrow(lr) != nrow(conditions)){
-
-      stop("Input data and 'model.matrix' should have same number of rows.")
-    }
-
-    # Build the glm models
-    model. <- conditions
-    glms <- apply(lr, 2, function(x){
-      glm(x ~ model., ...)
-    })
-    dof <- glm(lr[,1]~model.)$df.residual
-    # Combine to make data.frame
-    extracts <- lapply(glms, extract)
-    df <- do.call("rbind", extracts)
-    rownames(df) <- colnames(lr)
-    df <- as.data.frame(df)
-    
-    # Adjusting to one-sided p-values
-    colsToAdjust <- which(grepl("Pr\\(>",colnames(df)))
-    for(j in colsToAdjust){
-      df[,j] <- pt(df[,(j-1)], df = dof,lower.tail = FALSE)
-    }
-    
-    # Create new data.frame for FDR
-    pvals <- colnames(df)[grepl("Pr\\(>", colnames(df))]
-
-    df.bh <- apply(df[,pvals], 2, function(x) p.adjust(x, method=post.hoc))
-
-	colnames(df.bh) <- paste0(colnames(df.bh), '.', post.hoc, sep="")
-
-    # Merge results with FDR
-    cbind(df, df.bh)
-  }
 
   # Keep a running sum of lr2glm instances
   # verbose was throwing an error 'the condition has length > 1'
@@ -106,7 +63,7 @@ aldex.glm <- function(clr, verbose=FALSE, p.method = "holm", ...){
 
     if(verbose[1] == TRUE ){ numTicks <- progress(i, k, numTicks) }
     mci_lr <- t(sapply(mc, function(x) x[, i]))
-    mod <- lr2glm(mci_lr, conditions, p.method = p.method, ...)
+    mod <- lr2glm(mci_lr, conditions, fdr.method = fdr.method, ...)
     r <- r + mod$df
     r.p.lower <- r.p.lower + mod$df.p.lower
     r.p.upper <- r.p.upper + mod$df.p.greater
@@ -157,7 +114,7 @@ extract <- function(model){
   do.call("cbind", coefs)
 }
 
-lr2glm <- function(lr, conditions, p.method = "holm", ...){
+lr2glm <- function(lr, conditions, fdr.method = "holm", ...){
   
   if( !is(conditions, "matrix") &
       !("assign" %in% names(attributes(conditions)))){
@@ -203,8 +160,8 @@ lr2glm <- function(lr, conditions, p.method = "holm", ...){
   df.bh.lower <- 1-df[,pvals]
   colnames(df.bh.lower) <- paste0(colnames(df.bh.lower), ".padj")
   for(j in 1:ncol(df.bh.greater)){
-    df.bh.greater[,j] <- p.adjust(2*df.bh.greater[,j], method=p.method)
-    df.bh.lower[,j] <- p.adjust(2*df.bh.lower[,j], method=p.method)
+    df.bh.greater[,j] <- p.adjust(2*df.bh.greater[,j], method=fdr.method)
+    df.bh.lower[,j] <- p.adjust(2*df.bh.lower[,j], method=fdr.method)
   }
   
   # Merge results with FDR

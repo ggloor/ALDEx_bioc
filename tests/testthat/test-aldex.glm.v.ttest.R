@@ -12,7 +12,7 @@ ttest.test <- aldex.ttest(x)
 mm <- model.matrix(~ conds)
 x.mm <- x
 x.mm@conds <- mm
-glm.test <- aldex.glm(x.mm, p.method = "BH")
+glm.test <- aldex.glm(x.mm, fdr.method = "BH")
 
 test_that("glm p-values matches t-test", {
   expect_equal(ttest.test$we.ep, glm.test$`condsS:pval`, tol = 1e-2)

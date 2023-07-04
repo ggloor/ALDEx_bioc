@@ -26,7 +26,8 @@ aldex.plot(
   rare.col = "black",
   rare = 0,
   rare.pch = 20,
-  rare.cex = 0.2
+  rare.cex = 0.2,
+  main = NULL
 )
 }
 \arguments{
@@ -79,6 +80,8 @@ of either the difference or variance type: http://dx.doi.org/10.1186/gb-2003-4-4
 \item{rare.pch}{the default symbol of rare features}
 
 \item{rare.cex}{the default symbol size of rare points}
+
+\item{main}{the main label for the plot}
 }
 \value{
 None.

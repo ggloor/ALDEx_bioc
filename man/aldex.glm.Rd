@@ -4,7 +4,8 @@
 \alias{aldex.glm}
 \title{Calculate glm test statistics using a \code{model.matrix}}
 \usage{
-aldex.glm(clr, verbose = FALSE, p.method = "holm", ...)
+aldex.glm(clr, verbose = FALSE, fdr.method = "holm", ...)
+}
 \arguments{
 \item{clr}{An \code{ALDEx2} object. The output of \code{aldex.clr}.}
 
@@ -12,11 +13,9 @@ aldex.glm(clr, verbose = FALSE, p.method = "holm", ...)
 running. Useful for debugging errors on large datasets. Applies to
 \code{effect = TRUE}.}
 
-\item{p.method}{A string ("BH" or "holm") denoting which method to use to adjust p-values. Default is "holm"}
+\item{fdr.method}{A string ("BH" or "holm") denoting which method to use to adjust p-values. Default is "holm"}
 
 \item{...}{Arguments passed to \code{glm}.}
-
-\item{post-hod}{post-hoc correction to apply, any in p.adjust (default holm)}
 }
 \value{
 Returns a data.frame of the average
@@ -56,5 +55,5 @@ Please use the citation given by
  \code{\link{selex}}
 }
 \author{
-Thom Quinn
+Thom Quinn, Michelle Pistner
 }
