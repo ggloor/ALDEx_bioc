@@ -495,17 +495,8 @@ Note that we have generated both a random model  ``A'' and the correct model ``B
 
 The outputs are expected values of the intercept and its coefficients, and the estimates for each model and their coefficients. Also calculated is the Family Wide Error Rate (FWER) for each p-value (by default reported in the `model.x Pr(>|t|).holm` output. This is a Holm-Bonferroni FWER correction that is more powerful than the Bonferroni correction, and is a step-down correction that is more stringent than a false discovery rate correction such as Benjamini-Hochberg. Note that for a generalized linear model, Tukey's HSD is not applicable to control the FWER. This is because Tukey's HSD depends on an ANOVA in the background in R and packages that calculate Tukey's HSD essentially all do an `aov`, thus the FWER is calculated on a different test statistic than is calculated by the glm.  
  
-The expected value of the Holm-Bonferroni test can be used as the post-hoc standin for Tukey's HSD. Note, that this is true only when there are a relatively small number of contrasts (up to 10) in the model^[@kim2015RWER]. 
-
-For convenience the user can select any of the p-value adjustments in the `p.adjust()` base R function and the labels will update accordingly.
- 
- The `aldex.glm.effect()` function outputs the effect size calculations for each of the contrasts in the model matrix as a list labelled by the contrast identifier.
- 
- We can also plot the glm output
- 
-```{r, echo=TRUE,width=7,height=4, message=F, error=F, warning=F}
- aldex.glm.plot(glm.test, eff=glm.eff, contrast='B', type='MW', test='fdr')
- 
+The expected value of the Holm-Bonferroni test can be used as the post-hoc standin for Tukey's HSD. Note, that this is true only when there are a relatively small number of contrasts (up to 10) in the model^[@kim2015RWER]. For convenience the user can also select the Benjamini-Hochberg correction.
+  
 ```
 
 ## A word about effect size and overlap
@@ -516,31 +507,6 @@ We prefer to use the effect size whenever possible rather than statistical signi
 
 We suggest that an effect size cutoff of 1 or greater be used when analyzing HTS datasets. If preferred the user can also set a fold-change cutoff as is commonly done with p-value based methods, and volcano plots are now included as an option to help guide the user.
 
-The plot below shows the relationship between effect size and p-values and BH-adjusted p-values in the test dataset. Note that adding a tiny bit of scale information increases the correspondence between effect size and p-value.
-
-```{r, fig=TRUE, echo=TRUE,  fig.cap="Relationship between effect, difference, and p-values. We can see that the effect size has a much tighter relationship to the p-value than does the raw difference. The effect size is relatively stable across datasets, but the p-value become progressively smaller as the sample size is increased. "}
-
-par(mfrow=c(1,3))
-plot(x.all$effect, x.all$we.ep, log="y", cex=0.7, col=rgb(0,0,1,0.2),
-  pch=19, xlab="Effect size", ylab="p-value", main="Effect size plot")
-points(x.all$effect, x.all$we.eBH, cex=0.7, col=rgb(1,0,0,0.2),
-  pch=19)
-abline(h=0.05, lty=2, col="grey")
-legend(15,1, legend=c("p-value", "BH-adjusted"), pch=19, col=c("blue", "red"))
-
-plot(x.all$effect, x.all$we.ep, log="y", cex=0.7, col=rgb(0,0,1,0.2),
-  pch=19, xlab="Effect size", ylab="p-value", main="Effect size plot")
-points(x.all$effect, x.all$we.eBH, cex=0.7, col=rgb(1,0,0,0.2),
-  pch=19)
-abline(h=0.05, lty=2, col="grey")
-legend(15,1, legend=c("p-value", "BH-adjusted"), pch=19, col=c("blue", "red"))
-
-plot(x.all$diff.btw, x.all$we.ep, log="y", cex=0.7, col=rgb(0,0,1,0.2),
-  pch=19, xlab="Difference", ylab="p-value", main="Volcano plot")
-points(x.all$diff.btw, x.all$we.eBH, cex=0.7, col=rgb(1,0,0,0.2),
-  pch=19)
-abline(h=0.05, lty=2, col="grey")
-```
 
 ### Alternative plotting of outputs
 
