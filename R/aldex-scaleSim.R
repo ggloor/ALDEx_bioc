@@ -253,6 +253,7 @@ default.scale.model <- function(gamma, conds, p, mc.samples){
       ##Re-code to zero one
       binary <- TRUE
       conds_used <- as.numeric(as.factor(conds_used)) - 1
+      conds_used <- ifelse(conds_used == 0, -1, conds_used)
     } else{
       binary <- FALSE
     }
@@ -262,7 +263,8 @@ default.scale.model <- function(gamma, conds, p, mc.samples){
   conds_mat <- matrix(conds_used, nrow = length(p))
   conds_mat <- apply(conds_mat, 2, FUN = function(vec){
     if(length(unique(vec)) == 2){
-      return(as.numeric(as.factor(vec)) - 1)
+      vec <- as.numeric(as.factor(vec)) - 1
+      return(ifelse(vec == 0, -1, vec))
     } else{
       return(vec) 
     }
