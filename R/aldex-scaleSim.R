@@ -260,11 +260,11 @@ default.scale.model <- function(gamma, conds, p, mc.samples){
   }
   
   ##centering and scaling the conditions
-  conds_mat <- matrix(conds_used, nrow = length(p))
+  conds_mat <- as.matrix(conds_used)
   conds_mat <- apply(conds_mat, 2, FUN = function(vec){
     if(length(unique(vec)) == 2){
       vec <- as.numeric(as.factor(vec)) - 1
-      return(ifelse(vec == 0, -1, vec))
+      return(vec)
     } else{
       return(vec) 
     }
@@ -281,11 +281,14 @@ default.scale.model <- function(gamma, conds, p, mc.samples){
   col_var <- rep(gamma^2, ncol(conds_mat))
   scale_samples <- matrix(NA, length(p), mc.samples) ## empty container
 
+  noise <- matrix(NA, nrow = mc.samples, ncol = length(col_var))
+  for(i in 1:length(col_var)){
+    noise[,i] <- stats::rnorm(mc.samples, 0, sqrt(col_var[i]))
+  }
   for(i in 1:length(p)){
     geo_means <- log(apply(p[[i]],2,gm))
-    noise <- sapply(col_var, FUN = function(sd){stats::rnorm(mc.samples, 0, sqrt(sd))})
-    noise <- sweep(noise, 2, conds_mat[i,], "*")
-    noise_mean <- rowSums(noise)
+    noise.adj <- sweep(noise, 2, conds_mat[i,], "*")
+    noise_mean <- rowSums(noise.adj)
     
     scale_samples[i,] <- geo_means + noise_mean
   }
