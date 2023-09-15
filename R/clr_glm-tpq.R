@@ -100,7 +100,7 @@ aldex.glm <- function(clr, verbose=FALSE, fdr.method = "holm", ...){
   colnames(r.p.adj) <- sub("model.", '', colnames(r.p.adj))
   
   
-  cbind(r, r.p, r.p.adj) # return expected
+  cbind(r/k, r.p, r.p.adj) # return expected
 }
 
 # declaring this once provides a 40% speedup
