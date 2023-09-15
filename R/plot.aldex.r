@@ -58,16 +58,20 @@ aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xl
         if (length(x$we.eBH) == 0)
             stop("t test results not in dataset")
         if ( length(x$we.eBH) > 0 ){ 
-        	warning('using we.eBH') 
+        #warning('using we.eBH') 
+        	p.add <- min(x$we.eBH[x$we.eBH > 0])/10
+        	
         	called <- x$we.eBH <= cutoff.pval
-       		all.p <- x$we.eBH
+       		all.p <- x$we.eBH + p.add
         } 
     }
     else if (test == "wilcox") {
         if (length(x$wi.eBH) == 0)
             stop("Wilcoxon test results not in dataset")
-        called <- x$wi.eBH <= cutoff.pval
-        all.p <- x$wi.eBH
+            p.add <- min(x$wi.eBH[x$wi.eBH > 0])/10
+
+        	called <- x$wi.eBH <= cutoff.pval
+        	all.p <- x$wi.eBH + p.add
     }
     else if (test == "effect") {
         if (cutoff.effect <= 0.49)

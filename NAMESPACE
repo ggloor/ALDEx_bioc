@@ -15,7 +15,7 @@ importFrom("graphics", "abline","hist","par","plot","points","mtext","polygon","
 importFrom("stats", "cor.test", "drop1", "glm", "kruskal.test",
     "p.adjust", "rgamma", "t.test", "wilcox.test", "coef",
     "pnorm", "psignrank", "pt", "pwilcox", "as.dist", "density", "dist", "ecdf", "rt",
-    "runif", "reshape")
+    "runif", "reshape", "rlnorm")
 importFrom("utils", "installed.packages")
 importFrom("Rfast", "rowMedians", "colMedians")
 #importFrom("BiocParallel", "bplapply")

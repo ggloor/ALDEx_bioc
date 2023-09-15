@@ -8,7 +8,8 @@ aldex.plotFeature(
   clrData,
   featureName,
   pooledOnly = FALSE,
-  densityOnly = FALSE
+  densityOnly = FALSE,
+  reset.par = FALSE
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ aldex.plotFeature(
 \item{pooledOnly}{show only the pooled plots, default FALSE, shows all plots}
 
 \item{densityOnly}{show only the density plots, default FALSE includes expected values}
+
+\item{reset.par}{reset the plotting parameter to par(c(1,1)), default FALSE}
 }
 \description{
 \code{aldex.plotFeature} generates density plots showing the dispersion

@@ -8,7 +8,7 @@
 \alias{aldex.clr,RangedSummarizedExperiment-method}
 \title{Compute an \code{aldex.clr} Object
 Generate Monte Carlo samples of the Dirichlet distribution for each sample.
-Convert each instance using a log-ratio transform.
+Convert each instance using a centered log-ratio transform.
 This is the input for all further analyses.}
 \usage{
 aldex.clr.function(
@@ -99,6 +99,6 @@ returns the feature names.
 \description{
 Compute an \code{aldex.clr} Object
 Generate Monte Carlo samples of the Dirichlet distribution for each sample.
-Convert each instance using a log-ratio transform.
+Convert each instance using a centered log-ratio transform.
 This is the input for all further analyses.
 }

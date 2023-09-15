@@ -1,6 +1,6 @@
 #' Compute an \code{aldex.clr} Object
 #' Generate Monte Carlo samples of the Dirichlet distribution for each sample.
-#' Convert each instance using a log-ratio transform.
+#' Convert each instance using a centered log-ratio transform.
 #' This is the input for all further analyses.
 #' @aliases aldex.clr aldex.clr,data.frame-method aldex.clr,matrix-method aldex.clr,RangedSummarizedExperiment-method
 #' @param reads A \code{data.frame} or \code{RangedSummarizedExperiment} object containing
@@ -256,7 +256,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
         ## grabbing samples from the default scale model
         if(verbose) message("sampling from the default scale model.")
         scale_samples <- default.scale.model(gamma, conds, p, mc.samples)
-        
+        ## negative here because calculating CLR
         for(i in 1:length(p)){
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
         }
@@ -271,6 +271,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
         }
         if(verbose) message("using user specified scale samples.")
         for(i in 1:length(p)){
+        ## positive here because W = W(||) + W(perp)
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(gamma[i,]), "+")
         }
         scale_samples <- gamma

@@ -9,7 +9,8 @@
 #' @param featureName the name of the feature from the input data
 #' @param pooledOnly show only the pooled plots, default FALSE, shows all plots
 #' @param densityOnly show only the density plots, default FALSE includes expected values
-#' 
+#' @param reset.par reset the plotting parameter to par(c(1,1)), default FALSE
+#'
 #' @author Brandon Lieng, Greg Gloor
 #'
 #' @seealso
@@ -29,7 +30,7 @@
 #' aldex.plotFeature(x, "S:D:A:D")
 
 aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
-                              densityOnly=FALSE) {
+                              densityOnly=FALSE, reset.par=FALSE) {
     mcInstances <- getMonteCarloInstances(clrData)
     mcInstancesByGroup <- split(mcInstances, factor(clrData@conds))
 
@@ -117,5 +118,5 @@ aldex.plotFeature <- function(clrData, featureName, pooledOnly=FALSE,
             boxplot(effectVector, boxwex=max(effectVectorDensity$y) / 6, at=max(effectVectorDensity$y) / 2, horizontal=TRUE, add=TRUE, whisklty=0, staplelty=0, col=rgb(0,1,1,0), outline=FALSE)
         }
     }
-    par(mfrow=c(1,1))
+    if(reset.par == T) {par(mfrow=c(1,1))}
 }

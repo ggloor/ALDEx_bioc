@@ -29,7 +29,7 @@ data(selex)
 selex <- selex[1:50,]
 conds <- c(rep("N", 7), rep("S",7))
 cont.var <-  c(rep(1,7), rep(2,7))
-x <- aldex.clr(selex, conds)
+x <- aldex.clr(selex, conds, mc.samples=16)
 corr.test <- aldex.corr(x, cont.var)
 }
 \references{
