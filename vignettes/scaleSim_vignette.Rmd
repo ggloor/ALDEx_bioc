@@ -245,15 +245,16 @@ mod.coda %>% filter(we.eBH < 0.05)
 
 ### Measurement-Based Scale Model
 
-Next, we are going to show how we can use outside measurements to create scale models. Here, we will rely on the simulated flow cytometry data. If we let \(z_{1n}, z_{2n}, z_{3n}\) denote the three cytometry measurements from each sample, we are going to specify a scale model of the form:
+Next, we are going to show how we can use outside measurements to create scale models. Here, we will rely on the simulated flow cytometry data. If we let \(z_{1n}, z_{2n}, z_{3n}\) denote the log-transform of the three cytometry measurements from each sample, we are going to specify a scale model of the form:
 
-\[\hat{W}^{\perp (s)}_{n} \sim N(\text{mean}(z_{1n}, z_{2n}, z_{3n}),\text{var}(z_{1n}, z_{2n}, z_{3n})).\]
+\[\log \hat{W}^{\perp (s)}_{n} \sim N(\text{mean}(z_{1n}, z_{2n}, z_{3n}),\text{var}(z_{1n}, z_{2n}, z_{3n})).\]
 
 First, we need to extract the mean and standard deviation of the measurements for each sample.
 
 ```{r measureMod}
 flow_data_collapse <- flow_data %>%
   group_by(sample) %>%
+  mutate(flow = log(flow)) %>%
   mutate(mean = mean(flow)) %>%
   mutate(stdev = sd(flow)) %>%
   select(-flow) %>%
@@ -266,7 +267,7 @@ Second, we will simulate draws from the scale model for each sample.
 ```{r measureModSamps}
 scale_samps <- matrix(NA, nrow = 200, ncol = 128)
 for(i in 1:nrow(scale_samps)){
-  scale_samps[i,] <- rnorm(128, flow_data_collapse$mean[i], flow_data_collapse$stdev[i])
+  scale_samps[i,] <- rlnorm(128, flow_data_collapse$mean[i], flow_data_collapse$stdev[i])
 }
 ```
 
@@ -284,8 +285,8 @@ Remarkably, there are no false positives whereas all true positives are returned
 For our final scale model, suppose that we do not have access to our flow cytometry measurements, but previous literature and researcher intuition lead us to believe that there is a 10% decrease in the scale after antibiotic administration. We can encode this in a scale model:
 
 ```{r knowModSamps}
-scale_samps1 <- matrix(rnorm(100*128, mean = 5, sd = 1),ncol = 128)
-scale_samps2 <- matrix(rnorm(100*128, mean = 4.5, sd = 1),ncol = 128)
+scale_samps1 <- matrix(rlnorm(100*128, mean = log(5), sd = 1),ncol = 128)
+scale_samps2 <- matrix(rlnorm(100*128, mean = log(4.5), sd = 1),ncol = 128)
 
 scale_samps <- rbind(scale_samps1, scale_samps2)
 ```
