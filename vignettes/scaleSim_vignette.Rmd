@@ -12,7 +12,7 @@ output:
   BiocStyle::pdf_document: default
 package: ALDEx2
 abstract: |
-    In this vignette, we discuss the updates made to the `ALDEx2` package that makes it easy to incorporate scale uncertainty into analyses. We discuss these updates from a mathematical perspective, giving the relevant details to understand the core methods. Then, we show how to incorporate scale uncertainty into `ALDEx2` via a default scale model and create more complex scale models. Going further, we show how the package updates make it easy to assess how results change as a function of uncertainty using sensitivity analyses. 
+    In this vignette, we discuss the updates made to the `ALDEx2` package that makes it easy to incorporate scale uncertainty into analyses. We discuss these updates from a mathematical perspective, giving the relevant details to understand the core methods. Then, we show how to incorporate scale uncertainty into `ALDEx2` via a default scale model and how to create more complex scale models. Going further, we show how the package updates make it easy to assess how results change as a function of uncertainty using sensitivity analyses. 
 vignette: |
     %\VignetteIndexEntry{Incorporating Scale Uncertainty into ALDEx2}
     %\VignetteEngine{knitr::rmarkdown}
@@ -21,7 +21,7 @@ vignette: |
 
 # Introduction to Scale Simulation using `ALDEx2`
 
-`ALDEx2` is a popular software for fitting linear models on sequence count data developed by @fernandes:2013. It attempts to model how the abundance (or expression) of entities changes between different biological conditions. As a special case, `ALDEx2` is a method for differential expression or differential abundance when the covariate of interest is binary. 
+`ALDEx2` is software for fitting linear models on sequence count data developed by @fernandes:2013. It attempts to model how the abundance (or expression) of entities changes between different biological conditions. As a special case, `ALDEx2` is a method for differential expression or differential abundance when the covariate of interest is binary. 
 
 In short, the method works by testing Centered log-ratio (CLR)-transformed Dirichlet samples. Succinctly, for each entity (e.g., gene or taxa) $j$, it proceeds by:
 
@@ -33,7 +33,7 @@ In short, the method works by testing Centered log-ratio (CLR)-transformed Diric
 
 The average test statistic and p-value^[Corrected p-values using either the Benjamini-Hochberg or Holm procedure are also returned.] for each entity is returned and typically used by the end user to judge the significance of certain covariates on each taxa.
 
-Step 3 of `ALDEx2` relies on transforming the Dirichlet samples, which necessarily sum to one, to CLR coordinates. As noted by @nixon:2022, this can introduce a mismatch between the research question and the actual analysis that is carried out. To see this concretely, consider the case where we have access to a sequence count data set $Y$, which is a $D \times N$ matrix where $D$ is the number of entities and $N$ is the number of samples. $Y$ is a sample of some underlying system $W$. For example, in a study of the human gut, $Y$ denotes the sequenced microbes obtained from a fecal sample whereas $W$ represents the actual microbes that occupy the gut.
+Step 3 of `ALDEx2` relies on transforming the Dirichlet samples, which necessarily sum to one, to CLR coordinates. As noted by @nixon:2022, the CLR can introduce a mismatch between the research question and the actual analysis that is carried out. To see this concretely, consider the case where we have access to a sequence count data set $Y$, which is a $D \times N$ matrix where $D$ is the number of entities and $N$ is the number of samples. $Y$ is a sample of some underlying system $W$. For example, in a study of the human gut, $Y$ denotes the sequenced microbes obtained from a fecal sample whereas $W$ represents the actual microbes that occupy the gut.
 
 The scale of $Y$ does not match the scale of $W$ but rather is more reflective of the measurement process (@Props:2017, @Vandeputte:2017). This is problematic when the research question depends on the scale of $W$ but is inferred from $Y$ alone. For example, consider the case where the analyst wants to estimate log-fold changes between two conditions:
 
@@ -42,7 +42,7 @@ However, when using CLR coordinates, something different is estimated:
 
 $$\tilde{\theta}_d = \text{mean}_{x_i\text{ in group 1}} \text{CLR}( Y_{di}) - \text{mean}_{x_i \text{ in group 2}} \text{CLR}( Y_{di}).$$
 
-Note that $\tilde{\theta}_d$ is not necessarily an estimate of $\theta_d$ but something different: it is an estimate of the change in CLR coordinates of entity $d$ between conditions *not* an estimate in the change of the absolute abundances of entity $d$ between conditions. In fact, if $\tilde{\theta_d}$ is used as an estimate of $\theta_d$, a very specific assumption is being made equating the scale of the system to a function of the geometric mean of the observed data. Furthermore, this is being assumed with complete certainty which may skew analysis results. See @nixon:2022 for complete details.
+Note that $\tilde{\theta}_d$ is not necessarily an estimate of $\theta_d$ but something different: it is an estimate of the change in CLR coordinates of entity $d$ between conditions *not* an estimate in the change of the absolute abundances of entity $d$ between conditions. In fact, if $\tilde{\theta_d}$ is used as an estimate of $\theta_d$, a very specific assumption is being made equating the scale of the system to a function of the geometric mean of the observed data. Furthermore, this is being assumed with complete certainty which may skew analysis results. Importantly, all normalizations make assumptions of scale, see @nixon:2022 for complete details.
 
 While other normalizations are available within the ALDEx2 software, they similarly impose certain assumptions about the scales between conditions. In this vignette, we show how to step away from normalizations and instead rely on scale models for analysis.
 
@@ -50,7 +50,7 @@ While other normalizations are available within the ALDEx2 software, they simila
 
 Introduced and developed in @nixon:2022, scale simulation argues that many different types of analyses (including differential expression) are *scale reliant*, meaning that they inherently rely on the scale (e.g., total) of the system under study. Ignoring the scale can lead to incorrect inference or results that might not answer the right question.
 
-To circumvent this, @nixon:2022 develops *scale simulation random variables* (SSRVs) which, in essence, provides the framework to directly incorporate scale uncertainty in the modeling process and, in doing so, can greatly improve inference (i.e., control Type-I error). In addition, they develop the methodology to incorporate scale simulation within the context of ALDEx2.
+To circumvent this, @nixon:2022 develops *scale simulation random variables* (SSRVs) which, in essence, provides the framework to directly incorporate scale uncertainty in the modeling process and, in doing so, can greatly improve inference (i.e., control Type-I error). In addition, they developed the methodology to incorporate scale simulation within the context of ALDEx2.
 
 In brief, SSRVs replace normalizations with draws from a scale model. To see this concretely, lets consider the case of log fold changes. That is, we want to estimate $\theta_d$ from the previous section. As discussed, this quantity depends on the scale of the system $W$. We can decompose $W$ into both a compositional (denoted by the superscript $\parallel$) and total (denoted by the superscript $\perp$) component:
 
@@ -95,8 +95,8 @@ Currently, scale simulation within ALDEx2 is implemented in the `ALDEx_bioc` dev
 ```{r installScaleSim, warning = FALSE, message = FALSE}
 ##If needed, install devtools
 ##install.packages("devtools")
-##devtools::install_github("ggloor/ALDEx_bioc")
-library(ALDEx2)
+devtools::load_all("~/Documents/0_git/ALDEx_bioc")
+## library(ALDEx2)
 set.seed(1234)
 ```
 
@@ -122,8 +122,8 @@ create_true_abundances <- function(d, n){
     purrr::map(t) %>%
     do.call(rbind, .) %>%
     as.data.frame() %>%
-    cbind(Condition=factor(rep(c("Pre", "Post"), each=n), levels = c("Pre", "Post")), .) %>%
-    `rownames<-`(., NULL)
+    cbind(Condition=factor(rep(c("Pre", "Post"), each=n), 
+      levels = c("Pre", "Post")), .) %>% `rownames<-`(., NULL)
   return(dat)
 }
 ```
@@ -146,7 +146,9 @@ Now, we will use these functions to simulate data. Note that `dat` is analogous 
 ###Setting the data parameters for the simulation
 ##Denotes the mean for the 20 taxa
 ##Note only taxa 3, 4, 15, and 20 change
-d.pre <- c(4000, 4000, 4000, 4000, 4000, 400,400,400,400,4000,400,500,500,500,400,400,400,400,400,400)
+d.pre <- c(4000, 4000, 4000, 4000, 4000,
+  400,400,400,400,4000,400,500,500,500,
+  400,400,400,400,400,400)
 d.post <- d.pre
 d.post[c(3,4,15,20)] <- c(3000, 2000, 200, 100)
 
@@ -168,7 +170,9 @@ totals <- rowSums(dat[,-1])
 
 flow_cytometry <- function(totals, samp.names, replicates = 3){
   samp.names <- rep(samp.names, each = replicates)
-  flow_vals <- sapply(totals, FUN = function(totals, replicates){rnorm(replicates,totals,3e2)}, replicates = replicates, simplify = TRUE)
+  flow_vals <- sapply(totals, FUN = function(totals,   
+    replicates){rnorm(replicates,totals,3e2)}, 
+    replicates = replicates, simplify = TRUE)
   flow_data <- data.frame("sample" = samp.names, "flow" = c(flow_vals))
   return(flow_data)
 }
@@ -197,7 +201,7 @@ With all these pieces in hand, we are ready to show how scale can be added to `A
 2. A measurement-based scale model
 3. A knowledge-based scale model
 
-Recall that we know which taxa are truly changing: taxa 3, 4, 15, and 20. We can use this to understand the performance of the different methods.
+Recall that we know which taxa are truly changing: taxa 3, 4, 15, and 20 and all decrease post-treatmetn. We can use this to understand the performance of the different methods.
 
 ### Default Scale Model
 
@@ -211,7 +215,7 @@ mod.base %>% filter(we.eBH < 0.05)
 
 Note that all of the taxa are returned as significant. This leads to an elevated false discovery rate (FDR) of 80%!
 
-Next, we are going to recreate these results using the default scale model. To do this, we are going to set $\gamma$ to some arbitrarily small value. This represents a very minimal level of uncertainty in the CLR assumption. To do this, we set `gamma = 1e-3`.
+Next, we are going to recreate these results using the default scale model; this shows that the default scale model behaves as base `ALDEx2` when no appreciable uncertainty is added. To do this, we are going to set $\gamma$ to some arbitrarily small value. This represents a very minimal level of uncertainty in the CLR assumption. To do this, we set `gamma = 1e-3`.
 
 ```{r defaultModel2, message = FALSE}
 ## Recreating ALDEx2
@@ -222,7 +226,8 @@ mod.clr %>% filter(we.eBH < 0.05)
 To show that the effect sizes are identical, we will plot them from each of the two models above. Note how they fall on a straight line. Any small differences are due to Monte Carlo sampling error.
 
 ```{r defaultModel3, message = FALSE}
-plot(mod.base$effect, mod.clr$effect, xlab = "Original ALDEx2 Effect Size", ylab = "Minimal Noise Effect Size")
+plot(mod.base$effect, mod.clr$effect, xlab = "Original ALDEx2 
+  Effect Size", ylab = "Minimal Noise Effect Size")
 abline(a=0,b=1, col = "red", lty = "dashed")
 ```
 
@@ -235,10 +240,10 @@ mod.ss %>% filter(we.eBH < 0.05)
 ```
 
 Remarkably, all false positives are gone! Three of the true positives are still retained.
-Note that as $\gamma \rightarrow \infty$, all taxa will drop out as significant. Basically, if we are unwilling to any statement about the scales, we cannot make any conclusion as to how the absolute abundances are changing between conditions. 
+Note that as $\gamma \rightarrow \infty$, all taxa will drop out as significant. Basically, if we are unwilling to entertain any statement about the scales, we cannot make any conclusion as to how the absolute abundances are changing between conditions. 
 
 ```{r defaultModelNoise2, message = FALSE}
-## Adding noise
+## Adding more noise
 mod.coda <- aldex(Y, conds, gamma = 1)
 mod.coda %>% filter(we.eBH < 0.05)
 ```
@@ -261,7 +266,7 @@ flow_data_collapse <- flow_data %>%
   unique()
 ```
 
-Second, we will simulate draws from the scale model for each sample.
+Second, we will simulate draws from the scale model for each sample. This generates a matrix with the same number of rows as the number of samples, and the same number of columns as the number of Monte-Carlo samples used by the `aldex()` or `aldex.clr()` functions.
 
 ```{r measureModSamps}
 scale_samps <- matrix(NA, nrow = 200, ncol = 128)
@@ -270,24 +275,28 @@ for(i in 1:nrow(scale_samps)){
 }
 ```
 
-Finally, we will feed these into the `aldex` function. 
+Finally, we will feed these into the `aldex()` function. 
 
 ```{r measureModFit, message = FALSE}
 mod.flow <- aldex(Y, conds, gamma = scale_samps)
 mod.flow %>% filter(we.eBH < 0.05)
 ```
 
-Remarkably, there are no false positives whereas all true positives are returned as significant.
+Here, there are no false positives whereas all true positives are returned as significant.
 
 ### Knowledge-Based Scale Model
 
-For our final scale model, suppose that we do not have access to our flow cytometry measurements, but previous literature and researcher intuition lead us to believe that there is a 10% decrease in the scale after antibiotic administration. We can encode this in a scale model:
+For our final scale model, suppose that we do not have access to our flow cytometry measurements, but previous literature and researcher intuition lead us to believe that there is a 10% decrease in the scale after antibiotic administration. We assume that there is also some latent uncertainty and we use the a gamma value that gives the same dispersion as for the relaxed scale model. We can encode this in a full scale model. For this, we can use the `aldex.makeScaleMatrix()` function where we supply a vector of scales and the gamma parameter:
 
 ```{r knowModSamps}
-scale_samps1 <- matrix(rnorm(100*128, mean = 5, sd = 1),ncol = 128)
-scale_samps2 <- matrix(rnorm(100*128, mean = 4.5, sd = 1),ncol = 128)
-
-scale_samps <- rbind(scale_samps1, scale_samps2)
+devtools::load_all('~/Documents/0_git/ALDEx_bioc')
+# make a per-sample vector of scales
+scales <- c(rep(1, 100), rep(0.9, 100))
+scale_samps <- aldex.makeScaleMatrix(.15, scales, conds, log=FALSE)
+# note 10% difference is about 2^.13
+# can exactly replicate the above in log space with: 
+# scales <- c(rep(.13, 100), rep(0, 100))
+# scale_samps <- aldex.makeScaleMatrix(.15,scales, conds, log=TRUE)
 ```
 
 Passing these samples to the `aldex` function: 
@@ -297,13 +306,27 @@ mod.know <- aldex(Y, conds, gamma = scale_samps)
 mod.know %>% filter(we.eBH < 0.05)
 ```
 
-Remarkably, even without the outside measurements, there are no false positives whereas all true positives are returned as significant.
+Here we see that even without the outside measurements but knowledge of the difference in scale, there are no false positives whereas all true positives are returned as significant.
 
 ### Comparing the Models
 
-Now, to summarize the results. The original ALDEx2 model can be replicated by minimal uncertainty in the default scale model. In this simulation, they have an elevated false positive rate due to the lack of uncertainty in their underlying assumptions.
+Now, to summarize the results. The original ALDEx2 model can be replicated by including minimal uncertainty in the default scale model. In this simulation, they have an elevated false positive rate due to the lack of uncertainty in their underlying assumptions.
 
-Adding a small amount of noise, as seen in the Relaxed model, greatly improves inference at the expense of one false negative. Remarkably, both the knowledge-based model that assumed a 10% difference and the flow-based model using outside measurements retain the correct results when compared to the truth.
+The different methods of addressing scale have different effects on the data. In the base ALDEx2 or the CLR adjustment, we see that *all* the data points are off the midline of no difference in the effect plots. This asymmetry is a major issue when dealing with datasets of different scales. In both the flow and the knowledge-based models the asymmetry in location has been corrected, removing the false positives. We see that even with the increased dispersion in the knowledge-based model relative to the flow model that the true positives are still identified as such. 
+
+```{r aldex.plot, echo=FALSE, warning=FALSE}
+par(mfrow=c(2,2))
+aldex.plot(mod.clr, xlim=c(0.1,0.8), ylim=c(-0.5,2), main='Default/CLR')
+abline(h=0, lty=2, col='grey')
+aldex.plot(mod.ss, xlim=c(0.1,0.8), ylim=c(-0.5,2), main='Relaxed')
+abline(h=0, lty=2, col='grey')
+aldex.plot(mod.flow, xlim=c(0.1,0.8), ylim=c(-0.5,2), main='Flow')
+abline(h=0, lty=2, col='grey')
+aldex.plot(mod.know, xlim=c(0.1,0.8), ylim=c(-0.5,2), main='Knowledge')
+abline(h=0, lty=2, col='grey')
+```
+
+Adding a small amount of noise, as seen in the Relaxed model, greatly improves inference at the expense of one false negative. Both the knowledge-based model that assumed a 10% difference and the flow-based model using outside measurements retain the correct results when compared to the ground truth. 
 
 ```{r graph, echo = FALSE, warning = FALSE}
 library(ggplot2)
