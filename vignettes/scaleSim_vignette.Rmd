@@ -95,8 +95,8 @@ Currently, scale simulation within ALDEx2 is implemented in the `ALDEx_bioc` dev
 ```{r installScaleSim, warning = FALSE, message = FALSE}
 ##If needed, install devtools
 ##install.packages("devtools")
-devtools::load_all("~/Documents/0_git/ALDEx_bioc")
-## library(ALDEx2)
+# devtools::load_all("~/Documents/0_git/ALDEx_bioc")
+library(ALDEx2)
 set.seed(1234)
 ```
 
@@ -289,7 +289,6 @@ Here, there are no false positives whereas all true positives are returned as si
 For our final scale model, suppose that we do not have access to our flow cytometry measurements, but previous literature and researcher intuition lead us to believe that there is a 10% decrease in the scale after antibiotic administration. We assume that there is also some latent uncertainty and we use the a gamma value that gives the same dispersion as for the relaxed scale model. We can encode this in a full scale model. For this, we can use the `aldex.makeScaleMatrix()` function where we supply a vector of scales and the gamma parameter:
 
 ```{r knowModSamps}
-devtools::load_all('~/Documents/0_git/ALDEx_bioc')
 # make a per-sample vector of scales
 scales <- c(rep(1, 100), rep(0.9, 100))
 scale_samps <- aldex.makeScaleMatrix(.15, scales, conds, log=FALSE)

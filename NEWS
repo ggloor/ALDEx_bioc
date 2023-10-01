@@ -1,3 +1,13 @@
+CHANGES IN VERSIO 1.33
+
+NEW FEATURES (MPN, GBG)
+
+    o aldex.clr: now takes a gamma parameter to incorporate scale modelling
+
+    o aldex.makeScaleMatrix: new method to make an explicit scale model
+
+    o all p-values calculated are now true posterior predicted p-valuse
+
 CHANGES IN VERSION 1.11.0
 -------------------------
 

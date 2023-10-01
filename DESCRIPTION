@@ -8,7 +8,7 @@ Author: Greg Gloor, Andrew Fernandes, Jean Macklaim, Arianne Albert, Matt Links,
 Maintainer: Greg Gloor <ggloor@uwo.ca>
 biocViews: DifferentialExpression, RNASeq, Transcriptomics, GeneExpression, DNASeq,
     ChIPSeq, Bayesian, Sequencing, Software, Microbiome, Metagenomics,
-    ImmunoOncology
+    ImmunoOncology, Scale simulation, Posterior Predicted P-value
 Description: A differential abundance analysis for the comparison of two or more
     conditions. Useful for analyzing data from standard RNA-seq or meta-RNA-seq assays
     as well as selected and unselected values from in-vitro sequence selections.
@@ -17,9 +17,9 @@ Description: A differential abundance analysis for the comparison of two or more
     variation to calculate the expected false discovery rate, given the variation, based
     on a Wilcoxon Rank Sum test and Welch's t-test (via aldex.ttest), a Kruskal-Wallis test
     (via aldex.kw), a generalized linear model (via aldex.glm), or a correlation test
-    (via aldex.corr). All tests report p-values and Benjamini-Hochberg
-    corrected p-values. ALDEx2 also calculates expected standardized effect sizes for
-    paired or unpaired study designs.
+    (via aldex.corr). All tests report posterior predicted p-values and posterior
+    Benjamini-Hochberg corrected p-values. ALDEx2 also calculates expected standardized
+    effect sizes for paired or unpaired study designs.
 License: GPL (>=3)
 URL: https://github.com/ggloor/ALDEx_bioc
 BugReports: https://github.com/ggloor/ALDEx_bioc/issues

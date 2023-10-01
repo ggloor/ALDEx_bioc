@@ -4,28 +4,33 @@
 \alias{aldex.makeScaleMatrix}
 \title{Generate a differential scale matrix by group}
 \usage{
-aldex.makeScaleMatrix(gamma, diff, conditions, mc.samples = 128)
+aldex.makeScaleMatrix(gamma, mu, conditions, log = TRUE, mc.samples = 128)
 }
 \arguments{
 \item{gamma}{- the base gamma value for the sdlog parameter of rlnorm}
 
-\item{diff}{- the difference in meanlog value, this is usually small}
+\item{mu}{- pair of values, or a vector of values one for each sample}
 
 \item{conditions}{- the conditions vector for the dataset}
+
+\item{log}{- scale ratio in log2 (TRUE) or as simple ratio (FALSE)}
 
 \item{mc.samples}{- the number of Monte-Carlo instances used by aldex()}
 }
 \value{
 returns a matrix of gamma values that are used as an estimate
-of the posterior value of the geometric mean of the Monte-Carlo instances.
-This allows different gamma values to be applied to each group and has the
-result of moving the centre of mass of the data towards the midline of
-no difference. The data always move in the direction of the most 
-entropic group, except for very small values of diff.
+of the scale for the aldex.clr() function.
+This allows different scale and gamma values to be applied to each group
+and can move the centre of mass of the data if required. The example dataset
+has very extreme differences in scale. Most often these are likely in the
+range of 10-15% of the base scale.
 }
 \description{
-Takes as input the conditions vector and returns a matrix of
-scale values of the same dimension as the number of samples
+Takes as input the conditions vector, dispersion paramenter, starting
+scale values and the number of random instances. The ratio between the 
+scale values is key; setting mu = c(1,1.2) will have the same effect on
+the analysis as a value of mu =(c(0.5,0.6). The function returns a matrix 
+of scale values of the same dimension as the number of samples
 and the number of mc.samples used by the aldex() or aldex.clr()
 function.
 }
@@ -35,7 +40,8 @@ function.
 data(selex)
 # subset for efficiency
 conds <- c(rep("NS", 7), rep("S", 7))
-mu.vec <- aldex.makeScaleMatrix(1, 0.2, conds, mc.samples=128)
+mu.in <- c(1,50) # 50-fold difference in scale between groups
+mu.vec <- aldex.makeScaleMatrix(1, mu.in, conds, log=TRUE, mc.samples=128)
 
 }
 \references{
