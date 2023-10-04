@@ -286,13 +286,13 @@ default.scale.model <- function(gamma, conds, p, mc.samples){
     noise[,i] <- stats::rnorm(mc.samples, 0, sqrt(col_var[i]))
   }
   for(i in 1:length(p)){
-    geo_means <- log(apply(p[[i]],2,gm))
+    geo_means <- -1*log(apply(p[[i]],2,gm))
     noise.adj <- sweep(noise, 2, conds_mat[i,], "*")
     noise_mean <- rowSums(noise.adj)
     
     scale_samples[i,] <- geo_means + noise_mean
   }
-  scale_samples <- log2(exp(scale_samples))
+  scale_samples <- exp(scale_samples)
   return(scale_samples)
 }
 

@@ -237,14 +237,9 @@ if (verbose == TRUE) message("dirichlet samples complete")
       message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
       l2p <- list()
       if(length(gamma) == 1){ ##Add uncertainty around the scale samples
-        
         ## grabbing samples from the default scale model
         if(verbose) message("sampling from the default scale model.")
         scale_samples <- default.scale.model(gamma, conds, p, mc.samples)
-        
-        for(i in 1:length(p)){
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
-        }
       } else if(length(gamma) >1 & is.null(dim(gamma))){ ##Vector case/scale sim + senstitivity
         warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
         stop("Please supply either a single value or a matrix.")
@@ -255,11 +250,12 @@ if (verbose == TRUE) message("dirichlet samples complete")
           stop("Scale samples are of incorrect size!")
         }
         if(verbose) message("using user specified scale samples.")
-        for(i in 1:length(p)){
-          l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(gamma[i,]), "+")
-        }
         scale_samples <- gamma
-        
+      }
+      
+      ##Incorporating scale
+      for(i in 1:length(p)){
+        l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(scale_samples[i,]), "+")
       }
       names(l2p) <- names(p)
     }
