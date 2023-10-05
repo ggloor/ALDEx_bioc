@@ -2,7 +2,7 @@
 % Please edit documentation in R/aldex-scaleSim.R
 \name{interpretGamma}
 \alias{interpretGamma}
-\title{Interpret the scale model implied by a certain level of gamma}
+\title{Interpret the scale model implied by a certain level of gamma or scale model}
 \usage{
 interpretGamma(clr)
 }
@@ -10,8 +10,8 @@ interpretGamma(clr)
 \item{clr}{A aldex.clr object}
 }
 \value{
-A table
+A table. For each variable, an estimate of theta^perp that is implied by the scale model is returned. The average and 95% credible interval are returned.
 }
 \description{
-Interpret the scale model implied by a certain level of gamma
+Interpret the scale model implied by a certain level of gamma or scale model
 }

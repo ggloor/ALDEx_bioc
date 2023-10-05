@@ -297,13 +297,14 @@ default.scale.model <- function(gamma, conds, p, mc.samples){
 }
 
 
-#' Interpret the scale model implied by a certain level of gamma
+#' Interpret the scale model implied by a certain level of gamma or scale model
 #' 
 #' @param clr A aldex.clr object
-#' @return A table
+#' @return A table. For each variable, an estimate of theta^perp that is implied by the scale model is returned. The average and 95% credible interval are returned.
 #' 
 #' @export
 interpretGamma <- function(clr){
+  ## This assumes clr@scaleSamps is on the scale of W (not log2).
   ## Checking the scale samples were actual
   if(is.null(clr@scaleSamps)){
     stop("No scale samples passed in aldex.clr object. This function is for interpreting gamma if scale noise is added.")
@@ -311,58 +312,26 @@ interpretGamma <- function(clr){
   
   ## checking conds to see if a t-test or glm type test
   if(is.vector(clr@conds)){
-    scale.comb <- c(clr@scaleSamps)
+    log.scale <- clr@scaleSamps
+    vals <- unique(clr@conds)
+    group1 <- which(clr@conds == vals[1])
+    group2 <- which(clr@conds == vals[2])
+    theta.perp <- apply(log.scale, 2, FUN = function(vec, group1, group2){mean(vec[group1]) - mean(vec[group2])}, group1 = group1, group2 = group2)
     print("2.5th and 97.5th quantile of the scale samples...")
-    return(data.frame("Lower_Bound" = quantile(scale.comb, c(0.025)), "Upper_Bound" = quantile(scale.comb, c(0.975))))
+    return(data.frame("mean" = mean(theta.perp), "p2.5" = quantile(theta.perp, c(0.025)), "p97.5" = quantile(theta.perp, c(0.975)), row.names = NULL))
+  } else if(is.matrix(clr@conds)){
+    ##glm model
+    log.scale <- clr@scaleSamps
+    X <- clr@conds
+    X.matrix <- solve(t(X) %*% X) %*% t(X)
+    theta.perp <- apply(log.scale, 2, FUN = function(vec, X.mat){X.mat %*% vec}, X.mat = X.matrix)
+    
+    ##Extracting statistics
+    avg.est <- rowMeans(theta.perp)
+    lower.est <- apply(theta.perp,1,quantile,probs = 0.025)
+    upper.est <- apply(theta.perp,1,quantile,probs=.975)
+    return(data.frame("Variable" = colnames(X), "mean" = avg.est, "p2.5" = lower.est, "p97.5" = upper.est,row.names = NULL))
   } else{
-    ##glm type
-    ## creating a new clr object without scale
-    p <- length(clr@dirichletData)
-    
-    ## creating a new object to calculate beta^parallel
-    clr.par <- clr
-    
-    ## transforming the dirichlet samples
-    ## adding the clr-transformed dirichlet data as the analysis data
-    for(i in 1:p){
-      clr.par@analysisData[[i]] <- log2(clr@dirichletData[[i]])
-    }
-    
-    ##Fitting with scale
-    conditions <- clr@conds
-    k <- clr@mc.samples
-    scale.r <- list()
-    par.r <- list()
-    perp.r <- list()
-    
-    mc.scale <- clr@analysisData
-    for(i in 1:k){
-      mci_lr <- t(sapply(mc.scale, function(x) x[, i]))
-      scale.r[[i]] <- lr2glm(mci_lr, conditions)
-    }
-    
-    ## 1. Subtract of Beta^\parallel
-    ## 2. This gives Beta^\perp for each sample and variable
-    ## 3. Summarize over entities
-    
-    ##Fitting without scale
-    mc.par <- clr.par@analysisData
-    for(i in 1:k){
-      mci_lr <- t(sapply(mc.par, function(x) x[, i]))
-      par.r[[i]] <- lr2glm(mci_lr, conditions)
-      perp.r[[i]] <- scale.r[[i]] - par.r[[i]] ## For each mc sample, take the difference
-    }
-    
-    ## for each mc sample, find the average beta^perp
-    perp.names <- grepl("Estimate", names(perp.r[[1]]))
-    perp.est <- matrix(nrow=k,ncol=sum(perp.names))
-    for(i in 1:k){
-      perp.est[i,] <- colMeans(perp.r[[i]][,perp.names])
-    }
-    
-    lower.est <- apply(perp.est, 2, FUN = function(vec) quantile(vec, 0.025))
-    upper.est <- apply(perp.est, 2, FUN = function(vec) quantile(vec, 0.975))
-    
-    return(data.frame("Variable" = names(perp.r[[1]][,perp.names]), "Lower_Bound" = lower.est, "Upper_Bound" = upper.est))
-  }  
+    stop("clr@conds not supported.")
+  } 
 }
