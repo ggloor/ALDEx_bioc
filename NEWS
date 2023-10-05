@@ -6,7 +6,7 @@ NEW FEATURES (MPN, GBG)
 
     o aldex.makeScaleMatrix: new method to make an explicit scale model
 
-    o all p-values calculated are now true posterior predicted p-valuse
+    o all p-values calculated are now posterior p-values with consistent sign
 
 CHANGES IN VERSION 1.11.0
 -------------------------
