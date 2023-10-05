@@ -304,7 +304,7 @@ default.scale.model <- function(gamma, conds, p, mc.samples){
 #' 
 #' @export
 interpretGamma <- function(clr){
-  ## This assumes clr@scaleSamps is on the scale of W (not log2).
+  ## This assumes clr@scaleSamps is on the scale of log2 W (not W).
   ## Checking the scale samples were actual
   if(is.null(clr@scaleSamps)){
     stop("No scale samples passed in aldex.clr object. This function is for interpreting gamma if scale noise is added.")
