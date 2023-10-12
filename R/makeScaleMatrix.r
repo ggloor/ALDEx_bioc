@@ -64,4 +64,5 @@ aldex.makeScaleMatrix <- function(gamma, mu, conditions, log=TRUE, mc.samples=12
   # log2(1)=0, log2(1.15)~0.2; log2(4)=2, log2(4.6)~2.2
   
   return(t( sapply(mu.vec, FUN = function(mu) rlnorm(mc.samples, mu, gamma) ))/log(2))
+  #return( 2^(-1 * log2(mat)) )
 }
