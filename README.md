@@ -30,7 +30,7 @@ simulation from GitHub:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("michellepistner/ALDEx_bioc")
+devtools::install_github("ggloor/ALDEx_bioc")
 ```
 
 Getting started with `ALDEx2` is easy. All you need is a matrix (with
@@ -65,4 +65,4 @@ res <- aldex(selex, group, denom = "iqlr")
 #> aldex.effect: calculating effect sizes
 ```
 
-See the vignette for more details.
+See the scaleSim or ALDEx2 vignettes for more details.

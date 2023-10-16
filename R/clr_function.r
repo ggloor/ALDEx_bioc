@@ -260,6 +260,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
         for(i in 1:length(p)){
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
         }
+        scale_samples <- -1*scale_samples #-1 because of the "-" above. This just matters for what is returned.
       } else if(length(gamma) >1 & is.null(dim(gamma))){ ##Vector case/scale sim + senstitivity
         warning("A vector was supplied for scale.samples. To run a sensitivity analysis, use 'aldex.senAnalysis()'.")
         stop("Please supply either a single value or a matrix.")
@@ -274,7 +275,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
         ## positive here because W = W(||) + W(perp)
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(gamma[i,]), "+")
         }
-        scale_samples <- gamma
+        scale_samples <- log2(gamma)
         
       }
       names(l2p) <- names(p)

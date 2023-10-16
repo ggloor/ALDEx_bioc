@@ -6,7 +6,7 @@
 \title{getScaleSamples}
 
 \description{
-  Returns the scale samples if scale simulation is used, for
+  Returns the log2 scale samples if scale simulation is used, for
   \code{aldex.clr} object.
 }
 
@@ -20,11 +20,11 @@
 }
 
 \details{
-  Returns NULL if scale simulation was not used or a matrix of scale samples if scale simuation was used.
+  Returns NULL if scale simulation was not used or a matrix of log2 scale samples if scale simuation was used.
 }
 
 \value{
-  A matrix representing the scale samples if scale simulation was used.
+  A matrix representing the log2 scale samples if scale simulation was used.
 }
 
 \seealso{
