@@ -1,0 +1,14 @@
+Bioconductor instructions
+
+all changes should be pushed from the devel branch
+
+## pull latest version from Bioconductor
+# this will give the latest devel version, which is the latest 
+# release also if labelled with a .0 
+
+# prior to doing this move all uncommitted stuff to /devel
+fetch upstream
+git merge upstream/master
+
+# then build and check
+
