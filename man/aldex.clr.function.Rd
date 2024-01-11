@@ -19,7 +19,8 @@ aldex.clr.function(
   verbose = FALSE,
   useMC = FALSE,
   summarizedExperiment = NULL,
-  gamma = NULL
+  gamma = NULL,
+  entropy = FALSE
 )
 }
 \arguments{
@@ -70,6 +71,8 @@ will be used assuming that matrix denotes the scale samples. If a numeric is
 supplied, scale simulation will be applied by relaxing the geometric mean
 assumption with the numeric representing the standard deviation of the
 scale distribution.}
+
+\item{entropy=FALSE}{use differential entropy}
 }
 \value{
 The object produced by the \code{clr} function contains the log-ratio transformed

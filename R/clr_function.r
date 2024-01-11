@@ -42,6 +42,7 @@
 #' supplied, scale simulation will be applied by relaxing the geometric mean
 #' assumption with the numeric representing the standard deviation of the
 #' scale distribution.
+#' @param entropy=FALSE use differential entropy
 #' @param summarizedExperiment must be set to TRUE if input data are in this format.
 #'
 #' @return The object produced by the \code{clr} function contains the log-ratio transformed
@@ -69,7 +70,8 @@
 #'    x <- aldex.clr(selex, conds, mc.samples=4, gamma=NULL, verbose=FALSE)
 #' @export
 aldex.clr.function <- function( reads, conds, mc.samples=128, denom="all", 
-    verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, gamma = NULL) {
+    verbose=FALSE, useMC=FALSE, summarizedExperiment=NULL, gamma = NULL,
+    entropy=FALSE) {
 #  invocation:
 #  use selex dataset from ALDEx2 library
 #  x <- aldex.clr( reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE )
@@ -259,6 +261,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
         ## negative here because calculating CLR
         for(i in 1:length(p)){
           l2p[[i]] <- sweep(log2(p[[i]]), 2,  scale_samples[i,], "-")
+          
         }
         scale_samples <- -1*scale_samples #-1 because of the "-" above. This just matters for what is returned.
       } else if(length(gamma) >1 & is.null(dim(gamma))){ ##Vector case/scale sim + senstitivity
@@ -317,7 +320,7 @@ if (verbose == TRUE) message("dirichlet samples complete")
           if (denom[1] != "median"){
             l2p <- bplapply( p, function(m) {
               apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
-            })
+             })
           } else if (denom[1] == "median"){
             l2p <- bplapply( p, function(m) {
               apply( log2(m), 2, function(col) { col - median(col[feature.subset]) } )
@@ -328,7 +331,11 @@ if (verbose == TRUE) message("dirichlet samples complete")
         else{
           if (denom[1] != "median"){
             l2p <- lapply( p, function(m) {
-              apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
+              if(entropy == FALSE) {
+                apply( log2(m), 2, function(col) { col - mean(col[feature.subset]) } )
+              } else if (entropy == TRUE) {
+                apply( m, 2, function(col) { log2(col) - sum(-1*col*log2(col)) } )
+              } 
             })
           } else if (denom[1] == "median"){
             l2p <- lapply( p, function(m) {
@@ -387,8 +394,8 @@ setMethod("getConditions", signature(.object="aldex.clr"), function(.object) .ob
 
 setMethod("getScaleSamples", signature(.object="aldex.clr"), function(.object) .object@scaleSamps)
 
-setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma))
+setMethod("aldex.clr", signature(reads="data.frame"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma, entropy) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma, entropy))
 
-setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma))
+setMethod("aldex.clr", signature(reads="matrix"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma, entropy) aldex.clr.function(as.data.frame(reads), conds, mc.samples, denom, verbose, useMC, summarizedExperiment=FALSE, gamma, entropy))
 
-setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE, gamma))
+setMethod("aldex.clr", signature(reads="RangedSummarizedExperiment"), function(reads, conds, mc.samples=128, denom="all", verbose=FALSE, useMC=FALSE, gamma, entropy) aldex.clr.function(reads, conds, mc.samples, denom, verbose, useMC, summarizedExperiment=TRUE, gamma, entropy))
