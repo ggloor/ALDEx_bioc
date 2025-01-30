@@ -233,6 +233,8 @@ plotGamma <- function(sen_results, test = "t", thresh = 0.05, taxa_to_label = 10
   return(list(p1,p2))
 }
 
+# this is the non-log geometric mean
+# base is unimportant here then
 gm <- function(x, na.rm = TRUE){
   exp(mean(log(x[x > 0]), na.rm=na.rm))
 }
