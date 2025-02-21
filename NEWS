@@ -1,4 +1,9 @@
-CHANGES IN VERSIO 1.33
+CHANGES IN VERSION 1.39
+
+    o fixed bug in aldex.makeScaleMatrix
+    o added ability to take a function as input to generate scale matrix
+    
+CHANGES IN VERSION 1.33
 
 NEW FEATURES (MPN, GBG)
 

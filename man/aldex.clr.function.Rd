@@ -69,7 +69,9 @@ because of overhead in setting up the parallel processes.}
 will be used assuming that matrix denotes the scale samples. If a numeric is
 supplied, scale simulation will be applied by relaxing the geometric mean
 assumption with the numeric representing the standard deviation of the
-scale distribution.}
+scale distribution. If a function is called, the function will be used to generate
+the scale model. The function must not contain any parameters. The functionality to 
+pass a function is designed to be used for developers and advanced users.}
 }
 \value{
 The object produced by the \code{clr} function contains the log-ratio transformed

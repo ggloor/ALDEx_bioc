@@ -41,7 +41,9 @@
 #' will be used assuming that matrix denotes the scale samples. If a numeric is
 #' supplied, scale simulation will be applied by relaxing the geometric mean
 #' assumption with the numeric representing the standard deviation of the
-#' scale distribution.
+#' scale distribution. If a function is called, the function will be used to generate
+#' the scale model. The function must not contain any parameters. The functionality to 
+#' pass a function is designed to be used for developers and advanced users.
 #' @param summarizedExperiment must be set to TRUE if input data are in this format.
 #'
 #' @return The object produced by the \code{clr} function contains the log-ratio transformed
@@ -251,7 +253,30 @@ if (verbose == TRUE) message("dirichlet samples complete")
     if(!is.null(gamma)){
       message("aldex.scaleSim: adjusting samples to reflect scale uncertainty.")
       l2p <- list()
-      if(length(gamma) == 1){ ##Add uncertainty around the scale samples
+      # tests for passage of a function
+      # gamma is the passed function
+      if(typeof(gamma) == "closure"){
+      	if(!is.null(formals(gamma))){
+      	  stop("only a function without parameters is permitted")
+      	}
+      	 # p is a list of N samples
+      	 # each sample contains a D by S matrix of parts by Dirichlet MC instances
+           N <- length(p)
+           D <- nrow(p[[1]])
+           S <- ncol(p[[1]])
+           #print(p[1][,1]) # pull out Dir MC instance 1 from sample 1
+           #print(gamma)
+         fun.gamma <- gamma()
+
+     	 if(verbose) message("using function specified scale samples.")
+         for(i in 1:length(p)){
+         ## positive here because W = W(||) + W(perp)
+           l2p[[i]] <- sweep(log2(p[[i]]), 2,  log2(fun.gamma[i,]), "+")
+         }
+         scale_samples <- log2(fun.gamma)
+         #stop("custom gamma")
+      }
+      else if(length(gamma) == 1 & is.double(gamma)){ ##Add uncertainty around the scale samples
         
         ## grabbing samples from the default scale model
         if(verbose) message("sampling from the default scale model.")

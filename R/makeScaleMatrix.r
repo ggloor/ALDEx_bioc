@@ -14,12 +14,13 @@
 #' @param log - scale ratio in log2 (TRUE) or as simple ratio (FALSE)
 #' @param mc.samples - the number of Monte-Carlo instances used by aldex()
 #' 
-#' @return returns a matrix of gamma values that are used as an estimate
-#' of the scale for the aldex.clr() function.
+#' In the output of the aldex.clr() function, @scaleSamps returns the matrix 
+#' of gamma values that are used as an estimate of the scale.
 #' This allows different scale and gamma values to be applied to each group
 #' and can move the centre of mass of the data if required. The example dataset
 #' has very extreme differences in scale. Most often these are likely in the
-#' range of 10-15% of the base scale.
+#' range of 10-15% of the base scale. Taking the rowMeans() of this slot
+#' gives the mean of these estimates.
 #'
 #' @references Please use the citation given by \code{citation(package="ALDEx")}.
 #' 
@@ -33,8 +34,13 @@
 #' data(selex)
 #' # subset for efficiency
 #' conds <- c(rep("NS", 7), rep("S", 7))
+#' # this is the simple ratio
 #' mu.in <- c(1,256) # 256-fold difference in scale between groups
 #' mu.vec <- aldex.makeScaleMatrix(0.5, mu.in, conds, log=FALSE, mc.samples=128)
+#' 
+#' # this is the log ratio
+#' mu.in <- c(0,8) # 256-fold difference in scale between groups
+#' mu.vec <- aldex.makeScaleMatrix(0.5, mu.in, conds, log=TRUE, mc.samples=128)
 #' 
 #' @export
 aldex.makeScaleMatrix <- function(gamma, mu, conditions, log=TRUE, mc.samples=128){

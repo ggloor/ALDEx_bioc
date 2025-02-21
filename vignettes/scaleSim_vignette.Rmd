@@ -35,7 +35,7 @@ The average test statistic and p-value^[Corrected p-values using either the Benj
 
 Step 3 of `ALDEx2` relies on transforming the Dirichlet samples, which necessarily sum to one, to CLR coordinates. As noted by @nixon:2022, the CLR can introduce a mismatch between the research question and the actual analysis that is carried out. To see this concretely, consider the case where we have access to a sequence count data set $Y$, which is a $D \times N$ matrix where $D$ is the number of entities and $N$ is the number of samples. $Y$ is a sample of some underlying system $W$. For example, in a study of the human gut, $Y$ denotes the sequenced microbes obtained from a fecal sample whereas $W$ represents the actual microbes that occupy the gut.
 
-The scale of $Y$ does not match the scale of $W$ but rather is more reflective of the measurement process (@Props:2017, @Vandeputte:2017). This is problematic when the research question depends on the scale of $W$ but is inferred from $Y$ alone. For example, consider the case where the analyst wants to estimate log-fold changes between two conditions:
+The scale of $Y$ does not match the scale of $W$ but rather is more reflective of the measurement process (@Props:2017, @Vandeputte:2017). This is problematic when the research question depends on the scale of $W$ but is inferred from $Y$ alone. For example, consider the case where the analyst wants to estimate log-fold changes (diff.btw output by aldex.effect) between two conditions:
 
 $$\theta_d = \text{mean}_{x_i\text{ in group 1}} \log W_{di} - \text{mean}_{x_i \text{ in group 2}} \log W_{di}.$$
 However, when using CLR coordinates, something different is estimated:
@@ -52,7 +52,7 @@ Introduced and developed in @nixon:2022, scale simulation argues that many diffe
 
 To circumvent this, @nixon:2022 develops *scale simulation random variables* (SSRVs) which, in essence, provides the framework to directly incorporate scale uncertainty in the modeling process and, in doing so, can greatly improve inference (i.e., control Type-I error). In addition, they developed the methodology to incorporate scale simulation within the context of ALDEx2.
 
-In brief, SSRVs replace normalizations with draws from a scale model. To see this concretely, lets consider the case of log fold changes. That is, we want to estimate $\theta_d$ from the previous section. As discussed, this quantity depends on the scale of the system $W$. We can decompose $W$ into both a compositional (denoted by the superscript $\parallel$) and total (denoted by the superscript $\perp$) component:
+In brief, SSRVs replace normalizations with draws from a scale model. To see this concretely, lets consider the case of log fold changes which is reported as the diff.btw when aldex.effect is run. That is, we want to estimate $\theta_d$ from the previous section. As discussed, this quantity depends on the scale of the system $W$. We can decompose $W$ into both a compositional (denoted by the superscript $\parallel$) and total (denoted by the superscript $\perp$) component:
 
 $$W_{dn} = W_{dn}^{\parallel}W^{\perp}_{n}$$
 

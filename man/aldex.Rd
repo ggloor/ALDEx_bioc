@@ -66,7 +66,7 @@ using the set of per-group non-zero features.}
 this will use the results from an initial "t" routine to seed the reference
 (i.e., denominator of Geometric Mean calculation) for a second "t" routine.}
 
-\item{gamma}{A numeric. The standard deviation on the within sample variation.}
+\item{gamma}{A numeric, matrix or function. See \code{aldex.clr} for more information.}
 
 \item{...}{Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).}
 }

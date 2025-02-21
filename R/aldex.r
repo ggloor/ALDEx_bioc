@@ -47,7 +47,7 @@
 #' @param verbose A boolean. Toggles whether to print diagnostic information while
 #'  running. Useful for debugging errors on large datasets. Applies to
 #'  \code{effect = TRUE}.
-#' @param gamma A numeric. The standard deviation on the within sample variation.
+#' @param gamma A numeric, matrix or function. See \code{aldex.clr} for more information.
 #' @param ... Arguments to embedded method (e.g., \code{glm} or \code{cor.test}).
 #'
 #' @return Returns a number of values that depends on the set of options.
