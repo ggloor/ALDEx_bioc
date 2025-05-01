@@ -13,7 +13,8 @@
 #' @param test the method of calculating significance, one of:
 #' \code{welch} = welch's t test - here a posterior predictive p-value;
 #' \code{wilcox} = wilcox rank test;
-#' \code{effect} = effect size
+#' \code{effect} = effect size;
+#' \code{both} = welch's t test p value and effect size cutoff. 
 #' @param cutoff.pval the Benjamini-Hochberg fdr cutoff, default 0.05
 #' @param cutoff.effect the effect size cutoff for plotting, default 1
 #' @param xlab the x-label for the plot, as per the parent \code{plot} function
@@ -47,11 +48,12 @@
 aldex.plot<-function (x, ..., type = c("MW", "MA", "volcano", "volcano.var"), xlab = NULL, ylab = NULL,
     xlim = NULL, ylim = NULL, all.col = rgb(0, 0, 0, 0.2), all.pch = 19,
     all.cex = 0.4, called.col = "red", called.pch = 20, called.cex = 0.6,
-    thres.line.col = "darkgrey", thres.lwd = 1.5, test = "welch",
+    thres.line.col = "darkgrey", thres.lwd = 1.5, test = c("welch", "wilcox", "effect", "both"),
     cutoff.pval = 0.05, cutoff.effect = 1, rare.col = "black", rare = 0, rare.pch = 20,
     rare.cex = 0.2, main=NULL)
 {
     type <- match.arg(type)
+    test <- match.arg(test)
     if (length(x$effect) == 0)
         stop("Please run aldex.effect before plotting")
     if (test == "welch") {

@@ -13,7 +13,7 @@
 #' http://dx.doi.org/10.1080/10618600.2015.1131161; \code{volcano} is a volcano plot
 #' http://dx.doi.org/10.1186/gb-2003-4-4-210
 #' @param contrast the column name of the model matrix contrast to plot
-#' @param test the method of calculating significance, one of "pval" or "fdr"
+#' @param test the method of calculating significance, one of "pval" or "fdr" or "effect".
 #' @param cutoff.pval the fdr cutoff, default 0.05
 #' @param cutoff.effect the effect size cutoff for plotting, default 1
 #' @param xlab the x-label for the plot, as per the parent \code{plot} function
@@ -44,7 +44,7 @@
 #'
 #' @examples # See the examples for 'aldex.glm'
 #' @export
-aldex.glm.plot<-function (x, ..., eff = NULL, contrast=NULL, test = 'fdr', 
+aldex.glm.plot<-function (x, ..., eff = NULL, contrast=NULL, test = c('fdr', 'pval', 'effect'), 
 	type = c("MW", "MA", "volcano"), xlab = NULL, ylab = NULL,
     xlim = NULL, ylim = NULL, all.col = rgb(0, 0, 0, 0.2), all.pch = 19,
     all.cex = 0.4, called.col = "red", called.pch = 20, called.cex = 0.6,
@@ -52,6 +52,7 @@ aldex.glm.plot<-function (x, ..., eff = NULL, contrast=NULL, test = 'fdr',
     cutoff.effect = 1, rare.col = "black", rare = 0, rare.pch = 20,rare.cex = 0.2)
 {
     type <- match.arg(type)
+    test <- match.arg(test)
     if (length(eff) == 0){
         stop("Please run aldex.glm.effect before plotting")
     }
