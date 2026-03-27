@@ -68,7 +68,7 @@ aldex.makeScaleMatrix <- function(gamma, mu, conditions, log=TRUE, mc.samples=12
   # note: it is the log2 difference between mu1 and mu2 that is key here
   # eg; mu1=1, mu2=1.15 is equivalent to mu1=4, mu2=4.6
   # log2(1)=0, log2(1.15)~0.2; log2(4)=2, log2(4.6)~2.2
-  scale <- 2^log(t( sapply(mu.vec, FUN = function(mu) rlnorm(mc.samples, mu, gamma) )))
+  scale <- 2^log(t( sapply(mu.vec, FUN = function(mu) rnorm(mc.samples, mu, gamma) )))
   return(scale)
   #return( 2^(-1 * log2(mat)) )
 }
