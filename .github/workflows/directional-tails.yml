@@ -1,0 +1,16 @@
+name: Directional tail regression checks
+on:
+  push:
+    branches: ['fix/inclusive-directional-tails']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tails:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install independent statistical test dependencies
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y r-base r-bioc-multtest r-cran-testthat
+      - name: Check both tails, ties, paired tests and normal approximation
+        run: Rscript -e 'source("R/stats.fast.R"); testthat::test_file("tests/testthat/test-directional-tails.R", stop_on_failure=TRUE); sessionInfo()'
