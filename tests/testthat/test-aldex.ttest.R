@@ -1,6 +1,6 @@
 library(ALDEx2)
 
-# Old aldex.ttest function used to test new function
+# Independent stats::t.test and stats::wilcox.test oracle for both tails
 aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE) {
   
   # get dimensions, names, etc from the input data
@@ -33,6 +33,9 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
   wi.p.matrix =  matrix(data=NA, nrow = feature.number, ncol = mc.instances)
 
   
+  wi.p.less.matrix <- wi.p.matrix
+  we.p.less.matrix <- we.p.matrix
+
   #mc.i is the monte carlo instance
   for(mc.i in 1:mc.instances){
     
@@ -40,14 +43,16 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
     t.input <- sapply(getMonteCarloInstances(clr), function(y){y[,mc.i]})
     
     # do the Wilcoxon tests on each feature
-    wi.p.matrix[,mc.i] <- t(apply(t.input, 1, function(t.input){as.numeric(wilcox.test(x=t.input[setA],y=t.input[setB], alternative = "greater")[3])}))
+    wi.p.matrix[,mc.i] <- t(apply(t.input, 1, function(t.input){as.numeric(wilcox.test(x=t.input[setA],y=t.input[setB], paired=paired.test, correct=FALSE, alternative = "greater")[3])}))
+    wi.p.less.matrix[,mc.i] <- apply(t.input, 1, function(x) wilcox.test(x[setA], x[setB], paired=paired.test, correct=FALSE, alternative="less")$p.value)
     wi.BH.matrix.greater[,mc.i] <- as.numeric(p.adjust(2*wi.p.matrix[,mc.i], method="BH"))
-    wi.BH.matrix.less[,mc.i] <- as.numeric(p.adjust(2*(1-wi.p.matrix[,mc.i]), method="BH"))
+    wi.BH.matrix.less[,mc.i] <- as.numeric(p.adjust(2*wi.p.less.matrix[,mc.i], method="BH"))
     
     # do the welch's test on each feature
     we.p.matrix[,mc.i] <- t(apply(t.input, 1, function(t.input){as.numeric(t.test(x=t.input[setA],y=t.input[setB], paired=paired.test, alternative = "greater")[3])}))
+    we.p.less.matrix[,mc.i] <- apply(t.input, 1, function(x) t.test(x[setA], x[setB], paired=paired.test, alternative="less")$p.value)
     we.BH.matrix.greater[,mc.i] <- as.numeric(p.adjust(2*we.p.matrix[,mc.i], method="BH"))
-    we.BH.matrix.less[,mc.i] <- as.numeric(p.adjust(2*(1-we.p.matrix[,mc.i]), method="BH"))
+    we.BH.matrix.less[,mc.i] <- as.numeric(p.adjust(2*we.p.less.matrix[,mc.i], method="BH"))
   }
   if (hist.plot == TRUE) {
     par(mfrow=c(2,2))
@@ -60,9 +65,9 @@ aldex.ttest.old <- function(clr, conditions, paired.test=FALSE, hist.plot=FALSE)
   #get the Expected values of p, q and lfdr
   
   we.p.matrix.greater <- 2*we.p.matrix
-  we.p.matrix.less <- 2*(1-we.p.matrix)
+  we.p.matrix.less <- 2*we.p.less.matrix
   wi.p.matrix.greater <- 2*wi.p.matrix
-  wi.p.matrix.less <- 2*(1-wi.p.matrix)
+  wi.p.matrix.less <- 2*wi.p.less.matrix
   
   we.ep.greater <- rowMeans(apply(we.p.matrix.greater, c(1,2), FUN = function(x) min(1,x)))
   we.ep.less <- rowMeans(apply(we.p.matrix.less, c(1,2), FUN = function(x) min(1,x)))
@@ -92,7 +97,7 @@ data(selex)
 group <- c(rep("A", 7), rep("B", 7))
 clr <- ALDEx2::aldex.clr(selex[1:100,], group, mc.samples = 128)
 
-test_that("new faster alex.ttest matches old function", {
+test_that("fast aldex.ttest matches independent directional tests", {
   
   expect_equal(
     aldex.ttest.old(clr, group),
@@ -110,7 +115,7 @@ for(i in 1:6){
 group <- c(rep("A", 10), rep("B", 10))
 clr <- ALDEx2::aldex.clr(dat[1:100,], group, mc.samples = 128)
 
-test_that("new faster alex.ttest matches old function", {
+test_that("fast aldex.ttest matches independent directional tests", {
   
   expect_equal(
     aldex.ttest.old(clr, group),

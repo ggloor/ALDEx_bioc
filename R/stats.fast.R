@@ -20,25 +20,29 @@ t.fast <- function(data, group, paired){
     t <- multtest::mt.teststat(data[, paired.order], as.numeric(grp1)[paired.order],
                                  test = "pairt", nonpara = "n")
     df <- length(i.1) - 1
-    return(list(p = pt(t, df = df, lower.tail = FALSE), t= t))
+    return(list(p = pt(t, df = df, lower.tail = FALSE),
+                p.less = pt(t, df = df), t = t))
     
   } else{
     t <- multtest::mt.teststat(data, as.numeric(grp1), test = "t", nonpara = "n")
-    s1 <- apply(data[, grp1], 1, sd)
-    s2 <- apply(data[, grp2], 1, sd)
+    s1 <- apply(data[, grp1, drop = FALSE], 1, sd)
+    s2 <- apply(data[, grp2, drop = FALSE], 1, sd)
     df <- ( (s1^2/n1 + s2^2/n2)^2 )/( (s1^2/n1)^2/(n1-1) + (s2^2/n2)^2/(n2-1) )
-    return(list(p = pt(t, df = df, lower.tail = FALSE), t= t))
+    return(list(p = pt(t, df = df, lower.tail = FALSE),
+                p.less = pt(t, df = df), t = t))
   } 
 }
 
 # wilcox.fast function replaces wilcox.test
 #  * runs much faster
-#  * uses exact distribution for ties!
-#    * this differs from ?wilcox.test
+#  * exact tails include the observed statistic
+#  * ties use wilcox.test with its tie-adjusted normal approximation
 #  * optional paired test
 #    * equivalent to wilcox.test(..., correct = FALSE)
 #  * uses multtest
-wilcox.fast <- function(data, group, paired){
+wilcox.fast <- function(data, group, paired, alternative = c("greater", "less")){
+  alternative <- match.arg(alternative)
+  upper <- alternative == "greater"
   
   if(ncol(data) != length(group)) stop("Use rows for feature data.")
   grp1 <- group == unique(group)[1]
@@ -49,8 +53,10 @@ wilcox.fast <- function(data, group, paired){
   # Check for ties in i-th Monte-Carlo instance
   data.t <- t(data)
   if(paired){
-    anyTies <- any(apply(data.t[grp1, ] - data.t[grp2, ], 2,
-                         function(x) length(unique(x))) != ncol(data) / 2)
+    if(n1 != n2) stop("Cannot pair uneven groups.")
+    differences <- data.t[grp1, , drop = FALSE] - data.t[grp2, , drop = FALSE]
+    anyTies <- any(differences == 0) ||
+      any(apply(abs(differences), 2, function(x) length(unique(x))) != n1)
   }else{
     anyTies <- any(apply(data.t, 2,
                          function(x) length(unique(x))) != ncol(data))
@@ -59,22 +65,22 @@ wilcox.fast <- function(data, group, paired){
   # Ties trigger slower, safer wilcox.test function
   if(anyTies){
     return(apply(data.t, 2, function(i){
-      wilcox.test(x = i[grp1], y = i[grp2], paired = paired, correct = FALSE, alternative = "greater")$p.value}))
+      wilcox.test(x = i[grp1], y = i[grp2], paired = paired, correct = FALSE, alternative = alternative)$p.value}))
   }
   
   if(paired){
     
     if(n1 != n2) stop("Cannot pair uneven groups.")
-    data.diff <- data.t[grp1, ] - data.t[grp2, ]
+    data.diff <- data.t[grp1, , drop = FALSE] - data.t[grp2, , drop = FALSE]
     V <- apply(data.diff, 2, function(x) sum(rank(abs(x))[x > 0]))
     topscore <- (n1 * (n1+1)) / 2
     #V.lower <- ifelse(V > topscore / 2, topscore - V, V)
     if(sum(grp1) < 50){ # as per wilcox test, use exact -- ASSUMES NO TIES!!
-      V.p <- psignrank(V-1, n1, lower.tail = FALSE)
+      V.p <- psignrank(if (upper) V-1 else V, n1, lower.tail = !upper)
       return(V.p) # psignrank returns non-zero for W = mean
     }else{ # Use normal approximation
       V.std <- (V - topscore/2) / sqrt(n1*(n1 + 1) * (2*n1 + 1) / 24) # wilcox.test uses denom = 24
-      return(pnorm(V.std, lower.tail = FALSE))
+      return(pnorm(V.std, lower.tail = !upper))
     }
     
     
@@ -84,10 +90,10 @@ wilcox.fast <- function(data, group, paired){
     if(sum(grp1) < 50 && sum(grp2) < 50){ # as per wilcox test, use exact -- ASSUMES NO TIES!!
       W.var <- sqrt((n1*n2) * (n1+n2+1) / 12)
       W <- W.std * W.var + (n1*n2) / 2
-      W.p <- pwilcox(W-1, n1, n2, lower.tail = FALSE)
+      W.p <- pwilcox(if (upper) W-1 else W, n1, n2, lower.tail = !upper)
       return(W.p) # pwilcox returns non-zero for W = mean
     }else{ # Use normal approximation
-      return(pnorm(W.std, lower.tail = FALSE))
+      return(pnorm(W.std, lower.tail = !upper))
     }
   }
 }

@@ -76,6 +76,8 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
   
   # set up the t-test result containers
   wi.p.matrix <- as.data.frame(matrix(1, nrow = feature.number, ncol = mc.instances))
+  wi.p.less.matrix <- wi.p.matrix
+  we.p.less.matrix <- wi.p.matrix
   wi.BH.matrix.greater <- wi.p.matrix # duplicate result container
   wi.BH.matrix.less <- wi.p.matrix # duplicate result container
   we.p.matrix <- wi.p.matrix # duplicate result container
@@ -93,13 +95,16 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
     t.input <- sapply(mc.all, function(y){y[, mc.i]})
       
     wi.p.matrix[, mc.i] <- wilcox.fast(t.input, setAsBinary, paired.test)
+    wi.p.less.matrix[, mc.i] <- wilcox.fast(t.input, setAsBinary, paired.test, "less")
     wi.BH.matrix.greater[, mc.i] <- p.adjust(2*wi.p.matrix[, mc.i], method = "BH")
-    wi.BH.matrix.less[, mc.i] <- p.adjust(2*(1-wi.p.matrix[, mc.i]), method = "BH")
+    wi.BH.matrix.less[, mc.i] <- p.adjust(2*wi.p.less.matrix[, mc.i], method = "BH")
     
       
-    we.p.matrix[, mc.i] <- t.fast(t.input, setAsBinary, paired.test)$p
+    welch <- t.fast(t.input, setAsBinary, paired.test)
+    we.p.matrix[, mc.i] <- welch$p
+    we.p.less.matrix[, mc.i] <- welch$p.less
     we.BH.matrix.greater[, mc.i] <- p.adjust(2*we.p.matrix[, mc.i], method = "BH")
-    we.BH.matrix.less[, mc.i] <- p.adjust(2*(1-we.p.matrix[, mc.i]), method = "BH")
+    we.BH.matrix.less[, mc.i] <- p.adjust(2*we.p.less.matrix[, mc.i], method = "BH")
     
   }
     
@@ -112,9 +117,9 @@ aldex.ttest <- function(clr, paired.test=FALSE, hist.plot=FALSE, verbose=FALSE) 
   }
   ##Making this into a two sided test
   we.p.matrix.greater <- 2*we.p.matrix
-  we.p.matrix.less <- 2*(1-we.p.matrix)
+  we.p.matrix.less <- 2*we.p.less.matrix
   wi.p.matrix.greater <- 2*wi.p.matrix
-  wi.p.matrix.less <- 2*(1-wi.p.matrix)
+  wi.p.matrix.less <- 2*wi.p.less.matrix
   
   ##making sure the max p-value is 1
   we.p.matrix.greater <- apply(we.p.matrix.greater, c(1,2), FUN = function(x){min(x,1)})
